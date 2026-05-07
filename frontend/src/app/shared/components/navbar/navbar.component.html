@@ -1,0 +1,45 @@
+<nav class="navbar">
+  <div class="navbar-inner container">
+    <a class="navbar-brand" routerLink="/home">
+      <span class="brand-icon">♫</span>
+      <span class="brand-name">REakMusic</span>
+    </a>
+
+    <div class="navbar-links" [class.open]="menuOpen">
+      <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        {{ 'nav.home' | translate }}
+      </a>
+      <a routerLink="/home/songs" routerLinkActive="active">
+        {{ 'nav.browse' | translate }}
+      </a>
+
+      <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
+        <a routerLink="/cart" routerLinkActive="active">
+          {{ 'nav.cart' | translate }}
+          <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+        </a>
+        <a routerLink="/dashboard/profile" routerLinkActive="active">
+          {{ 'nav.dashboard' | translate }}
+        </a>
+        <a *ngIf="user.role === 'admin'" routerLink="/admin" routerLinkActive="active">
+          {{ 'nav.admin' | translate }}
+        </a>
+        <button class="btn btn-ghost" (click)="logout()">{{ 'nav.logout' | translate }}</button>
+      </ng-container>
+
+      <ng-template #guestLinks>
+        <a routerLink="/auth/login" routerLinkActive="active">{{ 'nav.login' | translate }}</a>
+        <a class="btn btn-primary" routerLink="/auth/register">{{ 'nav.register' | translate }}</a>
+      </ng-template>
+
+      <div class="lang-switcher">
+        <button [class.active]="currentLang === 'en'" (click)="switchLang('en')">EN</button>
+        <button [class.active]="currentLang === 'km'" (click)="switchLang('km')">ខ្មែរ</button>
+      </div>
+    </div>
+
+    <button class="hamburger" (click)="toggleMenu()" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>

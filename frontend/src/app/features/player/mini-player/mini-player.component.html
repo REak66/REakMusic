@@ -1,0 +1,7 @@
+<div class="mini-player" *ngIf="currentSong$ | async as song">
+  <span class="song-name">{{ song.title }}</span>
+  <button (click)="playerService.togglePlay()">
+    <span *ngIf="isPlaying$ | async">⏸</span>
+    <span *ngIf="!(isPlaying$ | async)">▶</span>
+  </button>
+</div>

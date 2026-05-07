@@ -1,0 +1,23 @@
+<div class="library-page main-content">
+  <div class="container">
+    <h1 class="page-title">{{ 'dashboard.library' | translate }}</h1>
+    <div class="loading-spinner" *ngIf="loading"></div>
+    <p class="empty-msg" *ngIf="!loading && songs.length === 0">
+      You haven't purchased any songs yet. <a routerLink="/home/songs">Browse songs</a>
+    </p>
+    <div class="library-grid" *ngIf="!loading && songs.length > 0">
+      <div class="library-item card" *ngFor="let song of songs">
+        <div class="lib-thumb">
+          <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
+        </div>
+        <div class="lib-info">
+          <span class="lib-title">{{ song.title }}</span>
+          <span class="lib-artist" *ngIf="$any(song.artistId)?.name">{{ $any(song.artistId).name }}</span>
+        </div>
+        <button class="btn btn-primary lib-download" (click)="download(song._id)">
+          ↓ {{ 'dashboard.downloadSong' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

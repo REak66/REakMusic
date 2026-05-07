@@ -1,0 +1,67 @@
+<div class="admin-page main-content">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">{{ 'admin.artists' | translate }}</h1>
+      <button class="btn btn-primary" (click)="openAdd()">+ {{ 'common.add' | translate }}</button>
+    </div>
+
+    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Country</th>
+            <th>Bio</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let artist of artists">
+            <td>{{ artist.name }}</td>
+            <td>{{ artist.country || '-' }}</td>
+            <td class="bio-cell">{{ artist.bio || '-' }}</td>
+            <td class="actions">
+              <button class="btn btn-ghost" (click)="openEdit(artist)">{{ 'common.edit' | translate }}</button>
+              <button class="btn btn-danger" (click)="delete(artist._id)">{{ 'common.delete' | translate }}</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="artists.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal card" (click)="$event.stopPropagation()">
+    <h2>{{ editingArtist ? ('common.edit' | translate) : ('common.add' | translate) }} Artist</h2>
+    <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" formControlName="name" />
+      </div>
+      <div class="form-group">
+        <label>Country</label>
+        <input type="text" formControlName="country" />
+      </div>
+      <div class="form-group">
+        <label>Image URL</label>
+        <input type="url" formControlName="imageUrl" />
+      </div>
+      <div class="form-group">
+        <label>Bio</label>
+        <textarea formControlName="bio" rows="3"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" (click)="showModal = false">{{ 'common.cancel' | translate }}</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">
+          <span *ngIf="saving">{{ 'common.loading' | translate }}</span>
+          <span *ngIf="!saving">{{ 'common.save' | translate }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

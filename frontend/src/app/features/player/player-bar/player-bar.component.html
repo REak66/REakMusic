@@ -1,0 +1,50 @@
+<div class="player-bar" *ngIf="currentSong$ | async as song">
+  <div class="player-track">
+    <div class="track-thumb">
+      <span>♫</span>
+    </div>
+    <div class="track-info">
+      <span class="track-title">{{ song.title }}</span>
+      <span class="track-artist">
+        {{ (song.artistId && $any(song.artistId).name) ? $any(song.artistId).name : '' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="player-controls">
+    <button class="ctrl-btn" (click)="playerService.previous()" title="Previous">⏮</button>
+    <button class="ctrl-btn play-btn" (click)="playerService.togglePlay()">
+      <span *ngIf="isPlaying$ | async">⏸</span>
+      <span *ngIf="!(isPlaying$ | async)">▶</span>
+    </button>
+    <button class="ctrl-btn" (click)="playerService.next()" title="Next">⏭</button>
+  </div>
+
+  <div class="player-progress">
+    <span class="time">{{ playerService.formatTime((currentTime$ | async) ?? 0) }}</span>
+    <input
+      type="range"
+      class="progress-slider"
+      [max]="(duration$ | async) ?? 0"
+      [value]="(currentTime$ | async) ?? 0"
+      (input)="onSeek($event)"
+    />
+    <span class="time">{{ playerService.formatTime((duration$ | async) ?? 0) }}</span>
+  </div>
+
+  <div class="player-volume">
+    <button class="ctrl-btn" (click)="playerService.toggleMute()">
+      <span *ngIf="isMuted$ | async">🔇</span>
+      <span *ngIf="!(isMuted$ | async)">🔊</span>
+    </button>
+    <input
+      type="range"
+      class="volume-slider"
+      min="0"
+      max="1"
+      step="0.05"
+      [value]="(volume$ | async) ?? 1"
+      (input)="onVolumeChange($event)"
+    />
+  </div>
+</div>

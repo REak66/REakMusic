@@ -1,0 +1,37 @@
+<div class="artist-detail-page main-content">
+  <div class="container">
+    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <div *ngIf="artist && !loading">
+      <div class="artist-header">
+        <div class="artist-avatar">
+          <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" [alt]="artist.name" />
+          <span *ngIf="!artist.imageUrl" class="avatar-placeholder">🎵</span>
+        </div>
+        <div class="artist-info">
+          <h1>{{ artist.name }}</h1>
+          <p *ngIf="artist.country" class="artist-country">{{ artist.country }}</p>
+          <p *ngIf="artist.bio" class="artist-bio">{{ artist.bio }}</p>
+        </div>
+      </div>
+
+      <h2 class="section-title">Songs by {{ artist.name }}</h2>
+      <div class="grid-songs">
+        <div class="song-card" *ngFor="let song of songs" [routerLink]="['/home/songs', song._id]">
+          <div class="song-thumbnail">
+            <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
+            <div class="play-overlay"><div class="play-icon">▶</div></div>
+          </div>
+          <div class="song-info">
+            <div class="song-title">{{ song.title }}</div>
+            <div class="song-price">
+              <span *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
+              <span *ngIf="song.price === 0" class="badge badge-success">Free</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p *ngIf="songs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
+    </div>
+  </div>
+</div>

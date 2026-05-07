@@ -1,0 +1,38 @@
+<div class="cart-page main-content">
+  <div class="container">
+    <h1 class="page-title">{{ 'cart.title' | translate }}</h1>
+
+    <ng-container *ngIf="cart$ | async as cart">
+      <p class="empty-msg" *ngIf="cart.length === 0">{{ 'cart.empty' | translate }}</p>
+
+      <div *ngIf="cart.length > 0">
+        <div class="cart-items">
+          <div class="cart-item" *ngFor="let item of cart; trackBy: trackById">
+            <div class="item-thumb">
+              <span>♫</span>
+            </div>
+            <div class="item-info">
+              <span class="item-title">{{ item.song.title }}</span>
+              <span class="item-artist" *ngIf="$any(item.song.artistId)?.name">
+                {{ $any(item.song.artistId).name }}
+              </span>
+            </div>
+            <span class="item-price">${{ item.song.price.toFixed(2) }}</span>
+            <button class="btn btn-ghost remove-btn" (click)="remove(item.song._id)">
+              {{ 'cart.remove' | translate }} ✕
+            </button>
+          </div>
+        </div>
+
+        <div class="cart-footer">
+          <div class="cart-total">
+            {{ 'cart.total' | translate }}: <strong>${{ cartService.getTotal().toFixed(2) }}</strong>
+          </div>
+          <button class="btn btn-primary checkout-btn" (click)="checkout()">
+            {{ 'cart.checkout' | translate }} →
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

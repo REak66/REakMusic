@@ -1,0 +1,47 @@
+<div class="admin-page main-content">
+  <div class="container">
+    <h1 class="page-title">{{ 'admin.orders' | translate }}</h1>
+
+    <div class="filters-bar">
+      <button
+        *ngFor="let s of ['all', 'pending', 'paid', 'expired', 'failed']"
+        class="btn"
+        [ngClass]="statusFilter === s ? 'btn-primary' : 'btn-outline'"
+        (click)="filter(s)"
+      >{{ s | titlecase }}</button>
+    </div>
+
+    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>User</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of filteredOrders">
+            <td>{{ order._id.slice(-8).toUpperCase() }}</td>
+            <td>{{ order.userId }}</td>
+            <td>${{ order.total.toFixed(2) }}</td>
+            <td>
+              <span class="badge"
+                [ngClass]="{
+                  'badge-success': order.status === 'paid',
+                  'badge-warning': order.status === 'pending',
+                  'badge-error': order.status === 'expired' || order.status === 'failed'
+                }">{{ order.status }}</span>
+            </td>
+            <td>{{ order.createdAt | date: 'short' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="filteredOrders.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
+    </div>
+  </div>
+</div>

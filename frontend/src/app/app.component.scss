@@ -1,0 +1,9 @@
+:host {
+  display: block;
+}
+
+.main-content {
+  padding-top: var(--navbar-height);
+  padding-bottom: calc(var(--player-height) + 1rem);
+  min-height: 100vh;
+}

@@ -1,0 +1,33 @@
+<div class="auth-page">
+  <div class="auth-card card">
+    <h1 class="auth-title">{{ 'auth.verifyOtp' | translate }}</h1>
+    <p class="otp-hint">{{ 'auth.otpSent' | translate }} <strong>{{ email }}</strong></p>
+
+    <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+    <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>OTP Code</label>
+        <input
+          type="text"
+          formControlName="otp"
+          maxlength="6"
+          placeholder="000000"
+          class="otp-input"
+          [class.is-invalid]="form.get('otp')?.invalid && form.get('otp')?.touched"
+        />
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-full" [disabled]="loading || form.invalid">
+        <span *ngIf="loading">{{ 'common.loading' | translate }}</span>
+        <span *ngIf="!loading">Verify</span>
+      </button>
+    </form>
+
+    <div class="resend-section">
+      <span *ngIf="countdown > 0" class="countdown">Resend in {{ countdown }}s</span>
+      <button *ngIf="countdown <= 0" class="btn btn-ghost" (click)="resend()">Resend OTP</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+<div class="orders-page main-content">
+  <div class="container">
+    <h1 class="page-title">{{ 'dashboard.orders' | translate }}</h1>
+
+    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <p class="empty-msg" *ngIf="!loading && orders.length === 0">{{ 'common.noResults' | translate }}</p>
+
+    <div class="orders-list" *ngIf="!loading && orders.length > 0">
+      <div class="order-card card" *ngFor="let order of orders">
+        <div class="order-header">
+          <span class="order-id">Order #{{ order._id.slice(-8).toUpperCase() }}</span>
+          <span class="badge"
+            [ngClass]="{
+              'badge-success': order.status === 'paid',
+              'badge-warning': order.status === 'pending',
+              'badge-error': order.status === 'expired' || order.status === 'failed'
+            }">
+            {{ order.status }}
+          </span>
+        </div>
+        <div class="order-songs">
+          <span *ngFor="let song of order.songs" class="song-tag">
+            {{ $any(song).title || '...' }}
+          </span>
+        </div>
+        <div class="order-footer">
+          <span class="order-date">{{ order.createdAt | date: 'mediumDate' }}</span>
+          <span class="order-total">${{ order.total.toFixed(2) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

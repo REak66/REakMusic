@@ -1,0 +1,34 @@
+<div class="album-detail-page main-content">
+  <div class="container">
+    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <div *ngIf="album && !loading">
+      <div class="album-header">
+        <div class="album-cover">
+          <img *ngIf="album.coverUrl" [src]="album.coverUrl" [alt]="album.title" />
+          <span *ngIf="!album.coverUrl" class="cover-placeholder">💿</span>
+        </div>
+        <div class="album-info">
+          <div class="badge badge-primary" style="margin-bottom: 0.75rem">Album</div>
+          <h1>{{ album.title }}</h1>
+          <p *ngIf="album.releaseYear" class="album-year">{{ album.releaseYear }}</p>
+          <p *ngIf="album.description" class="album-desc">{{ album.description }}</p>
+        </div>
+      </div>
+
+      <h2 class="section-title">Tracks ({{ songs.length }})</h2>
+      <div class="track-list">
+        <div class="track-item" *ngFor="let song of songs; let i = index" [routerLink]="['/home/songs', song._id]">
+          <span class="track-num">{{ i + 1 }}</span>
+          <div class="track-thumb">
+            <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
+          </div>
+          <span class="track-title">{{ song.title }}</span>
+          <span class="track-price" *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
+          <span class="badge badge-success" *ngIf="song.price === 0">Free</span>
+        </div>
+      </div>
+      <p *ngIf="songs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,78 @@
+<div class="song-detail-page main-content">
+  <div class="container">
+    <div class="loading-spinner" *ngIf="loading"></div>
+    <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
+    <div class="song-detail" *ngIf="song && !loading">
+      <div class="song-cover">
+        <img [src]="thumbnail" [alt]="song.title" />
+      </div>
+
+      <div class="song-content">
+        <div class="song-meta-tags">
+          <span class="badge badge-primary" *ngFor="let g of genres">{{ g.name }}</span>
+        </div>
+
+        <h1 class="song-title">{{ song.title }}</h1>
+
+        <div class="song-meta">
+          <div class="meta-item" *ngIf="artist">
+            <span class="meta-label">{{ 'music.artist' | translate }}</span>
+            <a class="meta-value" [routerLink]="['/home/artists', artist._id]">{{ artist.name }}</a>
+          </div>
+          <div class="meta-item" *ngIf="song.releaseYear">
+            <span class="meta-label">{{ 'music.releaseYear' | translate }}</span>
+            <span class="meta-value">{{ song.releaseYear }}</span>
+          </div>
+          <div class="meta-item" *ngIf="song.duration">
+            <span class="meta-label">{{ 'music.duration' | translate }}</span>
+            <span class="meta-value">{{ playerService.formatTime(song.duration) }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">{{ 'music.downloads' | translate }}</span>
+            <span class="meta-value">{{ song.downloadCount }}</span>
+          </div>
+        </div>
+
+        <p class="song-description" *ngIf="song.description">{{ song.description }}</p>
+
+        <div class="song-price-section">
+          <span class="price-label" *ngIf="song.price > 0">
+            {{ 'music.price' | translate }}: <strong>${{ song.price.toFixed(2) }}</strong>
+          </span>
+          <span class="badge badge-success" *ngIf="song.price === 0">{{ 'music.free' | translate }}</span>
+        </div>
+
+        <div class="song-actions">
+          <button class="btn btn-outline" (click)="playPreview()" *ngIf="song.previewUrl">
+            ▶ {{ 'music.preview' | translate }}
+          </button>
+
+          <ng-container *ngIf="isOwned">
+            <span class="badge badge-success">{{ 'music.alreadyOwned' | translate }}</span>
+            <button class="btn btn-primary" (click)="download()">
+              ↓ {{ 'music.download' | translate }}
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="!isOwned && song.price > 0">
+            <button
+              class="btn btn-primary"
+              (click)="cartService.addToCart(song)"
+              [disabled]="cartService.isInCart(song._id)"
+            >
+              <span *ngIf="!cartService.isInCart(song._id)">🛒 {{ 'music.addToCart' | translate }}</span>
+              <span *ngIf="cartService.isInCart(song._id)">In Cart</span>
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="!isOwned && song.price === 0">
+            <button class="btn btn-primary" (click)="download()">
+              ↓ {{ 'music.download' | translate }}
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
