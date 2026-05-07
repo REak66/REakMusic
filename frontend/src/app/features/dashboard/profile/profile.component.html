@@ -1,0 +1,38 @@
+<div class="profile-page main-content">
+  <div class="container">
+    <h1 class="page-title">{{ 'dashboard.profile' | translate }}</h1>
+
+    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <div class="profile-card card" *ngIf="!loading">
+      <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+      <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+
+      <div class="user-info" *ngIf="user">
+        <div class="user-avatar">{{ user.fullName.charAt(0).toUpperCase() }}</div>
+        <div>
+          <p class="user-email">{{ user.email }}</p>
+          <span class="badge" [ngClass]="user.role === 'admin' ? 'badge-warning' : 'badge-primary'">
+            {{ user.role }}
+          </span>
+        </div>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" formControlName="fullName"
+            [class.is-invalid]="form.get('fullName')?.invalid && form.get('fullName')?.touched" />
+        </div>
+        <div class="form-group">
+          <label>{{ 'auth.phone' | translate }}</label>
+          <input type="tel" formControlName="phone" />
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">
+          <span *ngIf="saving">{{ 'common.loading' | translate }}</span>
+          <span *ngIf="!saving">{{ 'common.save' | translate }}</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

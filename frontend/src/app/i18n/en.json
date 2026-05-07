@@ -1,0 +1,102 @@
+{
+  "nav": {
+    "home": "Home",
+    "browse": "Browse",
+    "cart": "Cart",
+    "dashboard": "Dashboard",
+    "admin": "Admin",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Full Name",
+    "phone": "Phone Number",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "verifyOtp": "Verify OTP",
+    "otpSent": "OTP sent to your email",
+    "invalidOtp": "Invalid OTP",
+    "loginSuccess": "Login successful",
+    "registerSuccess": "Registration successful. Please verify your email."
+  },
+  "music": {
+    "featured": "Featured Songs",
+    "trending": "Trending",
+    "newReleases": "New Releases",
+    "preview": "Preview",
+    "buyNow": "Buy Now",
+    "download": "Download",
+    "unlockFull": "Unlock Full Track",
+    "addToCart": "Add to Cart",
+    "alreadyOwned": "You own this",
+    "price": "Price",
+    "free": "Free",
+    "duration": "Duration",
+    "genre": "Genre",
+    "artist": "Artist",
+    "album": "Album",
+    "releaseYear": "Release Year",
+    "downloads": "Downloads"
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "total": "Total",
+    "checkout": "Checkout",
+    "remove": "Remove"
+  },
+  "checkout": {
+    "title": "Complete Payment",
+    "scanQr": "Scan QR Code to Pay",
+    "waiting": "Waiting for payment...",
+    "success": "Payment successful!",
+    "expired": "Payment expired. Please try again.",
+    "timeLeft": "Time left"
+  },
+  "player": {
+    "nowPlaying": "Now Playing",
+    "preview": "Preview",
+    "addToQueue": "Add to Queue",
+    "clearQueue": "Clear Queue"
+  },
+  "dashboard": {
+    "profile": "Profile",
+    "orders": "Order History",
+    "library": "My Library",
+    "downloadSong": "Download"
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "songs": "Song Management",
+    "artists": "Artist Management",
+    "orders": "Order Management",
+    "users": "User Management",
+    "totalRevenue": "Total Revenue",
+    "totalUsers": "Total Users",
+    "totalSongs": "Total Songs",
+    "topSongs": "Top Songs"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "noResults": "No results found",
+    "page": "Page",
+    "of": "of",
+    "next": "Next",
+    "previous": "Previous"
+  }
+}

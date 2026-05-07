@@ -1,0 +1,115 @@
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { SongService } from '../../../core/services/song.service';
+import { GenreService } from '../../../core/services/genre.service';
+import { CartService } from '../../../core/services/cart.service';
+import { Song, Genre, SongQueryParams } from '../../../core/models';
+
+@Component({
+  selector: 'app-song-list',
+  templateUrl: './song-list.component.html',
+  styleUrls: ['./song-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class SongListComponent implements OnInit {
+  songs: Song[] = [];
+  genres: Genre[] = [];
+  loading = false;
+  total = 0;
+  page = 1;
+  limit = 12;
+  totalPages = 1;
+
+  filterForm!: FormGroup;
+  sortOptions = [
+    { value: '-createdAt', label: 'Newest' },
+    { value: '-downloadCount', label: 'Most Popular' },
+    { value: 'price', label: 'Price: Low to High' },
+    { value: '-price', label: 'Price: High to Low' },
+    { value: 'title', label: 'Title A-Z' }
+  ];
+
+  constructor(
+    private songService: SongService,
+    private genreService: GenreService,
+    public cartService: CartService,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.filterForm = this.fb.group({
+      search: [''],
+      genre: [''],
+      minPrice: [''],
+      maxPrice: [''],
+      releaseYear: [''],
+      sort: ['-createdAt']
+    });
+
+    this.genreService.getGenres().subscribe(genres => {
+      this.genres = genres;
+      this.cdr.markForCheck();
+    });
+
+    this.filterForm.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.page = 1;
+      this.loadSongs();
+    });
+
+    this.loadSongs();
+  }
+
+  loadSongs(): void {
+    this.loading = true;
+    const v = this.filterForm.value as {
+      search: string; genre: string; minPrice: string; maxPrice: string; releaseYear: string; sort: string;
+    };
+    const params: SongQueryParams = {
+      page: this.page,
+      limit: this.limit,
+      sort: v.sort
+    };
+    if (v.search) params.search = v.search;
+    if (v.genre) params.genre = v.genre;
+    if (v.minPrice) params.minPrice = Number(v.minPrice);
+    if (v.maxPrice) params.maxPrice = Number(v.maxPrice);
+    if (v.releaseYear) params.releaseYear = Number(v.releaseYear);
+
+    this.songService.getSongs(params).subscribe({
+      next: res => {
+        this.songs = res.data || [];
+        this.total = res.total;
+        this.totalPages = res.totalPages;
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.loading = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  onPageChange(p: number): void {
+    this.page = p;
+    this.loadSongs();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  getArtistName(song: Song): string {
+    return typeof song.artistId === 'object' && song.artistId
+      ? (song.artistId as { name: string }).name : '';
+  }
+
+  getThumbnail(song: Song): string {
+    return song.thumbnailId
+      ? `https://drive.google.com/thumbnail?id=${song.thumbnailId}`
+      : 'assets/images/default-cover.svg';
+  }
+
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+}

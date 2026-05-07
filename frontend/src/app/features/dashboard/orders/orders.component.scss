@@ -1,0 +1,36 @@
+.orders-page {
+  .page-title { font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; }
+  .empty-msg { color: var(--color-text-muted); padding: 4rem 0; text-align: center; }
+
+  .orders-list { display: flex; flex-direction: column; gap: 1rem; }
+
+  .order-card {
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .order-id { font-weight: 700; font-size: 0.9375rem; }
+    .order-songs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.375rem;
+      margin-bottom: 0.75rem;
+    }
+    .song-tag {
+      background: var(--color-bg-elevated);
+      border-radius: 4px;
+      padding: 0.25rem 0.625rem;
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+    }
+    .order-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8125rem;
+      color: var(--color-text-muted);
+      .order-total { font-weight: 700; color: var(--color-accent-light); }
+    }
+  }
+}

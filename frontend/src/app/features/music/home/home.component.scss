@@ -1,0 +1,122 @@
+.hero {
+  background: radial-gradient(ellipse at 50% 0%, rgba(124, 58, 237, 0.25) 0%, transparent 65%);
+  padding: 5rem 0 4rem;
+  text-align: center;
+
+  .hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+
+    span {
+      background: linear-gradient(135deg, var(--color-accent-light), var(--color-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+
+  .hero-subtitle {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 2rem;
+  }
+
+  .btn-lg {
+    padding: 0.875rem 2rem;
+    font-size: 1rem;
+  }
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--color-text-primary);
+}
+
+.no-results {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.trending-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.trending-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover {
+    border-color: var(--color-accent);
+    background: var(--color-bg-elevated);
+  }
+
+  .rank {
+    width: 28px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+  }
+
+  .trending-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--color-bg-elevated);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .trending-info {
+    flex: 1;
+    min-width: 0;
+
+    .trending-title {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9375rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .trending-artist {
+      display: block;
+      font-size: 0.8125rem;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .trending-downloads {
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+  }
+
+  .trending-price {
+    font-weight: 700;
+    color: var(--color-accent-light);
+  }
+}

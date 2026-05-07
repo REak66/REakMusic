@@ -1,0 +1,89 @@
+.song-detail-page {
+  .song-detail {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 2.5rem;
+    align-items: start;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .song-cover {
+    img {
+      width: 100%;
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow);
+      aspect-ratio: 1;
+      object-fit: cover;
+    }
+  }
+
+  .song-meta-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+
+  .song-title {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 1.25rem;
+  }
+
+  .song-meta {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .meta-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+
+    .meta-value {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+  }
+
+  .song-description {
+    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+
+  .song-price-section {
+    margin-bottom: 1.5rem;
+
+    .price-label {
+      font-size: 1.125rem;
+      color: var(--color-text-secondary);
+
+      strong {
+        color: var(--color-accent-light);
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .song-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+}

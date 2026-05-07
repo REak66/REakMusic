@@ -1,0 +1,60 @@
+<div class="admin-dashboard main-content">
+  <div class="container">
+    <h1 class="page-title">{{ 'admin.dashboard' | translate }}</h1>
+
+    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <ng-container *ngIf="analytics && !loading">
+      <div class="stats-grid">
+        <div class="stat-card card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-info">
+            <span class="stat-value">${{ analytics.totalRevenue.toFixed(2) }}</span>
+            <span class="stat-label">{{ 'admin.totalRevenue' | translate }}</span>
+          </div>
+        </div>
+        <div class="stat-card card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ analytics.totalUsers }}</span>
+            <span class="stat-label">{{ 'admin.totalUsers' | translate }}</span>
+          </div>
+        </div>
+        <div class="stat-card card">
+          <div class="stat-icon">🎵</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ analytics.totalSongs }}</span>
+            <span class="stat-label">{{ 'admin.totalSongs' | translate }}</span>
+          </div>
+        </div>
+        <div class="stat-card card">
+          <div class="stat-icon">⬇️</div>
+          <div class="stat-info">
+            <span class="stat-value">{{ analytics.totalDownloads }}</span>
+            <span class="stat-label">Total Downloads</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="top-songs card">
+        <h2>{{ 'admin.topSongs' | translate }}</h2>
+        <div class="top-song-item" *ngFor="let s of analytics.topSongs; let i = index">
+          <span class="rank">{{ i + 1 }}</span>
+          <span class="song-name">{{ s.title }}</span>
+          <div class="bar-container">
+            <div class="bar" [style.width.%]="(s.downloadCount / (analytics.topSongs[0]?.downloadCount || 1)) * 100"></div>
+          </div>
+          <span class="count">{{ s.downloadCount }}</span>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Admin Navigation -->
+    <div class="admin-nav">
+      <a class="btn btn-outline" routerLink="/admin/songs">{{ 'admin.songs' | translate }}</a>
+      <a class="btn btn-outline" routerLink="/admin/artists">{{ 'admin.artists' | translate }}</a>
+      <a class="btn btn-outline" routerLink="/admin/orders">{{ 'admin.orders' | translate }}</a>
+      <a class="btn btn-outline" routerLink="/admin/users">{{ 'admin.users' | translate }}</a>
+    </div>
+  </div>
+</div>

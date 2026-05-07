@@ -1,0 +1,29 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
+import { AuthRoutingModule } from './auth-routing.module';
+import { LoginComponent } from './login/login.component';
+import { RegisterComponent } from './register/register.component';
+import { VerifyOtpComponent } from './verify-otp/verify-otp.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { RouterModule } from '@angular/router';
+
+@NgModule({
+  declarations: [
+    LoginComponent,
+    RegisterComponent,
+    VerifyOtpComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent
+  ],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    TranslateModule,
+    AuthRoutingModule
+  ]
+})
+export class AuthModule {}

@@ -1,0 +1,38 @@
+<div class="admin-page main-content">
+  <div class="container">
+    <h1 class="page-title">{{ 'admin.users' | translate }}</h1>
+
+    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Verified</th>
+            <th>Songs Owned</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.fullName }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="badge" [ngClass]="user.role === 'admin' ? 'badge-warning' : 'badge-primary'">
+                {{ user.role }}
+              </span>
+            </td>
+            <td>{{ user.isVerified ? '✓' : '✗' }}</td>
+            <td>{{ user.purchasedSongs?.length || 0 }}</td>
+            <td>{{ user.createdAt | date: 'mediumDate' }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p *ngIf="users.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
+    </div>
+    <p class="total-info">Total: {{ total }} users</p>
+  </div>
+</div>

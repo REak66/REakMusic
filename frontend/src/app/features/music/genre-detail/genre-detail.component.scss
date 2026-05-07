@@ -1,0 +1,8 @@
+.genre-detail-page {
+  .genre-header {
+    margin-bottom: 2rem;
+    h1 { font-size: 2rem; font-weight: 800; margin: 0.5rem 0; }
+    .genre-desc { color: var(--color-text-secondary); }
+  }
+  .no-results { color: var(--color-text-muted); padding: 2rem 0; }
+}

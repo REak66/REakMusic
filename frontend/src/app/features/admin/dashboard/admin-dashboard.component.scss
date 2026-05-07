@@ -1,0 +1,54 @@
+.admin-dashboard {
+  .page-title { font-size: 2rem; font-weight: 800; margin-bottom: 1.5rem; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    .stat-icon { font-size: 2rem; }
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+      .stat-value { font-size: 1.5rem; font-weight: 800; }
+      .stat-label { font-size: 0.8125rem; color: var(--color-text-muted); }
+    }
+  }
+
+  .top-songs {
+    margin-bottom: 2rem;
+    h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; }
+
+    .top-song-item {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      margin-bottom: 0.75rem;
+
+      .rank { width: 24px; text-align: center; color: var(--color-text-muted); font-size: 0.875rem; }
+      .song-name { min-width: 200px; font-size: 0.9rem; }
+      .bar-container {
+        flex: 1;
+        height: 8px;
+        background: var(--color-bg-elevated);
+        border-radius: 4px;
+        overflow: hidden;
+        .bar { height: 100%; background: var(--color-accent); border-radius: 4px; transition: width 0.5s ease; }
+      }
+      .count { font-size: 0.8125rem; color: var(--color-text-muted); min-width: 40px; text-align: right; }
+    }
+  }
+
+  .admin-nav {
+    display: flex;
+    gap: 0.875rem;
+    flex-wrap: wrap;
+  }
+}

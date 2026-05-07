@@ -1,0 +1,25 @@
+@use '../auth-shared' as *;
+
+.otp-hint {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.otp-input {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.5em;
+  font-weight: 700;
+}
+
+.resend-section {
+  text-align: center;
+  margin-top: 1.25rem;
+
+  .countdown {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+}

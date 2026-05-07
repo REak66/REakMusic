@@ -1,0 +1,74 @@
+<div class="song-list-page main-content">
+  <div class="container">
+    <h1 class="page-title">{{ 'nav.browse' | translate }}</h1>
+
+    <!-- Filters -->
+    <form [formGroup]="filterForm" class="filters-bar">
+      <div class="search-wrap">
+        <input
+          type="text"
+          formControlName="search"
+          [placeholder]="'common.search' | translate"
+          class="search-input"
+        />
+      </div>
+
+      <select formControlName="genre" class="filter-select">
+        <option value="">All Genres</option>
+        <option *ngFor="let g of genres" [value]="g._id">{{ g.name }}</option>
+      </select>
+
+      <input type="number" formControlName="minPrice" placeholder="Min $" class="filter-num" />
+      <input type="number" formControlName="maxPrice" placeholder="Max $" class="filter-num" />
+      <input type="number" formControlName="releaseYear" placeholder="Year" class="filter-num" />
+
+      <select formControlName="sort" class="filter-select">
+        <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </form>
+
+    <!-- Results info -->
+    <p class="results-info" *ngIf="!loading">{{ total }} songs found</p>
+
+    <!-- Loading -->
+    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <!-- Grid -->
+    <div class="grid-songs" *ngIf="!loading">
+      <div class="song-card" *ngFor="let song of songs" [routerLink]="['/home/songs', song._id]">
+        <div class="song-thumbnail">
+          <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
+          <div class="play-overlay">
+            <div class="play-icon">▶</div>
+          </div>
+        </div>
+        <div class="song-info">
+          <div class="song-title">{{ song.title }}</div>
+          <div class="song-artist">{{ getArtistName(song) }}</div>
+          <div class="song-footer">
+            <span class="song-price" *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
+            <span class="badge badge-success" *ngIf="song.price === 0">{{ 'music.free' | translate }}</span>
+            <button
+              class="btn btn-primary add-btn"
+              (click)="cartService.addToCart(song); $event.stopPropagation()"
+              *ngIf="song.price > 0 && !cartService.isInCart(song._id)"
+            >+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="no-results" *ngIf="!loading && songs.length === 0">{{ 'common.noResults' | translate }}</p>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button [disabled]="page === 1" (click)="onPageChange(page - 1)">‹</button>
+      <button
+        *ngFor="let p of pages"
+        [class.active]="p === page"
+        (click)="onPageChange(p)"
+      >{{ p }}</button>
+      <button [disabled]="page === totalPages" (click)="onPageChange(page + 1)">›</button>
+    </div>
+  </div>
+</div>

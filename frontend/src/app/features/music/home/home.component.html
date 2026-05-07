@@ -1,0 +1,57 @@
+<div class="home-page main-content">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">Discover & Own <span>Music</span></h1>
+      <p class="hero-subtitle">Buy, download and keep your favorite songs forever.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg" routerLink="/home/songs">{{ 'nav.browse' | translate }}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Songs -->
+  <section class="section container">
+    <h2 class="section-title">{{ 'music.featured' | translate }}</h2>
+    <div class="loading-spinner" *ngIf="loading"></div>
+    <div class="grid-songs" *ngIf="!loading">
+      <div class="song-card" *ngFor="let song of featuredSongs" [routerLink]="['/home/songs', song._id]">
+        <div class="song-thumbnail">
+          <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
+          <div class="play-overlay">
+            <div class="play-icon">▶</div>
+          </div>
+        </div>
+        <div class="song-info">
+          <div class="song-title">{{ song.title }}</div>
+          <div class="song-artist">{{ getArtistName(song) }}</div>
+          <div class="song-price">
+            <span *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
+            <span *ngIf="song.price === 0" class="badge badge-success">{{ 'music.free' | translate }}</span>
+          </div>
+        </div>
+      </div>
+      <p *ngIf="featuredSongs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
+    </div>
+  </section>
+
+  <!-- Trending Section -->
+  <section class="section container">
+    <h2 class="section-title">{{ 'music.trending' | translate }} 🔥</h2>
+    <div class="trending-list">
+      <div class="trending-item" *ngFor="let song of trendingSongs; let i = index" [routerLink]="['/home/songs', song._id]">
+        <span class="rank">{{ i + 1 }}</span>
+        <div class="trending-thumb">
+          <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
+        </div>
+        <div class="trending-info">
+          <span class="trending-title">{{ song.title }}</span>
+          <span class="trending-artist">{{ getArtistName(song) }}</span>
+        </div>
+        <span class="trending-downloads">{{ song.downloadCount }} ↓</span>
+        <span class="trending-price" *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
+        <span class="badge badge-success" *ngIf="song.price === 0">{{ 'music.free' | translate }}</span>
+      </div>
+    </div>
+  </section>
+</div>

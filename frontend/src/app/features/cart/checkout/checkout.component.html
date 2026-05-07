@@ -1,0 +1,47 @@
+<div class="checkout-page main-content">
+  <div class="container">
+    <h1 class="page-title">{{ 'checkout.title' | translate }}</h1>
+
+    <div class="loading-spinner" *ngIf="loading"></div>
+    <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
+    <div class="checkout-card card" *ngIf="order && !loading">
+      <!-- Pending state -->
+      <ng-container *ngIf="order.status === 'pending'">
+        <h2>{{ 'checkout.scanQr' | translate }}</h2>
+        <div class="qr-container" *ngIf="order.qrCode">
+          <img [src]="order.qrCode" alt="QR Code for payment" class="qr-code" />
+        </div>
+        <div class="qr-placeholder" *ngIf="!order.qrCode">
+          <span>QR Code loading...</span>
+        </div>
+        <p class="waiting-text">{{ 'checkout.waiting' | translate }}</p>
+        <p class="time-left" *ngIf="timeLeft">
+          {{ 'checkout.timeLeft' | translate }}: <strong>{{ timeLeft }}</strong>
+        </p>
+        <p class="order-total">Total: <strong>${{ order.total.toFixed(2) }}</strong></p>
+        <div class="payment-pulse"></div>
+      </ng-container>
+
+      <!-- Paid state -->
+      <ng-container *ngIf="order.status === 'paid'">
+        <div class="success-state">
+          <div class="success-icon">✓</div>
+          <h2>{{ 'checkout.success' | translate }}</h2>
+          <a class="btn btn-primary" routerLink="/dashboard/library">
+            Go to My Library →
+          </a>
+        </div>
+      </ng-container>
+
+      <!-- Expired state -->
+      <ng-container *ngIf="order.status === 'expired'">
+        <div class="expired-state">
+          <div class="expired-icon">✕</div>
+          <h2>{{ 'checkout.expired' | translate }}</h2>
+          <a class="btn btn-primary" routerLink="/cart">Back to Cart</a>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
