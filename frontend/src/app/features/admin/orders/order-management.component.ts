@@ -3,6 +3,7 @@ import { OrderService } from '../../../core/services/order.service';
 import { Order } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-order-management',
   templateUrl: './order-management.component.html',
   styleUrls: ['./order-management.component.scss'],

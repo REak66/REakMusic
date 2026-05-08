@@ -15,7 +15,7 @@
           <span class="lib-artist" *ngIf="$any(song.artistId)?.name">{{ $any(song.artistId).name }}</span>
         </div>
         <button class="btn btn-primary lib-download" (click)="download(song._id)">
-          ↓ {{ 'dashboard.downloadSong' | translate }}
+          <i class="fa-solid fa-download"></i> {{ 'dashboard.downloadSong' | translate }}
         </button>
       </div>
     </div>

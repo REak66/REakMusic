@@ -4,8 +4,10 @@ import { SongService } from '../../../core/services/song.service';
 import { ArtistService } from '../../../core/services/artist.service';
 import { GenreService } from '../../../core/services/genre.service';
 import { Song, Artist, Genre } from '../../../core/models';
+import { SelectOption } from '../../../shared/components/select-dropdown/select-dropdown.component';
 
 @Component({
+  standalone: false,
   selector: 'app-song-management',
   templateUrl: './song-management.component.html',
   styleUrls: ['./song-management.component.scss'],
@@ -22,13 +24,16 @@ export class SongManagementComponent implements OnInit {
   error = '';
   saving = false;
 
+  selectedFile: File | null = null;
+  dragOver = false;
+
   constructor(
     private songService: SongService,
     private artistService: ArtistService,
     private genreService: GenreService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -42,14 +47,16 @@ export class SongManagementComponent implements OnInit {
       price: [0, [Validators.required, Validators.min(0)]],
       releaseYear: [''],
       description: [''],
-      isFeatured: [false]
+      isFeatured: [false],
+      driveLink: [''],
+      previewUrl: ['']
     });
   }
 
   loadData(): void {
     this.loading = true;
     this.songService.getSongs({ limit: 50 }).subscribe({
-      next: res => {
+      next: (res: any) => {
         this.songs = res.data || [];
         this.loading = false;
         this.cdr.markForCheck();
@@ -57,7 +64,7 @@ export class SongManagementComponent implements OnInit {
       error: () => { this.loading = false; this.cdr.markForCheck(); }
     });
     this.artistService.getArtists({ limit: 100 }).subscribe({
-      next: res => { this.artists = res.data || []; this.cdr.markForCheck(); }
+      next: (res: any) => { this.artists = res.data?.artists || []; this.cdr.markForCheck(); }
     });
     this.genreService.getGenres().subscribe({
       next: genres => { this.genres = genres; this.cdr.markForCheck(); }
@@ -66,6 +73,7 @@ export class SongManagementComponent implements OnInit {
 
   openAdd(): void {
     this.editingSong = null;
+    this.selectedFile = null;
     this.form.reset({ price: 0, isFeatured: false });
     this.showModal = true;
     this.error = '';
@@ -74,31 +82,84 @@ export class SongManagementComponent implements OnInit {
 
   openEdit(song: Song): void {
     this.editingSong = song;
+    this.selectedFile = null;
     this.form.patchValue({
       title: song.title,
       artistId: typeof song.artistId === 'object' ? (song.artistId as Artist)._id : song.artistId,
       price: song.price,
       releaseYear: song.releaseYear || '',
       description: song.description || '',
-      isFeatured: song.isFeatured
+      isFeatured: song.isFeatured,
+      driveLink: song.driveLink || '',
+      previewUrl: song.previewUrl || ''
     });
     this.showModal = true;
     this.error = '';
     this.cdr.markForCheck();
   }
 
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+      this.cdr.markForCheck();
+    }
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver = true;
+    this.cdr.markForCheck();
+  }
+
+  onDragLeave(): void {
+    this.dragOver = false;
+    this.cdr.markForCheck();
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.dragOver = false;
+    const file = event.dataTransfer?.files[0];
+    if (file) {
+      this.selectedFile = file;
+      this.cdr.markForCheck();
+    }
+  }
+
+  clearFile(): void {
+    this.selectedFile = null;
+    this.cdr.markForCheck();
+  }
+
+  get existingDriveLink(): string {
+    return this.editingSong?.driveLink || '';
+  }
+
   save(): void {
     if (this.form.invalid) return;
     this.saving = true;
-    const data = this.form.value as Partial<Song>;
+
+    const formData = new FormData();
+    const values = this.form.value;
+    Object.entries(values).forEach(([key, val]) => {
+      if (val !== null && val !== undefined && val !== '') {
+        formData.append(key, String(val));
+      }
+    });
+    if (this.selectedFile) {
+      formData.append('songFile', this.selectedFile, this.selectedFile.name);
+    }
+
     const obs = this.editingSong
-      ? this.songService.updateSong(this.editingSong._id, data)
-      : this.songService.createSong(data as unknown as FormData);
+      ? this.songService.updateSong(this.editingSong._id, formData)
+      : this.songService.createSong(formData);
 
     obs.subscribe({
       next: () => {
         this.showModal = false;
         this.saving = false;
+        this.selectedFile = null;
         this.loadData();
         this.cdr.markForCheck();
       },
@@ -115,6 +176,14 @@ export class SongManagementComponent implements OnInit {
     this.songService.deleteSong(id).subscribe({
       next: () => { this.loadData(); }
     });
+  }
+
+  get artistOptions(): SelectOption[] {
+    return this.artists.map(a => ({ value: a._id, label: a.name }));
+  }
+
+  get genreOptions(): SelectOption[] {
+    return this.genres.map(g => ({ value: (g as any)._id, label: g.name }));
   }
 
   getArtistName(song: Song): string {

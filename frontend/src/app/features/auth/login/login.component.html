@@ -1,6 +1,11 @@
 <div class="auth-page">
   <div class="auth-card card">
+    <a class="auth-logo" routerLink="/home">
+      <div class="logo-icon"><i class="fa-solid fa-music"></i></div>
+      <span class="logo-name">REakMusic</span>
+    </a>
     <h1 class="auth-title">{{ 'auth.login' | translate }}</h1>
+    <p class="auth-subtitle">Welcome back! Sign in to your account.</p>
 
     <div class="alert alert-error" *ngIf="error">{{ error }}</div>
 
@@ -11,6 +16,7 @@
           type="email"
           formControlName="email"
           [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched"
+          placeholder="you@example.com"
           autocomplete="email"
         />
         <span class="error-msg" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('required')">
@@ -27,6 +33,7 @@
           type="password"
           formControlName="password"
           [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched"
+          placeholder="••••••••"
           autocomplete="current-password"
         />
         <span class="error-msg" *ngIf="form.get('password')?.touched && form.get('password')?.hasError('required')">

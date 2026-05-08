@@ -12,14 +12,11 @@ services:
     environment:
       - NODE_ENV=production
       - MONGO_URI=mongodb://mongo:27017/reakmusic
-      - REDIS_URL=redis://redis:6379
       - CORS_ORIGIN=http://localhost
     ports:
       - "3000:3000"
     depends_on:
       mongo:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     networks:
       - reakmusic-net
@@ -51,23 +48,8 @@ services:
     networks:
       - reakmusic-net
 
-  redis:
-    image: redis:7-alpine
-    container_name: reakmusic-redis
-    restart: unless-stopped
-    volumes:
-      - redis-data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - reakmusic-net
-
 volumes:
   mongo-data:
-  redis-data:
 
 networks:
   reakmusic-net:

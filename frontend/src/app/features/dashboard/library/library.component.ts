@@ -5,6 +5,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { Song } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-library',
   templateUrl: './library.component.html',
   styleUrls: ['./library.component.scss'],

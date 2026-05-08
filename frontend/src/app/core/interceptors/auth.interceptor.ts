@@ -11,7 +11,7 @@ export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
   private refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     const token = this.authService.getAccessToken();
@@ -54,6 +54,9 @@ export class AuthInterceptor implements HttpInterceptor {
       }),
       catchError(err => {
         this.isRefreshing = false;
+        const subject = this.refreshTokenSubject;
+        this.refreshTokenSubject = new BehaviorSubject<string | null>(null);
+        subject.error(err);
         return throwError(() => err);
       })
     );

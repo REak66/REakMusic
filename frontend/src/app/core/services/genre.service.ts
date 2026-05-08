@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Genre, ApiResponse } from '../models';
 
@@ -8,10 +9,12 @@ import { Genre, ApiResponse } from '../models';
 export class GenreService {
   private readonly apiUrl = `${environment.apiUrl}/genres`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getGenres(): Observable<Genre[]> {
-    return this.http.get<Genre[]>(this.apiUrl);
+    return this.http.get<any>(this.apiUrl).pipe(
+      map(res => res.data?.genres || [])
+    );
   }
 
   getGenre(slug: string): Observable<Genre> {

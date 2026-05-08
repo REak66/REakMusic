@@ -1,6 +1,10 @@
-<div class="admin-page main-content">
-  <div class="container">
-    <h1 class="page-title">{{ 'admin.users' | translate }}</h1>
+<div class="admin-page">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">{{ 'admin.users' | translate }}</h1>
+        <p class="page-sub">Registered platform members</p>
+      </div>
+    </div>
 
     <div class="loading-spinner" *ngIf="loading"></div>
 
@@ -25,8 +29,12 @@
                 {{ user.role }}
               </span>
             </td>
-            <td>{{ user.isVerified ? '✓' : '✗' }}</td>
-            <td>{{ user.purchasedSongs?.length || 0 }}</td>
+            <td>
+              <span class="badge" [ngClass]="user.isVerified ? 'badge-success' : 'badge-error'">
+                {{ user.isVerified ? 'Verified' : 'Unverified' }}
+              </span>
+            </td>
+            <td>{{ user.purchasedSongs.length || 0 }}</td>
             <td>{{ user.createdAt | date: 'mediumDate' }}</td>
           </tr>
         </tbody>
@@ -34,5 +42,4 @@
       <p *ngIf="users.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
     </div>
     <p class="total-info">Total: {{ total }} users</p>
-  </div>
 </div>

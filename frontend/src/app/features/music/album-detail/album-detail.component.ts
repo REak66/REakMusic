@@ -5,6 +5,7 @@ import { SongService } from '../../../core/services/song.service';
 import { Album, Song } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-album-detail',
   templateUrl: './album-detail.component.html',
   styleUrls: ['./album-detail.component.scss'],

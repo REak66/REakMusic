@@ -9,7 +9,8 @@
         <div class="cart-items">
           <div class="cart-item" *ngFor="let item of cart; trackBy: trackById">
             <div class="item-thumb">
-              <span>♫</span>
+              <img *ngIf="$any(item.song).thumbnailUrl" [src]="$any(item.song).thumbnailUrl" [alt]="item.song.title" />
+              <span *ngIf="!$any(item.song).thumbnailUrl"><i class="fa-solid fa-music"></i></span>
             </div>
             <div class="item-info">
               <span class="item-title">{{ item.song.title }}</span>
@@ -19,17 +20,18 @@
             </div>
             <span class="item-price">${{ item.song.price.toFixed(2) }}</span>
             <button class="btn btn-ghost remove-btn" (click)="remove(item.song._id)">
-              {{ 'cart.remove' | translate }} ✕
+              {{ 'cart.remove' | translate }}
             </button>
           </div>
         </div>
 
         <div class="cart-footer">
           <div class="cart-total">
-            {{ 'cart.total' | translate }}: <strong>${{ cartService.getTotal().toFixed(2) }}</strong>
+            <span class="total-label">{{ 'cart.total' | translate }}</span>
+            <strong>${{ cartService.getTotal().toFixed(2) }}</strong>
           </div>
           <button class="btn btn-primary checkout-btn" (click)="checkout()">
-            {{ 'cart.checkout' | translate }} →
+            {{ 'cart.checkout' | translate }} <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
       </div>

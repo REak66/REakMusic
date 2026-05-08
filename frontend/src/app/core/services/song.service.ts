@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Song, PaginatedResponse, SongQueryParams, ApiResponse } from '../models';
 
@@ -8,7 +9,7 @@ import { Song, PaginatedResponse, SongQueryParams, ApiResponse } from '../models
 export class SongService {
   private readonly apiUrl = `${environment.apiUrl}/songs`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getSongs(params: SongQueryParams = {}): Observable<PaginatedResponse<Song>> {
     let httpParams = new HttpParams();
@@ -17,11 +18,21 @@ export class SongService {
         httpParams = httpParams.set(key, String(val));
       }
     });
-    return this.http.get<PaginatedResponse<Song>>(this.apiUrl, { params: httpParams });
+    return this.http.get<any>(this.apiUrl, { params: httpParams }).pipe(
+      map(res => ({
+        data: res.data?.songs || [],
+        total: res.pagination?.total || 0,
+        page: res.pagination?.page || 1,
+        limit: res.pagination?.limit || 20,
+        totalPages: res.pagination?.pages || 1
+      }))
+    );
   }
 
   getSong(id: string): Observable<Song> {
-    return this.http.get<Song>(`${this.apiUrl}/${id}`);
+    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+      map(res => res.data?.song ?? res)
+    );
   }
 
   searchSongs(query: string, params: SongQueryParams = {}): Observable<PaginatedResponse<Song>> {

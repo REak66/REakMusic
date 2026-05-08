@@ -1,8 +1,13 @@
-<div class="admin-page main-content">
-  <div class="container">
+<div class="admin-page">
     <div class="page-header">
-      <h1 class="page-title">{{ 'admin.artists' | translate }}</h1>
-      <button class="btn btn-primary" (click)="openAdd()">+ {{ 'common.add' | translate }}</button>
+      <div>
+        <h1 class="page-title">{{ 'admin.artists' | translate }}</h1>
+        <p class="page-sub">Manage producers and artists</p>
+      </div>
+      <button class="btn btn-primary" (click)="openAdd()">
+        <i class="fa-solid fa-plus"></i>
+        {{ 'common.add' | translate }} Artist
+      </button>
     </div>
 
     <div class="loading-spinner" *ngIf="loading"></div>
@@ -11,50 +16,110 @@
       <table class="data-table">
         <thead>
           <tr>
+            <th>Photo</th>
             <th>Name</th>
             <th>Country</th>
             <th>Bio</th>
+            <th>Social</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let artist of artists">
+            <td class="photo-cell">
+              <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" [alt]="artist.name" class="artist-thumb" />
+              <div *ngIf="!artist.imageUrl" class="artist-thumb-placeholder">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            </td>
             <td>{{ artist.name }}</td>
             <td>{{ artist.country || '-' }}</td>
             <td class="bio-cell">{{ artist.bio || '-' }}</td>
+            <td>
+              <span class="social-count" *ngIf="artist.socialLinks?.length">
+                {{ artist.socialLinks!.length }} link{{ artist.socialLinks!.length !== 1 ? 's' : '' }}
+              </span>
+              <span *ngIf="!artist.socialLinks?.length">-</span>
+            </td>
             <td class="actions">
-              <button class="btn btn-ghost" (click)="openEdit(artist)">{{ 'common.edit' | translate }}</button>
-              <button class="btn btn-danger" (click)="delete(artist._id)">{{ 'common.delete' | translate }}</button>
+              <button class="btn btn-ghost btn-sm" (click)="openEdit(artist)">{{ 'common.edit' | translate }}</button>
+              <button class="btn btn-danger btn-sm" (click)="delete(artist._id)">{{ 'common.delete' | translate }}</button>
             </td>
           </tr>
         </tbody>
       </table>
       <p *ngIf="artists.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
     </div>
-  </div>
 </div>
 
 <div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
-  <div class="modal card" (click)="$event.stopPropagation()">
-    <h2>{{ editingArtist ? ('common.edit' | translate) : ('common.add' | translate) }} Artist</h2>
+  <div class="modal card modal-producer" (click)="$event.stopPropagation()">
+    <h2>{{ editingArtist ? ('common.edit' | translate) : ('common.add' | translate) }} Producer</h2>
     <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
     <form [formGroup]="form" (ngSubmit)="save()">
-      <div class="form-group">
-        <label>Name</label>
-        <input type="text" formControlName="name" />
+
+      <!-- Profile Photo (full-width, top) -->
+      <div class="photo-row">
+        <div class="photo-body">
+          <app-image-cropper
+            [initialImage]="editingArtist?.imageUrl"
+            (imageCropped)="onImageCropped($event)"
+          ></app-image-cropper>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Country</label>
-        <input type="text" formControlName="country" />
+
+      <!-- Info Fields -->
+      <div class="info-grid">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" formControlName="name" placeholder="Producer name" />
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          <input type="text" formControlName="country" placeholder="e.g. Cambodia" />
+        </div>
       </div>
-      <div class="form-group">
-        <label>Image URL</label>
-        <input type="url" formControlName="imageUrl" />
-      </div>
+
       <div class="form-group">
         <label>Bio</label>
-        <textarea formControlName="bio" rows="3"></textarea>
+        <textarea formControlName="bio" rows="3" placeholder="Producer biography..."></textarea>
       </div>
+
+      <!-- Social Links -->
+      <div class="social-section">
+        <div class="social-header">
+          <span class="social-title">Social Links</span>
+          <button type="button" class="btn-add-social" (click)="addSocialLink()">
+            <i class="fa-solid fa-plus"></i>
+            Add
+          </button>
+        </div>
+
+        <div class="social-list">
+          <div
+            class="social-row"
+            *ngFor="let link of socialLinks.controls; let i = index"
+            [formGroup]="$any(link)"
+          >
+            <app-select-dropdown
+              formControlName="platform"
+              [options]="SOCIAL_PLATFORM_OPTIONS"
+              [compact]="true"
+              placeholder="Platform"
+              class="platform-dropdown"
+            ></app-select-dropdown>
+            <div class="row-divider"></div>
+            <input type="url" formControlName="url" placeholder="https://..." class="url-input" />
+            <button type="button" class="btn-remove" (click)="removeSocialLink(i)" title="Remove">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+
+        <p class="no-socials" *ngIf="socialLinks.length === 0">No social links added yet.</p>
+      </div>
+
       <div class="modal-actions">
         <button type="button" class="btn btn-outline" (click)="showModal = false">{{ 'common.cancel' | translate }}</button>
         <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">

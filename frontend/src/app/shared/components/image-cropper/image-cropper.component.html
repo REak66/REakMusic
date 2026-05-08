@@ -1,0 +1,77 @@
+<div class="cropper-wrapper">
+  <!-- Canvas Area -->
+  <div class="canvas-container" [class.has-image]="hasImage">
+    <canvas
+      #canvas
+      [width]="DISPLAY_SIZE"
+      [height]="DISPLAY_SIZE"
+      [class.dragging]="_isDragging"
+      (mousedown)="onMouseDown($event)"
+      (mousemove)="onMouseMove($event)"
+      (mouseup)="onMouseUp()"
+      (mouseleave)="onMouseUp()"
+      (wheel)="onWheel($event)"
+      (touchstart)="onTouchStart($event)"
+      (touchmove)="onTouchMove($event)"
+      (touchend)="onTouchEnd()"
+    ></canvas>
+
+    <div class="canvas-placeholder" *ngIf="!hasImage">
+      <div class="placeholder-icon">
+        <i class="fa-regular fa-image"></i>
+      </div>
+      <p>Select an image to crop</p>
+      <span>Output: 500 × 500 px</span>
+    </div>
+
+    <div class="crop-badge" *ngIf="hasImage">500 × 500</div>
+  </div>
+
+  <!-- Zoom Controls -->
+  <div class="zoom-controls" *ngIf="hasImage">
+    <button type="button" class="zoom-btn" (click)="zoomBy(-0.1)">−</button>
+    <input
+      type="range"
+      class="zoom-slider"
+      [min]="_minScale"
+      [max]="8"
+      [step]="0.02"
+      [value]="zoomValue"
+      (input)="onZoomSlider($event)"
+    />
+    <button type="button" class="zoom-btn" (click)="zoomBy(0.1)">+</button>
+    <span class="zoom-label">{{ zoomPercent }}%</span>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="cropper-actions">
+    <input
+      #fileInput
+      type="file"
+      accept="image/*"
+      (change)="onFileChange($event)"
+      hidden
+    />
+    <button type="button" class="btn-pick" (click)="fileInputRef.nativeElement.click()">
+      <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      {{ hasImage ? 'Change' : 'Upload Image' }}
+    </button>
+
+    <ng-container *ngIf="hasImage">
+      <button type="button" class="btn-reset" (click)="reset()">
+        <i class="fa-solid fa-rotate-left"></i>
+        Reset
+      </button>
+      <button type="button" class="btn-confirm" [class.confirmed]="confirmed" (click)="confirmCrop()">
+        <i class="fa-solid fa-check"></i>
+        {{ confirmed ? 'Applied ✓' : 'Use This Crop' }}
+      </button>
+    </ng-container>
+  </div>
+
+  <!-- Cropped Preview -->
+  <div class="cropped-preview" *ngIf="croppedPreview">
+    <span class="preview-label">Preview (500×500)</span>
+    <img [src]="croppedPreview" alt="Cropped preview" width="80" height="80" />
+  </div>
+</div>

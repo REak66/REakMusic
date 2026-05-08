@@ -1,11 +1,15 @@
-<div class="admin-page main-content">
-  <div class="container">
-    <h1 class="page-title">{{ 'admin.orders' | translate }}</h1>
+<div class="admin-page">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">{{ 'admin.orders' | translate }}</h1>
+        <p class="page-sub">Track and review purchases</p>
+      </div>
+    </div>
 
     <div class="filters-bar">
       <button
         *ngFor="let s of ['all', 'pending', 'paid', 'expired', 'failed']"
-        class="btn"
+        class="btn filter-btn"
         [ngClass]="statusFilter === s ? 'btn-primary' : 'btn-outline'"
         (click)="filter(s)"
       >{{ s | titlecase }}</button>
@@ -43,5 +47,4 @@
       </table>
       <p *ngIf="filteredOrders.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
     </div>
-  </div>
 </div>

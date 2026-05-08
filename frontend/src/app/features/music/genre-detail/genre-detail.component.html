@@ -13,7 +13,7 @@
         <div class="song-card" *ngFor="let song of songs" [routerLink]="['/home/songs', song._id]">
           <div class="song-thumbnail">
             <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
-            <div class="play-overlay"><div class="play-icon">▶</div></div>
+            <div class="play-overlay"><div class="play-icon"><i class="fa-solid fa-play"></i></div></div>
           </div>
           <div class="song-info">
             <div class="song-title">{{ song.title }}</div>

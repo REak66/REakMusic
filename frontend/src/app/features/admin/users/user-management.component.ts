@@ -3,6 +3,7 @@ import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-user-management',
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.scss'],
@@ -14,7 +15,7 @@ export class UserManagementComponent implements OnInit {
   page = 1;
   total = 0;
 
-  constructor(private userService: UserService, private cdr: ChangeDetectorRef) {}
+  constructor(private userService: UserService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.load();
@@ -23,7 +24,7 @@ export class UserManagementComponent implements OnInit {
   load(): void {
     this.loading = true;
     this.userService.getUsers({ page: this.page, limit: 20 }).subscribe({
-      next: res => {
+      next: (res) => {
         this.users = res.data;
         this.total = res.total;
         this.loading = false;

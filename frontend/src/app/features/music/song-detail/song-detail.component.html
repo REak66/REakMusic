@@ -44,14 +44,14 @@
         </div>
 
         <div class="song-actions">
-          <button class="btn btn-outline" (click)="playPreview()" *ngIf="song.previewUrl">
-            ▶ {{ 'music.preview' | translate }}
+          <button class="btn btn-outline" (click)="playPreview()" *ngIf="song.previewUrl || song.driveFileId || song.driveLink">
+            <i class="fa-solid fa-play"></i> {{ 'music.preview' | translate }}
           </button>
 
           <ng-container *ngIf="isOwned">
             <span class="badge badge-success">{{ 'music.alreadyOwned' | translate }}</span>
             <button class="btn btn-primary" (click)="download()">
-              ↓ {{ 'music.download' | translate }}
+              <i class="fa-solid fa-download"></i> {{ 'music.download' | translate }}
             </button>
           </ng-container>
 
@@ -61,14 +61,14 @@
               (click)="cartService.addToCart(song)"
               [disabled]="cartService.isInCart(song._id)"
             >
-              <span *ngIf="!cartService.isInCart(song._id)">🛒 {{ 'music.addToCart' | translate }}</span>
+              <span *ngIf="!cartService.isInCart(song._id)"><i class="fa-solid fa-cart-shopping"></i> {{ 'music.addToCart' | translate }}</span>
               <span *ngIf="cartService.isInCart(song._id)">In Cart</span>
             </button>
           </ng-container>
 
           <ng-container *ngIf="!isOwned && song.price === 0">
             <button class="btn btn-primary" (click)="download()">
-              ↓ {{ 'music.download' | translate }}
+              <i class="fa-solid fa-download"></i> {{ 'music.download' | translate }}
             </button>
           </ng-container>
         </div>

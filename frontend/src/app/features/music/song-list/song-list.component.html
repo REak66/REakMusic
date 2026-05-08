@@ -5,6 +5,7 @@
     <!-- Filters -->
     <form [formGroup]="filterForm" class="filters-bar">
       <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input
           type="text"
           formControlName="search"
@@ -20,7 +21,7 @@
 
       <input type="number" formControlName="minPrice" placeholder="Min $" class="filter-num" />
       <input type="number" formControlName="maxPrice" placeholder="Max $" class="filter-num" />
-      <input type="number" formControlName="releaseYear" placeholder="Year" class="filter-num" />
+      <input type="number" formControlName="releaseYear" placeholder="Year" class="filter-num filter-year" />
 
       <select formControlName="sort" class="filter-select">
         <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
@@ -28,7 +29,9 @@
     </form>
 
     <!-- Results info -->
-    <p class="results-info" *ngIf="!loading">{{ total }} songs found</p>
+    <p class="results-info" *ngIf="!loading">
+      <strong>{{ total }}</strong> songs found
+    </p>
 
     <!-- Loading -->
     <div class="loading-spinner" *ngIf="loading"></div>
@@ -39,7 +42,7 @@
         <div class="song-thumbnail">
           <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
           <div class="play-overlay">
-            <div class="play-icon">▶</div>
+            <div class="play-icon"><i class="fa-solid fa-play"></i></div>
           </div>
         </div>
         <div class="song-info">
@@ -52,7 +55,7 @@
               class="btn btn-primary add-btn"
               (click)="cartService.addToCart(song); $event.stopPropagation()"
               *ngIf="song.price > 0 && !cartService.isInCart(song._id)"
-            >+</button>
+            ><i class="fa-solid fa-plus"></i></button>
           </div>
         </div>
       </div>
@@ -62,13 +65,13 @@
 
     <!-- Pagination -->
     <div class="pagination" *ngIf="totalPages > 1">
-      <button [disabled]="page === 1" (click)="onPageChange(page - 1)">‹</button>
+      <button [disabled]="page === 1" (click)="onPageChange(page - 1)"><i class="fa-solid fa-chevron-left"></i></button>
       <button
         *ngFor="let p of pages"
         [class.active]="p === page"
         (click)="onPageChange(p)"
       >{{ p }}</button>
-      <button [disabled]="page === totalPages" (click)="onPageChange(page + 1)">›</button>
+      <button [disabled]="page === totalPages" (click)="onPageChange(page + 1)"><i class="fa-solid fa-chevron-right"></i></button>
     </div>
   </div>
 </div>

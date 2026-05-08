@@ -7,6 +7,7 @@ import { CartService } from '../../../core/services/cart.service';
 import { Song, Genre, SongQueryParams } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-song-list',
   templateUrl: './song-list.component.html',
   styleUrls: ['./song-list.component.scss'],
@@ -36,7 +37,7 @@ export class SongListComponent implements OnInit {
     public cartService: CartService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.filterForm = this.fb.group({
@@ -104,9 +105,14 @@ export class SongListComponent implements OnInit {
   }
 
   getThumbnail(song: Song): string {
-    return song.thumbnailId
-      ? `https://drive.google.com/thumbnail?id=${song.thumbnailId}`
-      : 'assets/images/default-cover.svg';
+    if (song.thumbnailId) {
+      return `https://drive.google.com/thumbnail?id=${song.thumbnailId}`;
+    }
+    const artist = song.artistId as { imageUrl?: string } | null;
+    if (artist && typeof artist === 'object' && artist.imageUrl) {
+      return artist.imageUrl;
+    }
+    return 'assets/images/default-cover.svg';
   }
 
   get pages(): number[] {

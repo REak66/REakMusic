@@ -6,6 +6,7 @@ import { CartService } from '../../../core/services/cart.service';
 import { Order } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],

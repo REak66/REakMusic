@@ -4,7 +4,7 @@ const artistSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     bio: String,
-    photo: String,
+    imageUrl: String,
     country: String,
     socialLinks: [{ platform: String, url: String }],
   },

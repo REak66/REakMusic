@@ -1,38 +1,159 @@
 <div class="profile-page main-content">
-  <div class="container">
-    <h1 class="page-title">{{ 'dashboard.profile' | translate }}</h1>
-
+  <div class="profile-container">
     <div class="loading-spinner" *ngIf="loading"></div>
 
-    <div class="profile-card card" *ngIf="!loading">
-      <div class="alert alert-error" *ngIf="error">{{ error }}</div>
-      <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+    <ng-container *ngIf="!loading && user">
 
-      <div class="user-info" *ngIf="user">
-        <div class="user-avatar">{{ user.fullName.charAt(0).toUpperCase() }}</div>
-        <div>
-          <p class="user-email">{{ user.email }}</p>
-          <span class="badge" [ngClass]="user.role === 'admin' ? 'badge-warning' : 'badge-primary'">
-            {{ user.role }}
-          </span>
+      <!-- ── Profile Header ───────────────────────────────────── -->
+      <div class="profile-header">
+        <div class="header-cover">
+          <div class="cover-gradient"></div>
+        </div>
+        <div class="header-body">
+          <div class="avatar-container">
+            <div class="avatar-letter">{{ user.fullName.charAt(0).toUpperCase() }}</div>
+          </div>
+          <div class="user-details">
+            <h1 class="user-name">{{ user.fullName }}</h1>
+            <p class="user-email">
+              <i class="fa-regular fa-envelope"></i>
+              {{ user.email }}
+            </p>
+            <div class="user-tags">
+              <span class="tag" [ngClass]="user.role === 'admin' ? 'tag-gold' : 'tag-purple'">{{ user.role | titlecase }}</span>
+              <span class="tag tag-green" *ngIf="user.isVerified">
+                <i class="fa-solid fa-check"></i>
+                Verified
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Strip -->
+        <div class="stats-strip">
+          <div class="stat-item">
+            <span class="stat-num">{{ user.purchasedSongs.length }}</span>
+            <span class="stat-desc">
+              <i class="fa-solid fa-music"></i>
+              Songs Owned
+            </span>
+          </div>
+          <div class="stat-sep"></div>
+          <div class="stat-item">
+            <span class="stat-num">{{ user.createdAt | date:'yyyy' }}</span>
+            <span class="stat-desc">
+              <i class="fa-regular fa-calendar"></i>
+              Member Since
+            </span>
+          </div>
+          <div class="stat-sep"></div>
+          <div class="stat-item">
+            <span class="stat-num">{{ user.isVerified ? '✓' : '✗' }}</span>
+            <span class="stat-desc">
+              <i class="fa-solid fa-shield-halved"></i>
+              Account
+            </span>
+          </div>
         </div>
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" formControlName="fullName"
-            [class.is-invalid]="form.get('fullName')?.invalid && form.get('fullName')?.touched" />
-        </div>
-        <div class="form-group">
-          <label>{{ 'auth.phone' | translate }}</label>
-          <input type="tel" formControlName="phone" />
-        </div>
-        <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">
-          <span *ngIf="saving">{{ 'common.loading' | translate }}</span>
-          <span *ngIf="!saving">{{ 'common.save' | translate }}</span>
-        </button>
-      </form>
-    </div>
+      <!-- ── Alerts ────────────────────────────────────────────── -->
+      <div class="profile-alert profile-alert--error" *ngIf="error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{ error }}
+      </div>
+      <div class="profile-alert profile-alert--success" *ngIf="success">
+        <i class="fa-solid fa-circle-check"></i>
+        {{ success }}
+      </div>
+
+      <!-- ── Two-column content ─────────────────────────────────── -->
+      <div class="profile-columns">
+
+        <!-- Edit Form -->
+        <section class="pcard pcard--edit">
+          <div class="pcard-head">
+            <div class="pcard-icon">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </div>
+            <div>
+              <h2 class="pcard-title">Edit Profile</h2>
+              <p class="pcard-sub">Update your personal details</p>
+            </div>
+          </div>
+
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="form-group">
+              <label class="field-label">Full Name</label>
+              <div class="field-wrap">
+                <i class="fa-solid fa-user field-icon"></i>
+                <input type="text" formControlName="fullName" placeholder="Enter your full name"
+                  [class.is-invalid]="form.get('fullName')?.invalid && form.get('fullName')?.touched" />
+              </div>
+              <p class="field-error" *ngIf="form.get('fullName')?.invalid && form.get('fullName')?.touched">At least 2 characters required</p>
+            </div>
+
+            <div class="form-group">
+              <label class="field-label">Phone Number</label>
+              <div class="field-wrap">
+                <i class="fa-solid fa-phone field-icon"></i>
+                <input type="tel" formControlName="phone" placeholder="+855 XX XXX XXXX" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary submit-btn" [disabled]="saving || form.invalid">
+              <span class="btn-spinner" *ngIf="saving"></span>
+              <i *ngIf="!saving" class="fa-solid fa-floppy-disk"></i>
+              {{ saving ? 'Saving...' : 'Save Changes' }}
+            </button>
+          </form>
+        </section>
+
+        <!-- Account Info -->
+        <section class="pcard pcard--info">
+          <div class="pcard-head">
+            <div class="pcard-icon pcard-icon--teal">
+              <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <div>
+              <h2 class="pcard-title">Account Info</h2>
+              <p class="pcard-sub">Your account at a glance</p>
+            </div>
+          </div>
+
+          <ul class="info-rows">
+            <li class="info-row">
+              <span class="info-row-label">Email</span>
+              <span class="info-row-val">{{ user.email }}</span>
+            </li>
+            <li class="info-row">
+              <span class="info-row-label">Phone</span>
+              <span class="info-row-val">{{ user.phone || '—' }}</span>
+            </li>
+            <li class="info-row">
+              <span class="info-row-label">Role</span>
+              <span class="badge" [ngClass]="user.role === 'admin' ? 'badge-warning' : 'badge-primary'">{{ user.role | titlecase }}</span>
+            </li>
+            <li class="info-row">
+              <span class="info-row-label">Status</span>
+              <span class="badge" [ngClass]="user.isVerified ? 'badge-success' : 'badge-error'">{{ user.isVerified ? 'Verified' : 'Unverified' }}</span>
+            </li>
+            <li class="info-row">
+              <span class="info-row-label">Joined</span>
+              <span class="info-row-val">{{ user.createdAt | date:'MMM d, yyyy' }}</span>
+            </li>
+            <li class="info-row">
+              <span class="info-row-label">Last Updated</span>
+              <span class="info-row-val">{{ user.updatedAt | date:'MMM d, yyyy' }}</span>
+            </li>
+            <li class="info-row">
+              <span class="info-row-label">Songs Owned</span>
+              <span class="info-row-val info-row-val--accent">{{ user.purchasedSongs.length }}</span>
+            </li>
+          </ul>
+        </section>
+
+      </div>
+    </ng-container>
   </div>
 </div>

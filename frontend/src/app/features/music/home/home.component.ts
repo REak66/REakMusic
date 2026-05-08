@@ -3,6 +3,7 @@ import { SongService } from '../../../core/services/song.service';
 import { Song } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
@@ -13,7 +14,7 @@ export class HomeComponent implements OnInit {
   trendingSongs: Song[] = [];
   loading = true;
 
-  constructor(private songService: SongService, private cdr: ChangeDetectorRef) {}
+  constructor(private songService: SongService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.songService.getFeatured(6).subscribe({
@@ -37,8 +38,13 @@ export class HomeComponent implements OnInit {
   }
 
   getThumbnail(song: Song): string {
-    return song.thumbnailId
-      ? `https://drive.google.com/thumbnail?id=${song.thumbnailId}`
-      : 'assets/images/default-cover.svg';
+    if (song.thumbnailId) {
+      return `https://drive.google.com/thumbnail?id=${song.thumbnailId}`;
+    }
+    const artist = song.artistId as { imageUrl?: string } | null;
+    if (artist && typeof artist === 'object' && artist.imageUrl) {
+      return artist.imageUrl;
+    }
+    return 'assets/images/default-cover.svg';
   }
 }

@@ -29,7 +29,7 @@
     "featured": "Featured Songs",
     "trending": "Trending",
     "newReleases": "New Releases",
-    "preview": "Preview",
+    "preview": "Play",
     "buyNow": "Buy Now",
     "download": "Download",
     "unlockFull": "Unlock Full Track",
@@ -39,7 +39,7 @@
     "free": "Free",
     "duration": "Duration",
     "genre": "Genre",
-    "artist": "Artist",
+    "artist": "Producer",
     "album": "Album",
     "releaseYear": "Release Year",
     "downloads": "Downloads"
@@ -61,7 +61,8 @@
   },
   "player": {
     "nowPlaying": "Now Playing",
-    "preview": "Preview",
+    "play": "Play",
+    "preview": "Play",
     "addToQueue": "Add to Queue",
     "clearQueue": "Clear Queue"
   },
@@ -74,7 +75,7 @@
   "admin": {
     "dashboard": "Admin Dashboard",
     "songs": "Song Management",
-    "artists": "Artist Management",
+    "artists": "Producer Management",
     "orders": "Order Management",
     "users": "User Management",
     "totalRevenue": "Total Revenue",

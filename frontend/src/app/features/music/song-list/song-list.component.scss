@@ -1,47 +1,68 @@
 .song-list-page {
-  .page-title {
-    font-size: 2rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-  }
+  padding-top: calc(var(--navbar-height) + 2rem);
+  padding-bottom: calc(var(--player-height) + 2rem);
 }
 
 .filters-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.625rem;
   margin-bottom: 1.5rem;
   align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
 
   .search-wrap {
     flex: 1;
-    min-width: 200px;
+    min-width: 220px;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .search-icon {
+      position: absolute;
+      left: 0.875rem;
+      color: var(--color-text-muted);
+      pointer-events: none;
+    }
   }
 
   .search-input {
     width: 100%;
     background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-light);
     border-radius: var(--border-radius);
-    padding: 0.625rem 1rem;
+    padding: 0.625rem 1rem 0.625rem 2.5rem;
     color: var(--color-text-primary);
-    font-size: 0.9375rem;
+    font-size: 0.9rem;
     outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+
+    &::placeholder { color: var(--color-text-muted); }
 
     &:focus {
       border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
     }
   }
 
   .filter-select,
   .filter-num {
     background: var(--color-bg-elevated);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-light);
     border-radius: var(--border-radius);
     padding: 0.625rem 0.875rem;
     color: var(--color-text-primary);
     font-size: 0.875rem;
     outline: none;
+    transition: border-color var(--transition), box-shadow var(--transition);
+
+    &:focus {
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+    }
 
     option {
       background: var(--color-bg-card);
@@ -51,18 +72,27 @@
   .filter-num {
     width: 90px;
   }
+
+  .filter-year {
+    width: 80px;
+  }
 }
 
 .results-info {
   font-size: 0.8125rem;
   color: var(--color-text-muted);
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+
+  strong {
+    color: var(--color-text-primary);
+  }
 }
 
 .no-results {
   text-align: center;
   color: var(--color-text-muted);
-  padding: 3rem 0;
+  padding: 4rem 0;
+  font-size: 1rem;
 }
 
 .song-footer {
@@ -71,8 +101,14 @@
   justify-content: space-between;
 
   .add-btn {
-    padding: 0.25rem 0.625rem;
-    font-size: 1rem;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 1.25rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
   }
 }

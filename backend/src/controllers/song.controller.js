@@ -4,6 +4,11 @@ const User = require('../models/User');
 const driveService = require('../services/drive.service');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 
+function extractDriveFileId(link) {
+  const m = link && link.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
 exports.listSongs = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -12,7 +17,7 @@ exports.listSongs = async (req, res, next) => {
 
     const [songs, total] = await Promise.all([
       Song.find()
-        .populate('artistId', 'name photo')
+        .populate('artistId', 'name imageUrl')
         .populate('albumId', 'title coverImage')
         .populate('genre', 'name slug')
         .sort({ createdAt: -1 })
@@ -62,7 +67,7 @@ exports.searchSongs = async (req, res, next) => {
       ]);
       const songIds = trending.map((t) => t._id);
       const songs = await Song.find({ _id: { $in: songIds } })
-        .populate('artistId', 'name photo')
+        .populate('artistId', 'name imageUrl')
         .populate('albumId', 'title coverImage')
         .populate('genre', 'name slug');
       const sorted = songIds.map((id) => songs.find((s) => s._id.toString() === id.toString())).filter(Boolean);
@@ -74,7 +79,7 @@ exports.searchSongs = async (req, res, next) => {
 
     const [songs, total] = await Promise.all([
       Song.find(filter)
-        .populate('artistId', 'name photo')
+        .populate('artistId', 'name imageUrl')
         .populate('albumId', 'title coverImage')
         .populate('genre', 'name slug')
         .sort(sortOption)
@@ -94,7 +99,7 @@ exports.searchSongs = async (req, res, next) => {
 exports.getSong = async (req, res, next) => {
   try {
     const song = await Song.findById(req.params.id)
-      .populate('artistId', 'name photo bio country')
+      .populate('artistId', 'name imageUrl bio country')
       .populate('albumId', 'title coverImage releaseYear')
       .populate('genre', 'name slug');
     if (!song) return errorResponse(res, 'Song not found', 404);
@@ -106,7 +111,15 @@ exports.getSong = async (req, res, next) => {
 
 exports.createSong = async (req, res, next) => {
   try {
-    const song = await Song.create(req.body);
+    const body = { ...req.body };
+    if (req.file) {
+      const fileId = await driveService.uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype);
+      body.driveFileId = fileId;
+      body.driveLink = `https://drive.google.com/file/d/${fileId}/view`;
+    } else if (body.driveLink && !body.driveFileId) {
+      body.driveFileId = extractDriveFileId(body.driveLink);
+    }
+    const song = await Song.create(body);
     return successResponse(res, { song }, 'Song created', 201);
   } catch (err) {
     next(err);
@@ -115,7 +128,20 @@ exports.createSong = async (req, res, next) => {
 
 exports.updateSong = async (req, res, next) => {
   try {
-    const song = await Song.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const body = { ...req.body };
+    if (req.file) {
+      // Delete the old Drive file if one existed
+      const existing = await Song.findById(req.params.id);
+      if (existing && existing.driveFileId) {
+        try { await driveService.deleteFile(existing.driveFileId); } catch (_) { /* ignore */ }
+      }
+      const fileId = await driveService.uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype);
+      body.driveFileId = fileId;
+      body.driveLink = `https://drive.google.com/file/d/${fileId}/view`;
+    } else if (body.driveLink && !body.driveFileId) {
+      body.driveFileId = extractDriveFileId(body.driveLink);
+    }
+    const song = await Song.findByIdAndUpdate(req.params.id, body, { new: true, runValidators: true });
     if (!song) return errorResponse(res, 'Song not found', 404);
     return successResponse(res, { song }, 'Song updated');
   } catch (err) {
@@ -127,7 +153,22 @@ exports.deleteSong = async (req, res, next) => {
   try {
     const song = await Song.findByIdAndDelete(req.params.id);
     if (!song) return errorResponse(res, 'Song not found', 404);
+    if (song.driveFileId) {
+      try { await driveService.deleteFile(song.driveFileId); } catch (_) { /* ignore */ }
+    }
     return successResponse(res, null, 'Song deleted');
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.streamSong = async (req, res, next) => {
+  try {
+    const song = await Song.findById(req.params.id);
+    if (!song) return errorResponse(res, 'Song not found', 404);
+    const fileId = song.driveFileId || extractDriveFileId(song.driveLink);
+    if (!fileId) return errorResponse(res, 'Audio not available', 404);
+    await driveService.streamFile(fileId, req, res);
   } catch (err) {
     next(err);
   }

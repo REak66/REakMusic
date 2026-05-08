@@ -33,6 +33,25 @@ exports.updateMe = async (req, res, next) => {
   }
 };
 
+exports.listUsers = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await Promise.all([
+      User.find().select('-passwordHash').sort({ createdAt: -1 }).skip(skip).limit(limit),
+      User.countDocuments(),
+    ]);
+
+    return successResponse(res, { users }, 'Users retrieved', 200, {
+      page, limit, total, pages: Math.ceil(total / limit),
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.getMyOrders = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page) || 1;

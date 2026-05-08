@@ -6,7 +6,7 @@
       <div class="album-header">
         <div class="album-cover">
           <img *ngIf="album.coverUrl" [src]="album.coverUrl" [alt]="album.title" />
-          <span *ngIf="!album.coverUrl" class="cover-placeholder">💿</span>
+          <span *ngIf="!album.coverUrl" class="cover-placeholder"><i class="fa-solid fa-record-vinyl"></i></span>
         </div>
         <div class="album-info">
           <div class="badge badge-primary" style="margin-bottom: 0.75rem">Album</div>

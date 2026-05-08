@@ -1,0 +1,48 @@
+<div
+  class="select-dropdown"
+  [class.is-open]="isOpen"
+  [class.is-disabled]="disabled"
+  [class.has-value]="selectedValue !== null"
+  [class.is-compact]="compact"
+  [attr.tabindex]="disabled ? -1 : 0"
+  [attr.id]="id || null"
+  role="combobox"
+  [attr.aria-expanded]="isOpen"
+  [attr.aria-haspopup]="'listbox'"
+  [attr.aria-disabled]="disabled"
+>
+  <!-- Trigger -->
+  <div class="select-trigger" (click)="toggle(); $event.stopPropagation()">
+    <span class="select-value">
+      <span *ngIf="selectedLabel" class="selected-text">{{ selectedLabel }}</span>
+      <span *ngIf="!selectedLabel" class="placeholder-text">{{ placeholder }}</span>
+    </span>
+    <span class="select-arrow">
+      <i class="fa-solid fa-chevron-down"></i>
+    </span>
+  </div>
+
+  <!-- Dropdown Panel -->
+  <div class="select-panel" role="listbox" *ngIf="isOpen" (click)="$event.stopPropagation()">
+    <ul class="select-list">
+      <li
+        *ngFor="let option of options; let i = index"
+        class="select-option"
+        [class.is-selected]="isSelected(option)"
+        [class.is-focused]="focusedIndex === i"
+        [class.is-disabled]="option.disabled"
+        role="option"
+        [attr.aria-selected]="isSelected(option)"
+        [attr.aria-disabled]="option.disabled"
+        (mousedown)="onOptionMouseDown($event)"
+        (click)="onOptionClick(option, $event)"
+        (mouseenter)="focusedIndex = i"
+      >
+        <span class="option-label">{{ option.label }}</span>
+        <span class="option-check" *ngIf="isSelected(option)">
+          <i class="fa-solid fa-check"></i>
+        </span>
+      </li>
+    </ul>
+  </div>
+</div>

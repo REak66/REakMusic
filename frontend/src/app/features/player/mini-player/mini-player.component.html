@@ -1,7 +1,32 @@
 <div class="mini-player" *ngIf="currentSong$ | async as song">
-  <span class="song-name">{{ song.title }}</span>
-  <button (click)="playerService.togglePlay()">
-    <span *ngIf="isPlaying$ | async">⏸</span>
-    <span *ngIf="!(isPlaying$ | async)">▶</span>
-  </button>
+  <!-- progress strip -->
+  <div class="mp-progress">
+    <div class="mp-progress-fill" [style.width.%]="progressPercent$ | async"></div>
+  </div>
+
+  <div class="mp-body">
+    <div class="mp-cover">
+      <img [src]="getCoverUrl(song)" [alt]="song.title" />
+    </div>
+
+    <!-- info -->
+    <div class="mp-info">
+      <span class="mp-title">{{ song.title }}</span>
+      <span class="mp-artist">{{ getArtistName(song) }}</span>
+    </div>
+
+    <!-- controls -->
+    <div class="mp-controls">
+      <button class="mp-btn" (click)="playerService.previous()" title="Previous">
+        <i class="fa-solid fa-backward-step"></i>
+      </button>
+      <button class="mp-btn play" (click)="playerService.togglePlay()">
+        <i *ngIf="isPlaying$ | async" class="fa-solid fa-pause"></i>
+        <i *ngIf="!(isPlaying$ | async)" class="fa-solid fa-play"></i>
+      </button>
+      <button class="mp-btn" (click)="playerService.next()" title="Next">
+        <i class="fa-solid fa-forward-step"></i>
+      </button>
+    </div>
+  </div>
 </div>

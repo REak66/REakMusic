@@ -20,7 +20,7 @@
           </span>
         </div>
         <div class="order-songs">
-          <span *ngFor="let song of order.songs" class="song-tag">
+          <span *ngFor="let song of $any(order.songs)" class="song-tag">
             {{ $any(song).title || '...' }}
           </span>
         </div>

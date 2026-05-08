@@ -5,6 +5,7 @@ import { SongService } from '../../../core/services/song.service';
 import { Artist, Song } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-artist-detail',
   templateUrl: './artist-detail.component.html',
   styleUrls: ['./artist-detail.component.scss'],

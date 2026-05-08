@@ -14,26 +14,26 @@ export class AuthService {
 
   currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient, private router: Router) {
-    this.tryRefreshOnInit();
-  }
+  constructor(private http: HttpClient, private router: Router) { }
 
-  private tryRefreshOnInit(): void {
-    this.refreshToken().pipe(
+  /** Called by APP_INITIALIZER after all services are fully constructed. */
+  tryRefreshOnInit(): Observable<unknown> {
+    return this.refreshToken().pipe(
       catchError(() => of(null))
-    ).subscribe();
+    );
   }
 
   login(email: string, password: string): Observable<{ accessToken: string; user: User }> {
-    return this.http.post<{ accessToken: string; user: User }>(
+    return this.http.post<{ data: { accessToken: string; user: User } }>(
       `${this.apiUrl}/login`,
       { email, password },
       { withCredentials: true }
     ).pipe(
       tap(res => {
-        this.accessToken = res.accessToken;
-        this.currentUserSubject.next(res.user);
-      })
+        this.accessToken = res.data.accessToken;
+        this.currentUserSubject.next(res.data.user);
+      }),
+      map(res => res.data)
     );
   }
 
@@ -54,7 +54,9 @@ export class AuthService {
   }
 
   verifyForgotOtp(email: string, otp: string): Observable<{ resetToken: string }> {
-    return this.http.post<{ resetToken: string }>(`${this.apiUrl}/verify-forgot-otp`, { email, otp });
+    return this.http.post<{ data: { resetToken: string } }>(`${this.apiUrl}/verify-forgot-otp`, { email, otp }).pipe(
+      map(res => res.data)
+    );
   }
 
   resetPassword(token: string, newPassword: string): Observable<unknown> {
@@ -62,16 +64,16 @@ export class AuthService {
   }
 
   refreshToken(): Observable<AuthTokens> {
-    return this.http.post<{ accessToken: string; user: User }>(
+    return this.http.post<{ data: { accessToken: string; user?: User } }>(
       `${this.apiUrl}/refresh`,
       {},
       { withCredentials: true }
     ).pipe(
       tap(res => {
-        this.accessToken = res.accessToken;
-        this.currentUserSubject.next(res.user);
+        this.accessToken = res.data.accessToken;
+        if (res.data.user) this.currentUserSubject.next(res.data.user);
       }),
-      map(res => ({ accessToken: res.accessToken })),
+      map(res => ({ accessToken: res.data.accessToken })),
       catchError(err => {
         this.accessToken = null;
         this.currentUserSubject.next(null);

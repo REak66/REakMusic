@@ -1,9 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest, map } from 'rxjs';
 import { PlayerService } from '../player.service';
-import { Song } from '../../../core/models';
+import { Song, Artist } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-player-bar',
   templateUrl: './player-bar.component.html',
   styleUrls: ['./player-bar.component.scss'],
@@ -16,8 +17,13 @@ export class PlayerBarComponent implements OnInit {
   duration$!: Observable<number>;
   volume$!: Observable<number>;
   isMuted$!: Observable<boolean>;
+  shuffle$!: Observable<boolean>;
+  repeatMode$!: Observable<string>;
 
-  constructor(public playerService: PlayerService) {}
+  private _currentTime = 0;
+  private _duration = 0;
+
+  constructor(public playerService: PlayerService) { }
 
   ngOnInit(): void {
     this.currentSong$ = this.playerService.currentSong$;
@@ -26,20 +32,42 @@ export class PlayerBarComponent implements OnInit {
     this.duration$ = this.playerService.duration$;
     this.volume$ = this.playerService.volume$;
     this.isMuted$ = this.playerService.isMuted$;
+    this.shuffle$ = this.playerService.shuffle$;
+    this.repeatMode$ = this.playerService.repeatMode$;
+
+    this.currentTime$.subscribe(t => (this._currentTime = t));
+    this.duration$.subscribe(d => (this._duration = d));
   }
 
   onSeek(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.playerService.seek(Number(input.value));
+    this.playerService.seek(Number((event.target as HTMLInputElement).value));
   }
 
   onVolumeChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.playerService.setVolume(Number(input.value));
+    this.playerService.setVolume(Number((event.target as HTMLInputElement).value));
   }
 
-  progressPercent(current: number, duration: number): number {
-    if (!duration) return 0;
-    return (current / duration) * 100;
+  onProgressClick(event: MouseEvent): void {
+    const el = event.currentTarget as HTMLElement;
+    const ratio = event.offsetX / el.clientWidth;
+    this.playerService.seek(ratio * this._duration);
+  }
+
+  getProgressPercent(): number {
+    return this._duration ? (this._currentTime / this._duration) * 100 : 0;
+  }
+
+  getCoverUrl(song: Song): string {
+    if (song.thumbnailId) {
+      return `https://drive.google.com/thumbnail?id=${song.thumbnailId}&sz=w200`;
+    }
+    const artist = song.artistId as Artist;
+    if (artist?.imageUrl) return artist.imageUrl;
+    return 'assets/images/default-cover.svg';
+  }
+
+  getArtistName(song: Song): string {
+    const artist = song.artistId as Artist;
+    return artist?.name ?? 'Unknown Artist';
   }
 }

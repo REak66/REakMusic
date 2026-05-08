@@ -20,6 +20,7 @@ export interface Song {
   duration?: number;
   previewUrl?: string;
   driveFileId?: string;
+  driveLink?: string;
   thumbnailId?: string;
   downloadCount: number;
   releaseYear?: number;
@@ -29,12 +30,18 @@ export interface Song {
   updatedAt: string;
 }
 
+export interface SocialLink {
+  platform: string;
+  url: string;
+}
+
 export interface Artist {
   _id: string;
   name: string;
   bio?: string;
   imageUrl?: string;
   country?: string;
+  socialLinks?: SocialLink[];
   createdAt: string;
   updatedAt: string;
 }

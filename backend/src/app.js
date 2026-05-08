@@ -11,7 +11,19 @@ const errorHandler = require('./middleware/errorHandler.middleware');
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
+
+// Allow browser Audio element to load cross-origin audio (overrides helmet's same-origin CORP)
+app.use('/api/v1/songs/:id/stream', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+});
+
+app.use(cors({
+  origin: process.env.CORS_ORIGIN,
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'Range'],
+  exposedHeaders: ['Content-Range', 'Accept-Ranges', 'Content-Length', 'Content-Type'],
+}));
 app.use(express.json());
 app.use(cookieParser());
 app.use(mongoSanitize());

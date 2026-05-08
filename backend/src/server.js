@@ -1,7 +1,6 @@
 require('dotenv').config();
 const app = require('./app');
 const connectDB = require('./config/db');
-const redisClient = require('./config/redis');
 require('./utils/scheduler');
 
 const PORT = process.env.PORT || 3000;

@@ -129,8 +129,11 @@ exports.refresh = async (req, res, next) => {
     if (blacklisted) return errorResponse(res, 'Token invalidated', 401);
 
     const decoded = verifyToken(token);
+    const user = await User.findById(decoded.id).select('-passwordHash');
+    if (!user) return errorResponse(res, 'User not found', 401);
+
     const accessToken = signAccessToken({ id: decoded.id, role: decoded.role, email: decoded.email });
-    return successResponse(res, { accessToken }, 'Token refreshed');
+    return successResponse(res, { accessToken, user }, 'Token refreshed');
   } catch (err) {
     return errorResponse(res, 'Invalid or expired refresh token', 401);
   }

@@ -5,8 +5,10 @@ import { CartService } from '../../../core/services/cart.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { PlayerService } from '../../player/player.service';
 import { Song, Genre, Artist } from '../../../core/models';
+import { environment } from '../../../../environments/environment';
 
 @Component({
+  standalone: false,
   selector: 'app-song-detail',
   templateUrl: './song-detail.component.html',
   styleUrls: ['./song-detail.component.scss'],
@@ -24,7 +26,7 @@ export class SongDetailComponent implements OnInit {
     public authService: AuthService,
     public playerService: PlayerService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id') || '';
@@ -53,9 +55,13 @@ export class SongDetailComponent implements OnInit {
   }
 
   get thumbnail(): string {
-    return this.song?.thumbnailId
-      ? `https://drive.google.com/thumbnail?id=${this.song.thumbnailId}`
-      : 'assets/images/default-cover.svg';
+    if (this.song?.thumbnailId) {
+      return `https://drive.google.com/thumbnail?id=${this.song.thumbnailId}`;
+    }
+    if (this.artist?.imageUrl) {
+      return this.artist.imageUrl;
+    }
+    return 'assets/images/default-cover.svg';
   }
 
   get isOwned(): boolean {
@@ -70,6 +76,13 @@ export class SongDetailComponent implements OnInit {
   }
 
   playPreview(): void {
-    if (this.song) this.playerService.play(this.song);
+    if (!this.song) return;
+    // Prefer the backend stream endpoint when a Drive file exists, since
+    // song.previewUrl may contain a Drive share/view URL (HTML page, not audio).
+    const url = (this.song.driveFileId || this.song.driveLink)
+      ? `${environment.apiUrl}/songs/${this.song._id}/stream`
+      : (this.song.previewUrl || null);
+    if (!url) return;
+    this.playerService.play({ ...this.song, previewUrl: url });
   }
 }

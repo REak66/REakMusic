@@ -1,13 +1,18 @@
 <div class="auth-page">
   <div class="auth-card card">
+    <a class="auth-logo" routerLink="/home">
+      <div class="logo-icon"><i class="fa-solid fa-music"></i></div>
+      <span class="logo-name">REakMusic</span>
+    </a>
     <h1 class="auth-title">{{ 'auth.register' | translate }}</h1>
+    <p class="auth-subtitle">Create your free account today.</p>
 
     <div class="alert alert-error" *ngIf="error">{{ error }}</div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label>{{ 'auth.fullName' | translate }}</label>
-        <input type="text" formControlName="fullName"
+        <input type="text" formControlName="fullName" placeholder="John Doe"
           [class.is-invalid]="form.get('fullName')?.invalid && form.get('fullName')?.touched" />
         <span class="error-msg" *ngIf="form.get('fullName')?.touched && form.get('fullName')?.hasError('required')">Full name is required</span>
         <span class="error-msg" *ngIf="form.get('fullName')?.touched && form.get('fullName')?.hasError('minlength')">At least 2 characters</span>
@@ -15,26 +20,26 @@
 
       <div class="form-group">
         <label>{{ 'auth.email' | translate }}</label>
-        <input type="email" formControlName="email"
+        <input type="email" formControlName="email" placeholder="you@example.com"
           [class.is-invalid]="form.get('email')?.invalid && form.get('email')?.touched" autocomplete="email" />
         <span class="error-msg" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('email')">Invalid email</span>
       </div>
 
       <div class="form-group">
         <label>{{ 'auth.phone' | translate }}</label>
-        <input type="tel" formControlName="phone" />
+        <input type="tel" formControlName="phone" placeholder="+1 234 567 8900" />
       </div>
 
       <div class="form-group">
         <label>{{ 'auth.password' | translate }}</label>
-        <input type="password" formControlName="password"
+        <input type="password" formControlName="password" placeholder="Min 8 characters"
           [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched" autocomplete="new-password" />
         <span class="error-msg" *ngIf="form.get('password')?.touched && form.get('password')?.hasError('minlength')">At least 8 characters</span>
       </div>
 
       <div class="form-group">
         <label>{{ 'auth.confirmPassword' | translate }}</label>
-        <input type="password" formControlName="confirmPassword"
+        <input type="password" formControlName="confirmPassword" placeholder="Repeat password"
           [class.is-invalid]="form.hasError('mismatch') && form.get('confirmPassword')?.touched" autocomplete="new-password" />
         <span class="error-msg" *ngIf="form.hasError('mismatch') && form.get('confirmPassword')?.touched">Passwords do not match</span>
       </div>

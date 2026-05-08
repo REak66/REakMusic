@@ -4,6 +4,7 @@ import { CartService } from '../../../core/services/cart.service';
 import { CartItem } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-cart',
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.scss'],

@@ -1,11 +1,17 @@
 const { google } = require('googleapis');
 
+const path = require('path');
+const fs = require('fs');
+
 const getAuth = () => {
-  const serviceAccountJson = Buffer.from(
-    process.env.GOOGLE_SERVICE_ACCOUNT || '',
-    'base64'
-  ).toString('utf8');
-  const credentials = JSON.parse(serviceAccountJson);
+  let credentials;
+  if (process.env.GOOGLE_SERVICE_ACCOUNT) {
+    const json = Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT, 'base64').toString('utf8');
+    credentials = JSON.parse(json);
+  } else {
+    const keyFile = path.join(__dirname, '../../reakmusic-402a021b664e.json');
+    credentials = JSON.parse(fs.readFileSync(keyFile, 'utf8'));
+  }
   return new google.auth.GoogleAuth({
     credentials,
     scopes: ['https://www.googleapis.com/auth/drive'],
@@ -56,4 +62,32 @@ const deleteFile = async (fileId) => {
   await drive.files.delete({ fileId });
 };
 
-module.exports = { uploadFile, generateSignedUrl, deleteFile };
+const streamFile = async (fileId, req, res) => {
+  const axios = require('axios');
+  const auth = getAuth();
+  const client = await auth.getClient();
+  const { token } = await client.getAccessToken();
+
+  const rangeHeader = req.headers['range'];
+  const reqHeaders = { Authorization: `Bearer ${token}` };
+  if (rangeHeader) reqHeaders['Range'] = rangeHeader;
+
+  const driveRes = await axios.get(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+    { headers: reqHeaders, responseType: 'stream', maxRedirects: 5 }
+  );
+
+  res.status(rangeHeader ? 206 : 200);
+  ['content-type', 'content-length', 'content-range', 'accept-ranges'].forEach(h => {
+    if (driveRes.headers[h]) res.setHeader(h, driveRes.headers[h]);
+  });
+  res.setHeader('Accept-Ranges', 'bytes');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
+  res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length, Content-Type');
+
+  driveRes.data.pipe(res);
+  req.on('close', () => driveRes.data.destroy());
+};
+
+module.exports = { uploadFile, generateSignedUrl, deleteFile, streamFile };

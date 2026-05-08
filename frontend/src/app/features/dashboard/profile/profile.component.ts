@@ -5,6 +5,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { User } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
@@ -23,7 +24,7 @@ export class ProfileComponent implements OnInit {
     private userService: UserService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -47,18 +48,21 @@ export class ProfileComponent implements OnInit {
     if (this.form.invalid) return;
     this.saving = true;
     this.error = '';
+    this.success = '';
     const data = this.form.value as { fullName: string; phone: string };
     this.userService.updateProfile(data).subscribe({
       next: user => {
         this.user = user;
-        this.success = 'Profile updated!';
+        this.success = 'Profile updated successfully!';
         this.saving = false;
         this.cdr.markForCheck();
+        setTimeout(() => { this.success = ''; this.cdr.markForCheck(); }, 4000);
       },
       error: (err: { error?: { message?: string } }) => {
         this.error = err.error?.message || 'Failed to update profile.';
         this.saving = false;
         this.cdr.markForCheck();
+        setTimeout(() => { this.error = ''; this.cdr.markForCheck(); }, 5000);
       }
     });
   }

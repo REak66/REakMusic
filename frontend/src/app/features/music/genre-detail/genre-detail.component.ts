@@ -5,6 +5,7 @@ import { SongService } from '../../../core/services/song.service';
 import { Genre, Song } from '../../../core/models';
 
 @Component({
+  standalone: false,
   selector: 'app-genre-detail',
   templateUrl: './genre-detail.component.html',
   styleUrls: ['./genre-detail.component.scss'],

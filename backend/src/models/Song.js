@@ -10,6 +10,7 @@ const songSchema = new mongoose.Schema(
     duration: Number,
     previewUrl: String,
     driveFileId: String,
+    driveLink: String,
     thumbnailId: String,
     downloadCount: { type: Number, default: 0 },
     releaseYear: Number,

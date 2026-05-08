@@ -13,6 +13,8 @@ export class PlayerService {
   private durationSubject = new BehaviorSubject<number>(0);
   private volumeSubject = new BehaviorSubject<number>(1);
   private isMutedSubject = new BehaviorSubject<boolean>(false);
+  private shuffleSubject = new BehaviorSubject<boolean>(false);
+  private repeatModeSubject = new BehaviorSubject<'off' | 'all' | 'one'>('off');
 
   currentSong$ = this.currentSongSubject.asObservable();
   queue$ = this.queueSubject.asObservable();
@@ -21,6 +23,8 @@ export class PlayerService {
   duration$ = this.durationSubject.asObservable();
   volume$ = this.volumeSubject.asObservable();
   isMuted$ = this.isMutedSubject.asObservable();
+  shuffle$ = this.shuffleSubject.asObservable();
+  repeatMode$ = this.repeatModeSubject.asObservable();
 
   constructor() {
     this.audio.addEventListener('timeupdate', () => {
@@ -30,7 +34,12 @@ export class PlayerService {
       this.durationSubject.next(this.audio.duration);
     });
     this.audio.addEventListener('ended', () => {
-      this.next();
+      if (this.repeatModeSubject.value === 'one') {
+        this.audio.currentTime = 0;
+        this.audio.play().catch(() => { });
+      } else {
+        this.next();
+      }
     });
     this.audio.addEventListener('play', () => this.isPlayingSubject.next(true));
     this.audio.addEventListener('pause', () => this.isPlayingSubject.next(false));
@@ -42,7 +51,7 @@ export class PlayerService {
     this.currentSongSubject.next(song);
     this.audio.src = url;
     this.audio.load();
-    this.audio.play().catch(() => {});
+    this.audio.play().catch(() => { });
   }
 
   pause(): void {
@@ -50,7 +59,7 @@ export class PlayerService {
   }
 
   resume(): void {
-    this.audio.play().catch(() => {});
+    this.audio.play().catch(() => { });
   }
 
   togglePlay(): void {
@@ -65,9 +74,21 @@ export class PlayerService {
     const queue = this.queueSubject.value;
     const current = this.currentSongSubject.value;
     if (!current || queue.length === 0) return;
+    if (this.repeatModeSubject.value === 'one') {
+      this.seek(0);
+      this.resume();
+      return;
+    }
+    if (this.shuffleSubject.value) {
+      const others = queue.filter(s => s._id !== current._id);
+      if (others.length > 0) {
+        this.play(others[Math.floor(Math.random() * others.length)]);
+      }
+      return;
+    }
     const idx = queue.findIndex(s => s._id === current._id);
-    const nextSong = queue[idx + 1] ?? queue[0];
-    this.play(nextSong);
+    const nextSong = queue[idx + 1] ?? (this.repeatModeSubject.value === 'all' ? queue[0] : null);
+    if (nextSong) this.play(nextSong);
   }
 
   previous(): void {
@@ -77,6 +98,17 @@ export class PlayerService {
     const idx = queue.findIndex(s => s._id === current._id);
     const prevSong = queue[idx - 1] ?? queue[queue.length - 1];
     this.play(prevSong);
+  }
+
+  toggleShuffle(): void {
+    this.shuffleSubject.next(!this.shuffleSubject.value);
+  }
+
+  toggleRepeat(): void {
+    const modes: Array<'off' | 'all' | 'one'> = ['off', 'all', 'one'];
+    const current = this.repeatModeSubject.value;
+    const idx = modes.indexOf(current);
+    this.repeatModeSubject.next(modes[(idx + 1) % modes.length]);
   }
 
   seek(time: number): void {

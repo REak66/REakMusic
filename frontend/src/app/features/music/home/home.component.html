@@ -1,25 +1,39 @@
 <div class="home-page main-content">
   <!-- Hero Section -->
   <section class="hero">
-    <div class="container">
-      <h1 class="hero-title">Discover & Own <span>Music</span></h1>
-      <p class="hero-subtitle">Buy, download and keep your favorite songs forever.</p>
+    <div class="hero-bg-orb orb-1"></div>
+    <div class="hero-bg-orb orb-2"></div>
+    <div class="container hero-content">
+      <div class="hero-eyebrow"><i class="fa-solid fa-music"></i> The Music Marketplace</div>
+      <h1 class="hero-title">Discover &amp; Own<br><span>Music Forever</span></h1>
+      <p class="hero-subtitle">Buy DRM-free tracks and keep them forever. Support independent producers directly.</p>
       <div class="hero-actions">
         <a class="btn btn-primary btn-lg" routerLink="/home/songs">{{ 'nav.browse' | translate }}</a>
+        <a class="btn btn-outline btn-lg" routerLink="/home">Explore Producers</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="stat-num">10K+</span><span class="stat-lbl">Songs</span></div>
+        <div class="hero-divider"></div>
+        <div class="hero-stat"><span class="stat-num">500+</span><span class="stat-lbl">Producers</span></div>
+        <div class="hero-divider"></div>
+        <div class="hero-stat"><span class="stat-num">50K+</span><span class="stat-lbl">Downloads</span></div>
       </div>
     </div>
   </section>
 
   <!-- Featured Songs -->
   <section class="section container">
-    <h2 class="section-title">{{ 'music.featured' | translate }}</h2>
+    <div class="section-header">
+      <h2 class="section-title">{{ 'music.featured' | translate }}</h2>
+      <a class="section-link" routerLink="/home/songs">View all <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
     <div class="loading-spinner" *ngIf="loading"></div>
     <div class="grid-songs" *ngIf="!loading">
       <div class="song-card" *ngFor="let song of featuredSongs" [routerLink]="['/home/songs', song._id]">
         <div class="song-thumbnail">
           <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
           <div class="play-overlay">
-            <div class="play-icon">▶</div>
+            <div class="play-icon"><i class="fa-solid fa-play"></i></div>
           </div>
         </div>
         <div class="song-info">
@@ -37,10 +51,13 @@
 
   <!-- Trending Section -->
   <section class="section container">
-    <h2 class="section-title">{{ 'music.trending' | translate }} 🔥</h2>
+    <div class="section-header">
+      <h2 class="section-title">{{ 'music.trending' | translate }} <span class="fire"><i class="fa-solid fa-fire"></i></span></h2>
+      <a class="section-link" routerLink="/home/songs">View all <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
     <div class="trending-list">
       <div class="trending-item" *ngFor="let song of trendingSongs; let i = index" [routerLink]="['/home/songs', song._id]">
-        <span class="rank">{{ i + 1 }}</span>
+        <span class="rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">{{ i + 1 }}</span>
         <div class="trending-thumb">
           <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
         </div>
@@ -48,7 +65,7 @@
           <span class="trending-title">{{ song.title }}</span>
           <span class="trending-artist">{{ getArtistName(song) }}</span>
         </div>
-        <span class="trending-downloads">{{ song.downloadCount }} ↓</span>
+        <span class="trending-downloads">{{ song.downloadCount }} downloads</span>
         <span class="trending-price" *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
         <span class="badge badge-success" *ngIf="song.price === 0">{{ 'music.free' | translate }}</span>
       </div>
