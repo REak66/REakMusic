@@ -1,23 +1,38 @@
 <div class="artist-detail-page main-content">
   <div class="container">
-    <div class="loading-spinner" *ngIf="loading"></div>
+    <app-skeleton type="artist-detail" *ngIf="loading" />
 
     <div *ngIf="artist && !loading">
+      <app-animate-on-scroll enterClass="animate-fade-in" [threshold]="0.1">
       <div class="artist-header">
-        <div class="artist-avatar">
+        <div class="artist-avatar"
+          pAnimateOnScroll
+          enterClass="animate-slide-in-left"
+          [threshold]="0.15">
           <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" [alt]="artist.name" />
           <span *ngIf="!artist.imageUrl" class="avatar-placeholder"><i class="fa-solid fa-microphone-lines"></i></span>
         </div>
-        <div class="artist-info">
+        <div class="artist-info"
+          pAnimateOnScroll
+          enterClass="animate-slide-in-right"
+          [threshold]="0.15">
           <h1>{{ artist.name }}</h1>
           <p *ngIf="artist.country" class="artist-country">{{ artist.country }}</p>
           <p *ngIf="artist.bio" class="artist-bio">{{ artist.bio }}</p>
         </div>
       </div>
+      </app-animate-on-scroll>
 
-      <h2 class="section-title">Songs by {{ artist.name }}</h2>
+      <app-animate-on-scroll enterClass="animate-fade-in-up" [threshold]="0.1">
+        <h2 class="section-title">Songs by {{ artist.name }}</h2>
+      </app-animate-on-scroll>
       <div class="grid-songs">
-        <div class="song-card" *ngFor="let song of songs" [routerLink]="['/home/songs', song._id]">
+        <div class="song-card"
+          *ngFor="let song of songs"
+          [routerLink]="['/home/songs', song._id]"
+          pAnimateOnScroll
+          enterClass="animate-zoom-in"
+          [threshold]="0.1">
           <div class="song-thumbnail">
             <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
             <div class="play-overlay"><div class="play-icon"><i class="fa-solid fa-play"></i></div></div>

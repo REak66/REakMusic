@@ -1,24 +1,39 @@
 <div class="album-detail-page main-content">
   <div class="container">
-    <div class="loading-spinner" *ngIf="loading"></div>
+    <app-skeleton type="album-detail" *ngIf="loading" />
 
     <div *ngIf="album && !loading">
+      <app-animate-on-scroll enterClass="animate-fade-in" [threshold]="0.1">
       <div class="album-header">
-        <div class="album-cover">
+        <div class="album-cover"
+          pAnimateOnScroll
+          enterClass="animate-slide-in-left"
+          [threshold]="0.15">
           <img *ngIf="album.coverUrl" [src]="album.coverUrl" [alt]="album.title" />
           <span *ngIf="!album.coverUrl" class="cover-placeholder"><i class="fa-solid fa-record-vinyl"></i></span>
         </div>
-        <div class="album-info">
+        <div class="album-info"
+          pAnimateOnScroll
+          enterClass="animate-slide-in-right"
+          [threshold]="0.15">
           <div class="badge badge-primary" style="margin-bottom: 0.75rem">Album</div>
           <h1>{{ album.title }}</h1>
           <p *ngIf="album.releaseYear" class="album-year">{{ album.releaseYear }}</p>
           <p *ngIf="album.description" class="album-desc">{{ album.description }}</p>
         </div>
       </div>
+      </app-animate-on-scroll>
 
-      <h2 class="section-title">Tracks ({{ songs.length }})</h2>
+      <app-animate-on-scroll enterClass="animate-fade-in-up" [threshold]="0.1">
+        <h2 class="section-title">Tracks ({{ songs.length }})</h2>
+      </app-animate-on-scroll>
       <div class="track-list">
-        <div class="track-item" *ngFor="let song of songs; let i = index" [routerLink]="['/home/songs', song._id]">
+        <div class="track-item"
+          *ngFor="let song of songs; let i = index"
+          [routerLink]="['/home/songs', song._id]"
+          pAnimateOnScroll
+          enterClass="animate-slide-in-left"
+          [threshold]="0.1">
           <span class="track-num">{{ i + 1 }}</span>
           <div class="track-thumb">
             <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />

@@ -15,7 +15,7 @@ const routes: Routes = [
       { path: '', component: AdminDashboardComponent },
       { path: 'songs', component: SongManagementComponent },
       { path: 'artists', component: ArtistManagementComponent },
-      { path: 'orders', component: OrderManagementComponent },
+      { path: 'subscriptions', component: OrderManagementComponent },
       { path: 'users', component: UserManagementComponent }
     ]
   }

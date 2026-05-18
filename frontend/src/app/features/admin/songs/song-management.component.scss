@@ -102,3 +102,13 @@
     width: 100%;
   }
 }
+
+// ─── Row entrance animation ───────────────────────────────────────────────────
+
+.data-table tbody tr {
+  animation: fadeInUp 0.35s ease both;
+
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) { animation-delay: #{($i - 1) * 35}ms; }
+  }
+}

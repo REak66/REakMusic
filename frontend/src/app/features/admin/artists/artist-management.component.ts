@@ -1,5 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api';
 import { ArtistService } from '../../../core/services/artist.service';
 import { Artist } from '../../../core/models';
 import { SelectOption } from '../../../shared/components/select-dropdown/select-dropdown.component';
@@ -9,7 +11,21 @@ import { SelectOption } from '../../../shared/components/select-dropdown/select-
   selector: 'app-artist-management',
   templateUrl: './artist-management.component.html',
   styleUrls: ['./artist-management.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('slideUp', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(22px)' }),
+        animate('450ms cubic-bezier(0.35, 0, 0.25, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ]),
+    trigger('tableEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(16px)' }),
+        animate('400ms 60ms cubic-bezier(0.35, 0, 0.25, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ])
+  ]
 })
 export class ArtistManagementComponent implements OnInit {
   artists: Artist[] = [];
@@ -19,15 +35,44 @@ export class ArtistManagementComponent implements OnInit {
   form!: FormGroup;
   error = '';
   saving = false;
+  searchQuery = '';
+  page = 1;
+  pageSize = 10;
+
+  get filteredArtists(): Artist[] {
+    if (!this.searchQuery.trim()) return this.artists;
+    const q = this.searchQuery.toLowerCase();
+    return this.artists.filter(a =>
+      a.name.toLowerCase().includes(q) ||
+      (a.country || '').toLowerCase().includes(q) ||
+      (a.bio || '').toLowerCase().includes(q)
+    );
+  }
+
+  get pagedArtists(): Artist[] {
+    const start = (this.page - 1) * this.pageSize;
+    return this.filteredArtists.slice(start, start + this.pageSize);
+  }
 
   readonly SOCIAL_PLATFORMS = ['Facebook', 'Instagram', 'Twitter', 'YouTube', 'TikTok', 'Spotify', 'SoundCloud', 'Website', 'Other'];
 
-  readonly SOCIAL_PLATFORM_OPTIONS: SelectOption[] = this.SOCIAL_PLATFORMS.map(p => ({ value: p, label: p }));
+  readonly SOCIAL_PLATFORM_OPTIONS: SelectOption[] = [
+    { value: 'Facebook', label: 'Facebook', icon: 'fa-brands fa-facebook' },
+    { value: 'Instagram', label: 'Instagram', icon: 'fa-brands fa-instagram' },
+    { value: 'Twitter', label: 'Twitter', icon: 'fa-brands fa-x-twitter' },
+    { value: 'YouTube', label: 'YouTube', icon: 'fa-brands fa-youtube' },
+    { value: 'TikTok', label: 'TikTok', icon: 'fa-brands fa-tiktok' },
+    { value: 'Spotify', label: 'Spotify', icon: 'fa-brands fa-spotify' },
+    { value: 'SoundCloud', label: 'SoundCloud', icon: 'fa-brands fa-soundcloud' },
+    { value: 'Website', label: 'Website', icon: 'fa-solid fa-globe' },
+    { value: 'Other', label: 'Other', icon: 'fa-solid fa-link' },
+  ];
 
   constructor(
     private artistService: ArtistService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
@@ -118,8 +163,32 @@ export class ArtistManagementComponent implements OnInit {
   }
 
   delete(id: string): void {
-    if (!confirm('Delete this artist?')) return;
-    this.artistService.deleteArtist(id).subscribe({ next: () => this.load() });
+    this.confirmationService.confirm({
+      header: 'Delete Producer',
+      message: 'Are you sure you want to delete this producer? This action cannot be undone.',
+      acceptLabel: 'Delete',
+      rejectLabel: 'Cancel',
+      accept: () => {
+        this.artistService.deleteArtist(id).subscribe({ next: () => this.load() });
+      }
+    });
+  }
+
+  setSearch(query: string): void {
+    this.searchQuery = query;
+    this.page = 1;
+    this.cdr.markForCheck();
+  }
+
+  onPageChange(page: number): void {
+    this.page = page;
+    this.cdr.markForCheck();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.page = 1;
+    this.cdr.markForCheck();
   }
 
   isBase64(value: string | undefined): boolean {

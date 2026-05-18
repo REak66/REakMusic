@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MusicRoutingModule } from './music-routing.module';
+import { SharedModule } from '../../shared/shared.module';
 import { HomeComponent } from './home/home.component';
 import { SongListComponent } from './song-list/song-list.component';
 import { SongDetailComponent } from './song-detail/song-detail.component';
@@ -25,7 +26,8 @@ import { GenreDetailComponent } from './genre-detail/genre-detail.component';
     ReactiveFormsModule,
     RouterModule,
     TranslateModule,
-    MusicRoutingModule
+    MusicRoutingModule,
+    SharedModule
   ]
 })
-export class MusicModule {}
+export class MusicModule { }

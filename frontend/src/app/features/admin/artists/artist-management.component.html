@@ -1,95 +1,188 @@
 <div class="admin-page">
-    <div class="page-header">
+    <div class="page-header" [@slideUp]>
       <div>
-        <h1 class="page-title">{{ 'admin.artists' | translate }}</h1>
+        <h1 class="page-title">Producer Management</h1>
         <p class="page-sub">Manage producers and artists</p>
       </div>
       <button class="btn btn-primary" (click)="openAdd()">
         <i class="fa-solid fa-plus"></i>
-        {{ 'common.add' | translate }} Artist
+        Add Producer
       </button>
+    </div>
+
+    <!-- Stats Bar -->
+    <div class="stats-bar" *ngIf="!loading" [@slideUp]>
+      <div class="stat-chip">
+        <i class="fa-solid fa-microphone-lines"></i>
+        <span>{{ artists.length }} Producer{{ artists.length !== 1 ? 's' : '' }}</span>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-bar" *ngIf="!loading" [@slideUp]>
+      <div class="search-input-wrap">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search producers..."
+          [value]="searchQuery"
+          (input)="setSearch($any($event.target).value)"
+        />
+        <button class="search-clear" *ngIf="searchQuery" (click)="setSearch('')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
     </div>
 
     <div class="loading-spinner" *ngIf="loading"></div>
 
-    <div class="table-wrap" *ngIf="!loading">
+    <div class="table-wrap" *ngIf="!loading" [@tableEnter]>
       <table class="data-table">
         <thead>
           <tr>
-            <th>Photo</th>
-            <th>Name</th>
-            <th>Country</th>
-            <th>Bio</th>
-            <th>Social</th>
-            <th>Actions</th>
+            <th class="col-num">#</th>
+            <th class="col-producer">Producer</th>
+            <th class="col-country">Country</th>
+            <th class="col-bio">Bio</th>
+            <th class="col-social">Social</th>
+            <th class="col-actions">Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let artist of artists">
-            <td class="photo-cell">
-              <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" [alt]="artist.name" class="artist-thumb" />
-              <div *ngIf="!artist.imageUrl" class="artist-thumb-placeholder">
-                <i class="fa-solid fa-user"></i>
-              </div>
-            </td>
-            <td>{{ artist.name }}</td>
-            <td>{{ artist.country || '-' }}</td>
-            <td class="bio-cell">{{ artist.bio || '-' }}</td>
-            <td>
-              <span class="social-count" *ngIf="artist.socialLinks?.length">
-                {{ artist.socialLinks!.length }} link{{ artist.socialLinks!.length !== 1 ? 's' : '' }}
-              </span>
-              <span *ngIf="!artist.socialLinks?.length">-</span>
-            </td>
-            <td class="actions">
-              <button class="btn btn-ghost btn-sm" (click)="openEdit(artist)">{{ 'common.edit' | translate }}</button>
-              <button class="btn btn-danger btn-sm" (click)="delete(artist._id)">{{ 'common.delete' | translate }}</button>
-            </td>
-          </tr>
+          <ng-container *ngFor="let artist of pagedArtists; let i = index">
+            <tr class="producer-row">
+              <td class="row-num">{{ (page - 1) * pageSize + i + 1 }}</td>
+              <td class="producer-cell">
+                <div class="producer-identity">
+                  <div class="avatar-wrap">
+                    <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" [alt]="artist.name" class="artist-thumb" />
+                    <div *ngIf="!artist.imageUrl" class="artist-thumb-placeholder">
+                      <span class="avatar-initials">{{ artist.name.charAt(0).toUpperCase() }}</span>
+                    </div>
+                    <span class="avatar-status"></span>
+                  </div>
+                  <div class="producer-info">
+                    <span class="producer-name">{{ artist.name }}</span>
+                    <span class="producer-role">Producer</span>
+                  </div>
+                </div>
+              </td>
+              <td class="country-cell">
+                <span class="country-badge" *ngIf="artist.country">
+                  <i class="fa-solid fa-location-dot"></i>
+                  {{ artist.country }}
+                </span>
+                <span class="cell-empty" *ngIf="!artist.country">—</span>
+              </td>
+              <td class="bio-cell">
+                <span class="bio-text" [title]="artist.bio || ''" *ngIf="artist.bio">{{ artist.bio }}</span>
+                <span class="cell-empty" *ngIf="!artist.bio">—</span>
+              </td>
+              <td class="social-cell">
+                <span class="social-badge" *ngIf="artist.socialLinks?.length">
+                  <i class="fa-solid fa-link"></i>
+                  {{ artist.socialLinks!.length }}
+                </span>
+                <span class="cell-empty" *ngIf="!artist.socialLinks?.length">—</span>
+              </td>
+              <td class="actions">
+                <button class="btn-icon btn-edit" (click)="openEdit(artist)" title="Edit producer">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="btn-icon btn-delete" (click)="delete(artist._id)" title="Delete producer">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
-      <p *ngIf="artists.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="filteredArtists.length === 0 && searchQuery">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <p>No producers match "<strong>{{ searchQuery }}</strong>"</p>
+        <button class="btn btn-outline btn-sm" (click)="setSearch('')">Clear Search</button>
+      </div>
+      <div class="empty-state" *ngIf="artists.length === 0 && !searchQuery">
+        <i class="fa-solid fa-microphone-lines"></i>
+        <p>No producers yet. Add your first producer!</p>
+      </div>
     </div>
+
+    <app-pagination
+      [total]="filteredArtists.length"
+      [pageSize]="pageSize"
+      [currentPage]="page"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-pagination>
 </div>
 
 <div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
   <div class="modal card modal-producer" (click)="$event.stopPropagation()">
-    <h2>{{ editingArtist ? ('common.edit' | translate) : ('common.add' | translate) }} Producer</h2>
-    <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon">
+          <i class="fa-solid fa-microphone-lines"></i>
+        </div>
+        <div>
+          <h2>{{ editingArtist ? ('common.edit' | translate) : ('common.add' | translate) }} Producer</h2>
+          <p class="modal-subtitle">{{ editingArtist ? 'Update producer details' : 'Add a new producer to your catalog' }}</p>
+        </div>
+      </div>
+      <button type="button" class="modal-close" (click)="showModal = false" title="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
 
     <form [formGroup]="form" (ngSubmit)="save()">
 
-      <!-- Profile Photo (full-width, top) -->
-      <div class="photo-row">
-        <div class="photo-body">
-          <app-image-cropper
-            [initialImage]="editingArtist?.imageUrl"
-            (imageCropped)="onImageCropped($event)"
-          ></app-image-cropper>
+      <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
+      <!-- Profile Photo -->
+      <div class="form-section">
+        <span class="section-label"><i class="fa-solid fa-image"></i> Profile Photo</span>
+        <div class="photo-row">
+          <div class="photo-body">
+            <app-image-cropper
+              [initialImage]="editingArtist?.imageUrl"
+              (imageCropped)="onImageCropped($event)"
+            ></app-image-cropper>
+          </div>
         </div>
       </div>
 
       <!-- Info Fields -->
-      <div class="info-grid">
-        <div class="form-group">
-          <label>Name *</label>
-          <input type="text" formControlName="name" placeholder="Producer name" />
+      <div class="form-section">
+        <span class="section-label"><i class="fa-solid fa-circle-info"></i> Basic Info</span>
+        <div class="info-grid">
+          <div class="form-group">
+            <label>Name <span class="required">*</span></label>
+            <input type="text" formControlName="name" placeholder="Producer name" />
+          </div>
+          <div class="form-group">
+            <label>Country</label>
+            <input type="text" formControlName="country" placeholder="e.g. Cambodia" />
+          </div>
         </div>
         <div class="form-group">
-          <label>Country</label>
-          <input type="text" formControlName="country" placeholder="e.g. Cambodia" />
+          <label>Bio</label>
+          <textarea formControlName="bio" rows="3" placeholder="Producer biography..."></textarea>
         </div>
-      </div>
-
-      <div class="form-group">
-        <label>Bio</label>
-        <textarea formControlName="bio" rows="3" placeholder="Producer biography..."></textarea>
       </div>
 
       <!-- Social Links -->
       <div class="social-section">
         <div class="social-header">
-          <span class="social-title">Social Links</span>
+          <div class="social-title-group">
+            <i class="fa-solid fa-share-nodes"></i>
+            <span class="social-title">Social Links</span>
+            <span class="social-count" *ngIf="socialLinks.length > 0">{{ socialLinks.length }}</span>
+          </div>
           <button type="button" class="btn-add-social" (click)="addSocialLink()">
             <i class="fa-solid fa-plus"></i>
             Add
@@ -117,16 +210,22 @@
           </div>
         </div>
 
-        <p class="no-socials" *ngIf="socialLinks.length === 0">No social links added yet.</p>
+        <p class="no-socials" *ngIf="socialLinks.length === 0">
+          <i class="fa-solid fa-link-slash"></i>
+          No social links added yet.
+        </p>
       </div>
 
       <div class="modal-actions">
         <button type="button" class="btn btn-outline" (click)="showModal = false">{{ 'common.cancel' | translate }}</button>
         <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">
-          <span *ngIf="saving">{{ 'common.loading' | translate }}</span>
-          <span *ngIf="!saving">{{ 'common.save' | translate }}</span>
+          <i class="fa-solid fa-spinner fa-spin" *ngIf="saving"></i>
+          <i class="fa-solid fa-floppy-disk" *ngIf="!saving"></i>
+          <span>{{ saving ? ('common.loading' | translate) : ('common.save' | translate) }}</span>
         </button>
       </div>
     </form>
   </div>
 </div>
+
+<app-confirm-dialog></app-confirm-dialog>

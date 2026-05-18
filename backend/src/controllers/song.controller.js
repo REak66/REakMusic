@@ -179,18 +179,30 @@ exports.downloadSong = async (req, res, next) => {
     const song = await Song.findById(req.params.id);
     if (!song) return errorResponse(res, 'Song not found', 404);
 
+    const Subscription = require('../models/Subscription');
     const user = await User.findById(req.user.id);
-    const owned = user.purchasedSongs.some((id) => id.toString() === song._id.toString());
-    if (!owned) return errorResponse(res, 'You have not purchased this song', 403);
+
+    // Free songs: any authenticated user can download
+    // Paid songs: must own the song or have an active subscription
+    if (song.price > 0) {
+      const owned = user.purchasedSongs.some((id) => id.toString() === song._id.toString());
+      const activeSubscription = await Subscription.findOne({
+        userId: req.user.id,
+        status: 'active',
+        endDate: { $gt: new Date() },
+      });
+      if (!owned && !activeSubscription) {
+        return errorResponse(res, 'An active subscription is required to download this song.', 403);
+      }
+    }
 
     if (!song.driveFileId) return errorResponse(res, 'File not available for download', 404);
-
-    const signedUrl = await driveService.generateSignedUrl(song.driveFileId, 10);
 
     await Download.create({ userId: req.user.id, songId: song._id, ip: req.ip });
     await Song.findByIdAndUpdate(song._id, { $inc: { downloadCount: 1 } });
 
-    return successResponse(res, { signedUrl }, 'Download URL generated');
+    const filename = `${song.title}.mp3`;
+    await driveService.streamFile(song.driveFileId, req, res, filename);
   } catch (err) {
     next(err);
   }

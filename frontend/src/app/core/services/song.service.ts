@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -47,8 +47,16 @@ export class SongService {
     return this.getSongs({ featured: true, limit });
   }
 
-  downloadSong(id: string): Observable<{ downloadUrl: string }> {
-    return this.http.get<{ downloadUrl: string }>(`${this.apiUrl}/${id}/download`);
+  downloadSong(id: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/${id}/download`, { responseType: 'blob' });
+  }
+
+  downloadSongWithProgress(id: string): Observable<HttpEvent<Blob>> {
+    return this.http.get(`${this.apiUrl}/${id}/download`, {
+      responseType: 'blob',
+      reportProgress: true,
+      observe: 'events'
+    });
   }
 
   createSong(data: FormData): Observable<Song> {

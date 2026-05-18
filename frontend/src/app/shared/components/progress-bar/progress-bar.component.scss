@@ -1,0 +1,72 @@
+// ── ProgressBar shared component ──────────────────────────────────────────────
+
+.pb-wrapper {
+  width: 100%;
+
+  // Header row: label + percentage
+  .pb-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.45rem;
+
+    .pb-label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: rgba(255, 255, 255, 0.75);
+      text-transform: uppercase;
+    }
+
+    .pb-pct {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  // Override PrimeNG p-progressbar styles to match dark theme
+  ::ng-deep .p-progressbar {
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+
+    .p-progressbar-value {
+      border-radius: 999px;
+      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  // ── Color variants ──────────────────────────────────────────────────────────
+  &.pb--primary ::ng-deep .p-progressbar .p-progressbar-value {
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+  }
+
+  &.pb--success ::ng-deep .p-progressbar .p-progressbar-value {
+    background: linear-gradient(90deg, #059669, #34d399);
+    box-shadow: 0 0 10px rgba(5, 150, 105, 0.4);
+  }
+
+  &.pb--warning ::ng-deep .p-progressbar .p-progressbar-value {
+    background: linear-gradient(90deg, #d97706, #fbbf24);
+    box-shadow: 0 0 10px rgba(217, 119, 6, 0.4);
+  }
+
+  &.pb--danger ::ng-deep .p-progressbar .p-progressbar-value {
+    background: linear-gradient(90deg, #dc2626, #f87171);
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.4);
+  }
+
+  &.pb--info ::ng-deep .p-progressbar .p-progressbar-value {
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    box-shadow: 0 0 10px rgba(2, 132, 199, 0.4);
+  }
+
+  // Indeterminate: animated scanning effect
+  &.pb--primary ::ng-deep .p-progressbar-indeterminate .p-progressbar-value::before,
+  &.pb--primary ::ng-deep .p-progressbar-indeterminate .p-progressbar-value::after {
+    background: linear-gradient(90deg, transparent, #a855f7, transparent);
+  }
+}

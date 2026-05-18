@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { SongService } from '../../../core/services/song.service';
 import { GenreService } from '../../../core/services/genre.service';
-import { CartService } from '../../../core/services/cart.service';
 import { Song, Genre, SongQueryParams } from '../../../core/models';
 
 @Component({
@@ -34,7 +33,6 @@ export class SongListComponent implements OnInit {
   constructor(
     private songService: SongService,
     private genreService: GenreService,
-    public cartService: CartService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef
   ) { }
@@ -115,7 +113,9 @@ export class SongListComponent implements OnInit {
     return 'assets/images/default-cover.svg';
   }
 
-  get pages(): number[] {
-    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  onLimitChange(size: number): void {
+    this.limit = size;
+    this.page = 1;
+    this.loadSongs();
   }
 }

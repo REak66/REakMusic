@@ -1,37 +1,47 @@
-const redisClient = require('../config/redis');
+const store = new Map();
 
 const OTP_TTL = 600; // 10 minutes
 const MAX_ATTEMPTS = 3;
 
-const generateOtp = async (email, prefix) => {
+const _set = (key, value, ttlSeconds) => {
+  store.set(key, { value, expiresAt: Date.now() + ttlSeconds * 1000 });
+};
+
+const _get = (key) => {
+  const item = store.get(key);
+  if (!item) return null;
+  if (item.expiresAt < Date.now()) { store.delete(key); return null; }
+  return item.value;
+};
+
+const generateOtp = (email, prefix) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  await redisClient.set(`${prefix}:${email}`, otp, { EX: OTP_TTL });
+  _set(`${prefix}:${email}`, otp, OTP_TTL);
   return otp;
 };
 
-const verifyOtp = async (email, otp, prefix) => {
-  const stored = await redisClient.get(`${prefix}:${email}`);
-  return stored === otp;
+const verifyOtp = (email, otp, prefix) => {
+  return _get(`${prefix}:${email}`) === otp;
 };
 
-const deleteOtp = async (email, prefix) => {
-  await redisClient.del(`${prefix}:${email}`);
+const deleteOtp = (email, prefix) => {
+  store.delete(`${prefix}:${email}`);
 };
 
-const incrementAttempts = async (email, prefix) => {
+const incrementAttempts = (email, prefix) => {
   const key = `${prefix}_attempts:${email}`;
-  const attempts = await redisClient.incr(key);
-  await redisClient.expire(key, OTP_TTL);
-  return attempts;
+  const current = parseInt(_get(key)) || 0;
+  const next = current + 1;
+  _set(key, String(next), OTP_TTL);
+  return next;
 };
 
-const lockOtp = async (email, prefix, seconds) => {
-  await redisClient.set(`${prefix}_lock:${email}`, '1', { EX: seconds });
+const lockOtp = (email, prefix, seconds) => {
+  _set(`${prefix}_lock:${email}`, '1', seconds);
 };
 
-const isLocked = async (email, prefix) => {
-  const lock = await redisClient.get(`${prefix}_lock:${email}`);
-  return lock !== null;
+const isLocked = (email, prefix) => {
+  return _get(`${prefix}_lock:${email}`) !== null;
 };
 
 module.exports = { generateOtp, verifyOtp, deleteOtp, incrementAttempts, lockOtp, isLocked, MAX_ATTEMPTS };

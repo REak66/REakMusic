@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Inject } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { Observable, combineLatest, map } from 'rxjs';
 import { PlayerService } from '../player.service';
 import { Song, Artist } from '../../../core/models';
@@ -22,8 +23,13 @@ export class PlayerBarComponent implements OnInit {
 
   private _currentTime = 0;
   private _duration = 0;
+  private _repeatMode: string = 'off';
+  isMinimized = false;
 
-  constructor(public playerService: PlayerService) { }
+  constructor(
+    public playerService: PlayerService,
+    @Inject(DOCUMENT) private document: Document
+  ) { }
 
   ngOnInit(): void {
     this.currentSong$ = this.playerService.currentSong$;
@@ -37,6 +43,7 @@ export class PlayerBarComponent implements OnInit {
 
     this.currentTime$.subscribe(t => (this._currentTime = t));
     this.duration$.subscribe(d => (this._duration = d));
+    this.repeatMode$.subscribe(m => (this._repeatMode = m));
   }
 
   onSeek(event: Event): void {
@@ -69,5 +76,21 @@ export class PlayerBarComponent implements OnInit {
   getArtistName(song: Song): string {
     const artist = song.artistId as Artist;
     return artist?.name ?? 'Unknown Artist';
+  }
+
+  getRepeatTitle(): string {
+    const mode = this._repeatMode;
+    if (mode === 'one') return 'Repeat one';
+    if (mode === 'all') return 'Repeat all';
+    return 'Repeat off';
+  }
+
+  toggleMinimize(): void {
+    this.isMinimized = !this.isMinimized;
+    if (this.isMinimized) {
+      this.document.body.classList.add('player-minimized');
+    } else {
+      this.document.body.classList.remove('player-minimized');
+    }
   }
 }

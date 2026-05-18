@@ -1,112 +1,196 @@
 <div class="admin-dashboard">
 
-  <div class="dash-header">
-    <div>
-      <h1 class="page-title">{{ 'admin.dashboard' | translate }}</h1>
-      <p class="dash-subtitle">Overview of your music platform</p>
+  <!-- Welcome Banner -->
+  <div class="welcome-banner" [@slideUp]>
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <p class="welcome-eyebrow">
+          <i class="fa-solid fa-gauge-high"></i>
+          Admin Control Panel
+        </p>
+        <h1 class="page-title">{{ 'admin.dashboard' | translate }}</h1>
+        <p class="dash-subtitle">Monitor and manage your music platform in real time</p>
+      </div>
+      <div class="dash-quick-links">
+        <a class="quick-link" routerLink="/admin/songs">
+          <i class="fa-solid fa-music"></i>
+          Songs
+        </a>
+        <a class="quick-link" routerLink="/admin/subscriptions">
+          <i class="fa-solid fa-credit-card"></i>
+          Subscriptions
+        </a>
+        <a class="quick-link quick-link--accent" routerLink="/admin/users">
+          <i class="fa-solid fa-users"></i>
+          Users
+        </a>
+      </div>
     </div>
-    <div class="dash-quick-links">
-      <a class="quick-link" routerLink="/admin/songs">
-        <i class="fa-solid fa-music"></i>
-        Songs
-      </a>
-      <a class="quick-link" routerLink="/admin/orders">
-        <i class="fa-solid fa-credit-card"></i>
-        Orders
-      </a>
-    </div>
+    <div class="welcome-orb welcome-orb--1"></div>
+    <div class="welcome-orb welcome-orb--2"></div>
   </div>
 
-  <div class="loading-spinner" *ngIf="loading"></div>
+  <!-- Loading skeleton -->
+  <div *ngIf="loading" class="skeleton-grid">
+    <div class="skeleton-card" *ngFor="let i of [1,2,3,4]"></div>
+  </div>
 
   <ng-container *ngIf="analytics && !loading">
+
+    <!-- Section label -->
+    <div class="section-label">
+      <span class="section-label__dot"></span>
+      Platform Overview
+    </div>
 
     <!-- Stats grid -->
     <div class="stats-grid">
       <div class="stat-card stat-revenue">
-        <div class="stat-bg-icon">
-          <i class="fa-solid fa-dollar-sign"></i>
-        </div>
-        <div class="stat-icon-wrap">
-          <i class="fa-solid fa-dollar-sign"></i>
+        <div class="stat-top">
+          <div class="stat-icon-wrap">
+            <i class="fa-solid fa-sack-dollar"></i>
+          </div>
+          <span class="stat-trend stat-trend--up">
+            <i class="fa-solid fa-arrow-trend-up"></i> Live
+          </span>
         </div>
         <div class="stat-info">
-          <span class="stat-value">${{ analytics.totalRevenue.toFixed(2) }}</span>
+          <span class="stat-value">${{ animatedRevenue.toFixed(2) }}</span>
           <span class="stat-label">{{ 'admin.totalRevenue' | translate }}</span>
+        </div>
+        <div class="stat-sparkline">
+          <div class="spark-bar" style="height:40%"></div>
+          <div class="spark-bar" style="height:65%"></div>
+          <div class="spark-bar" style="height:50%"></div>
+          <div class="spark-bar" style="height:80%"></div>
+          <div class="spark-bar" style="height:60%"></div>
+          <div class="spark-bar active" style="height:100%"></div>
         </div>
       </div>
 
       <div class="stat-card stat-users">
-        <div class="stat-bg-icon">
-          <i class="fa-solid fa-users"></i>
-        </div>
-        <div class="stat-icon-wrap">
-          <i class="fa-solid fa-users"></i>
+        <div class="stat-top">
+          <div class="stat-icon-wrap">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <span class="stat-trend stat-trend--up">
+            <i class="fa-solid fa-arrow-trend-up"></i> Active
+          </span>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ analytics.totalUsers }}</span>
+          <span class="stat-value">{{ animatedUsers | number:'1.0-0' }}</span>
           <span class="stat-label">{{ 'admin.totalUsers' | translate }}</span>
+        </div>
+        <div class="stat-sparkline">
+          <div class="spark-bar" style="height:30%"></div>
+          <div class="spark-bar" style="height:55%"></div>
+          <div class="spark-bar" style="height:45%"></div>
+          <div class="spark-bar" style="height:70%"></div>
+          <div class="spark-bar" style="height:85%"></div>
+          <div class="spark-bar active" style="height:100%"></div>
         </div>
       </div>
 
       <div class="stat-card stat-songs">
-        <div class="stat-bg-icon">
-          <i class="fa-solid fa-music"></i>
-        </div>
-        <div class="stat-icon-wrap">
-          <i class="fa-solid fa-music"></i>
+        <div class="stat-top">
+          <div class="stat-icon-wrap">
+            <i class="fa-solid fa-music"></i>
+          </div>
+          <span class="stat-trend stat-trend--neutral">
+            <i class="fa-solid fa-wave-square"></i> Catalog
+          </span>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ analytics.totalSongs }}</span>
+          <span class="stat-value">{{ animatedSongs | number:'1.0-0' }}</span>
           <span class="stat-label">{{ 'admin.totalSongs' | translate }}</span>
+        </div>
+        <div class="stat-sparkline">
+          <div class="spark-bar" style="height:55%"></div>
+          <div class="spark-bar" style="height:60%"></div>
+          <div class="spark-bar" style="height:75%"></div>
+          <div class="spark-bar" style="height:65%"></div>
+          <div class="spark-bar" style="height:90%"></div>
+          <div class="spark-bar active" style="height:100%"></div>
         </div>
       </div>
 
       <div class="stat-card stat-downloads">
-        <div class="stat-bg-icon">
-          <i class="fa-solid fa-download"></i>
-        </div>
-        <div class="stat-icon-wrap">
-          <i class="fa-solid fa-download"></i>
+        <div class="stat-top">
+          <div class="stat-icon-wrap">
+            <i class="fa-solid fa-download"></i>
+          </div>
+          <span class="stat-trend stat-trend--up">
+            <i class="fa-solid fa-arrow-trend-up"></i> Growing
+          </span>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ analytics.totalDownloads }}</span>
+          <span class="stat-value">{{ animatedDownloads | number:'1.0-0' }}</span>
           <span class="stat-label">Total Downloads</span>
+        </div>
+        <div class="stat-sparkline">
+          <div class="spark-bar" style="height:25%"></div>
+          <div class="spark-bar" style="height:50%"></div>
+          <div class="spark-bar" style="height:40%"></div>
+          <div class="spark-bar" style="height:75%"></div>
+          <div class="spark-bar" style="height:88%"></div>
+          <div class="spark-bar active" style="height:100%"></div>
         </div>
       </div>
     </div>
 
     <!-- Bottom section -->
     <div class="dash-bottom">
+
       <!-- Top songs -->
-      <div class="top-songs card">
+      <div class="top-songs card" [@slideLeft]>
         <div class="section-header">
-          <h2>{{ 'admin.topSongs' | translate }}</h2>
-          <a routerLink="/admin/songs" class="section-link">View all</a>
+          <div class="section-header__left">
+            <div class="section-header__icon section-header__icon--purple">
+              <i class="fa-solid fa-chart-bar"></i>
+            </div>
+            <h2>{{ 'admin.topSongs' | translate }}</h2>
+          </div>
+          <a routerLink="/admin/songs" class="section-link">
+            View all <i class="fa-solid fa-arrow-right"></i>
+          </a>
         </div>
 
         <div class="top-song-item" *ngFor="let s of analytics.topSongs; let i = index">
           <span class="rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">
-            <ng-container *ngIf="i < 3">
-              <i class="fa-solid fa-star"></i>
-            </ng-container>
+            <ng-container *ngIf="i === 0"><i class="fa-solid fa-trophy"></i></ng-container>
+            <ng-container *ngIf="i === 1"><i class="fa-solid fa-medal"></i></ng-container>
+            <ng-container *ngIf="i === 2"><i class="fa-solid fa-award"></i></ng-container>
             <ng-container *ngIf="i >= 3">{{ i + 1 }}</ng-container>
           </span>
-          <span class="song-name">{{ s.title }}</span>
-          <div class="bar-container">
-            <div class="bar" [style.width.%]="(s.downloadCount / (analytics.topSongs[0].downloadCount || 1)) * 100"></div>
+          <div class="song-details">
+            <span class="song-name">{{ s.title }}</span>
+            <div class="bar-container">
+              <div class="bar" [style.width.%]="(s.downloadCount / (analytics.topSongs[0].downloadCount || 1)) * 100"></div>
+            </div>
           </div>
-          <span class="count">{{ s.downloadCount }}</span>
+          <span class="count">
+            <i class="fa-solid fa-download"></i>
+            {{ s.downloadCount }}
+          </span>
         </div>
 
-        <p *ngIf="!analytics.topSongs.length" class="no-data">No songs yet</p>
+        <p *ngIf="!analytics.topSongs.length" class="no-data">
+          <i class="fa-solid fa-music"></i>
+          No songs yet
+        </p>
       </div>
 
       <!-- Quick actions -->
-      <div class="quick-actions card">
+      <div class="quick-actions card" [@slideRight]>
         <div class="section-header">
-          <h2>Quick Actions</h2>
+          <div class="section-header__left">
+            <div class="section-header__icon section-header__icon--blue">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h2>Quick Actions</h2>
+          </div>
         </div>
+
         <div class="action-list">
           <a routerLink="/admin/songs" class="action-item">
             <div class="action-icon action-icon--purple">
@@ -114,8 +198,9 @@
             </div>
             <div class="action-text">
               <span class="action-title">Manage Songs</span>
-              <span class="action-sub">{{ analytics.totalSongs }} total</span>
+              <span class="action-sub">{{ analytics.totalSongs }} tracks in catalog</span>
             </div>
+            <span class="action-badge action-badge--purple">{{ analytics.totalSongs }}</span>
             <i class="fa-solid fa-chevron-right action-arrow"></i>
           </a>
           <a routerLink="/admin/artists" class="action-item">
@@ -124,17 +209,17 @@
             </div>
             <div class="action-text">
               <span class="action-title">Manage Artists</span>
-              <span class="action-sub">Producers & artists</span>
+              <span class="action-sub">Producers & creators</span>
             </div>
             <i class="fa-solid fa-chevron-right action-arrow"></i>
           </a>
-          <a routerLink="/admin/orders" class="action-item">
+          <a routerLink="/admin/subscriptions" class="action-item">
             <div class="action-icon action-icon--green">
               <i class="fa-solid fa-credit-card"></i>
             </div>
             <div class="action-text">
-              <span class="action-title">View Orders</span>
-              <span class="action-sub">Track purchases</span>
+              <span class="action-title">View Subscriptions</span>
+              <span class="action-sub">Track all subscribers</span>
             </div>
             <i class="fa-solid fa-chevron-right action-arrow"></i>
           </a>
@@ -144,12 +229,20 @@
             </div>
             <div class="action-text">
               <span class="action-title">Manage Users</span>
-              <span class="action-sub">{{ analytics.totalUsers }} registered</span>
+              <span class="action-sub">{{ analytics.totalUsers }} registered members</span>
             </div>
+            <span class="action-badge action-badge--amber">{{ analytics.totalUsers }}</span>
             <i class="fa-solid fa-chevron-right action-arrow"></i>
           </a>
         </div>
+
+        <!-- Platform status -->
+        <div class="platform-status">
+          <span class="status-dot"></span>
+          All systems operational
+        </div>
       </div>
+
     </div>
 
   </ng-container>

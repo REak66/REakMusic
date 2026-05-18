@@ -14,8 +14,15 @@
   <!-- Trigger -->
   <div class="select-trigger" (click)="toggle(); $event.stopPropagation()">
     <span class="select-value">
-      <span *ngIf="selectedLabel" class="selected-text">{{ selectedLabel }}</span>
-      <span *ngIf="!selectedLabel" class="placeholder-text">{{ placeholder }}</span>
+      <ng-container *ngIf="selectedLabel; else showPlaceholder">
+        <span class="selected-content">
+          <i *ngIf="selectedIcon" [class]="selectedIcon" class="option-icon"></i>
+          <span class="selected-text">{{ selectedLabel }}</span>
+        </span>
+      </ng-container>
+      <ng-template #showPlaceholder>
+        <span class="placeholder-text">{{ placeholder }}</span>
+      </ng-template>
     </span>
     <span class="select-arrow">
       <i class="fa-solid fa-chevron-down"></i>
@@ -38,7 +45,10 @@
         (click)="onOptionClick(option, $event)"
         (mouseenter)="focusedIndex = i"
       >
-        <span class="option-label">{{ option.label }}</span>
+        <span class="option-content">
+          <i *ngIf="option.icon" [class]="option.icon" class="option-icon"></i>
+          <span class="option-label">{{ option.label }}</span>
+        </span>
         <span class="option-check" *ngIf="isSelected(option)">
           <i class="fa-solid fa-check"></i>
         </span>

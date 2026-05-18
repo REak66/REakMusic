@@ -1,14 +1,14 @@
 <div class="admin-page">
-    <div class="page-header">
+    <div class="page-header" [@slideUp]>
       <div>
-        <h1 class="page-title">{{ 'admin.orders' | translate }}</h1>
-        <p class="page-sub">Track and review purchases</p>
+        <h1 class="page-title">{{ 'admin.subscriptions' | translate }}</h1>
+        <p class="page-sub">Track active and past subscriptions</p>
       </div>
     </div>
 
-    <div class="filters-bar">
+    <div class="filters-bar" [@slideUp]>
       <button
-        *ngFor="let s of ['all', 'pending', 'paid', 'expired', 'failed']"
+        *ngFor="let s of ['all', 'pending', 'active', 'expired', 'cancelled']"
         class="btn filter-btn"
         [ngClass]="statusFilter === s ? 'btn-primary' : 'btn-outline'"
         (click)="filter(s)"
@@ -17,34 +17,57 @@
 
     <div class="loading-spinner" *ngIf="loading"></div>
 
-    <div class="table-wrap" *ngIf="!loading">
+    <div class="table-wrap" *ngIf="!loading" [@tableEnter]>
       <table class="data-table">
         <thead>
           <tr>
-            <th>Order ID</th>
+            <th>ID</th>
             <th>User</th>
-            <th>Total</th>
+            <th>Plan</th>
+            <th>Price</th>
             <th>Status</th>
-            <th>Date</th>
+            <th>End Date</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let order of filteredOrders">
-            <td>{{ order._id.slice(-8).toUpperCase() }}</td>
-            <td>{{ order.userId }}</td>
-            <td>${{ order.total.toFixed(2) }}</td>
+          <tr *ngFor="let sub of pagedSubscriptions">
+            <td>{{ sub._id.slice(-8).toUpperCase() }}</td>
+            <td>{{ $any(sub.userId)?.email || sub.userId }}</td>
+            <td>{{ sub.plan | titlecase }}</td>
+            <td>${{ sub.price.toFixed(2) }}</td>
             <td>
               <span class="badge"
                 [ngClass]="{
-                  'badge-success': order.status === 'paid',
-                  'badge-warning': order.status === 'pending',
-                  'badge-error': order.status === 'expired' || order.status === 'failed'
-                }">{{ order.status }}</span>
+                  'badge-success': sub.status === 'active',
+                  'badge-warning': sub.status === 'pending',
+                  'badge-muted': sub.status === 'expired',
+                  'badge-error': sub.status === 'cancelled' || sub.status === 'rejected'
+                }">{{ sub.status }}</span>
             </td>
-            <td>{{ order.createdAt | date: 'short' }}</td>
+            <td>{{ sub.endDate ? (sub.endDate | date: 'short') : '—' }}</td>
+            <td>
+              <ng-container *ngIf="sub.status === 'pending'">
+                <button class="btn btn-xs btn-success" [disabled]="actionInProgress === sub._id" (click)="approve(sub._id)">
+                  {{ 'subscription.approve' | translate }}
+                </button>
+                <button class="btn btn-xs btn-danger" [disabled]="actionInProgress === sub._id" (click)="reject(sub._id)">
+                  {{ 'subscription.reject' | translate }}
+                </button>
+              </ng-container>
+              <span *ngIf="sub.status !== 'pending'">—</span>
+            </td>
           </tr>
         </tbody>
       </table>
-      <p *ngIf="filteredOrders.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
+      <p *ngIf="filteredSubscriptions.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
     </div>
+
+    <app-pagination
+      [total]="filteredSubscriptions.length"
+      [pageSize]="pageSize"
+      [currentPage]="page"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-pagination>
 </div>

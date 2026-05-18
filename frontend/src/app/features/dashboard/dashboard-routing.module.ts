@@ -7,7 +7,7 @@ import { LibraryComponent } from './library/library.component';
 const routes: Routes = [
   { path: '', redirectTo: 'profile', pathMatch: 'full' },
   { path: 'profile', component: ProfileComponent },
-  { path: 'orders', component: OrdersComponent },
+  { path: 'subscription', component: OrdersComponent },
   { path: 'library', component: LibraryComponent }
 ];
 
@@ -15,4 +15,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class DashboardRoutingModule {}
+export class DashboardRoutingModule { }

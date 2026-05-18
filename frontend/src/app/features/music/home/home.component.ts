@@ -13,6 +13,7 @@ export class HomeComponent implements OnInit {
   featuredSongs: Song[] = [];
   trendingSongs: Song[] = [];
   loading = true;
+  trendingLoading = true;
 
   constructor(private songService: SongService, private cdr: ChangeDetectorRef) { }
 
@@ -28,8 +29,10 @@ export class HomeComponent implements OnInit {
     this.songService.getTrending(10).subscribe({
       next: res => {
         this.trendingSongs = res.data || res as unknown as Song[];
+        this.trendingLoading = false;
         this.cdr.markForCheck();
-      }
+      },
+      error: () => { this.trendingLoading = false; this.cdr.markForCheck(); }
     });
   }
 

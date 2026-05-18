@@ -1,38 +1,35 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
-import { User, AuthTokens } from '../models';
+import { User } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly apiUrl = `${environment.apiUrl}/auth`;
-  private accessToken: string | null = null;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
 
   currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router) { }
 
-  /** Called by APP_INITIALIZER after all services are fully constructed. */
+  /** Called by APP_INITIALIZER to restore session on page load. */
   tryRefreshOnInit(): Observable<unknown> {
-    return this.refreshToken().pipe(
+    return this.http.get<{ data: { user: User } }>(`${this.apiUrl}/me`, { withCredentials: true }).pipe(
+      tap(res => this.currentUserSubject.next(res.data.user)),
       catchError(() => of(null))
     );
   }
 
-  login(email: string, password: string): Observable<{ accessToken: string; user: User }> {
-    return this.http.post<{ data: { accessToken: string; user: User } }>(
+  login(email: string, password: string): Observable<{ user: User }> {
+    return this.http.post<{ data: { user: User } }>(
       `${this.apiUrl}/login`,
       { email, password },
       { withCredentials: true }
     ).pipe(
-      tap(res => {
-        this.accessToken = res.data.accessToken;
-        this.currentUserSubject.next(res.data.user);
-      }),
+      tap(res => this.currentUserSubject.next(res.data.user)),
       map(res => res.data)
     );
   }
@@ -60,43 +57,23 @@ export class AuthService {
   }
 
   resetPassword(token: string, newPassword: string): Observable<unknown> {
-    return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword });
-  }
-
-  refreshToken(): Observable<AuthTokens> {
-    return this.http.post<{ data: { accessToken: string; user?: User } }>(
-      `${this.apiUrl}/refresh`,
-      {},
-      { withCredentials: true }
-    ).pipe(
-      tap(res => {
-        this.accessToken = res.data.accessToken;
-        if (res.data.user) this.currentUserSubject.next(res.data.user);
-      }),
-      map(res => ({ accessToken: res.data.accessToken })),
-      catchError(err => {
-        this.accessToken = null;
-        this.currentUserSubject.next(null);
-        return throwError(() => err);
-      })
-    );
+    return this.http.post(`${this.apiUrl}/reset-password`, { resetToken: token, password: newPassword });
   }
 
   logout(): void {
     this.http.post(`${this.apiUrl}/logout`, {}, { withCredentials: true }).pipe(
       catchError(() => of(null))
     ).subscribe();
-    this.accessToken = null;
+    this.clearSession();
+  }
+
+  clearSession(): void {
     this.currentUserSubject.next(null);
     this.router.navigate(['/auth/login']);
   }
 
-  getAccessToken(): string | null {
-    return this.accessToken;
-  }
-
   isAuthenticated(): boolean {
-    return this.accessToken !== null;
+    return this.currentUserSubject.value !== null;
   }
 
   isAdmin(): boolean {

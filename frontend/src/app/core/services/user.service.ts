@@ -23,6 +23,14 @@ export class UserService {
     );
   }
 
+  uploadAvatar(file: File): Observable<User> {
+    const fd = new FormData();
+    fd.append('avatar', file);
+    return this.http.post<{ data: { user: User } }>(`${this.apiUrl}/me/avatar`, fd).pipe(
+      map(res => res.data.user)
+    );
+  }
+
   getUsers(params: { page?: number; limit?: number } = {}): Observable<{ data: User[]; total: number }> {
     return this.http.get<{ data: { users: User[] }; pagination: { total: number } }>(this.apiUrl, { params: params as Record<string, string> }).pipe(
       map(res => ({ data: res.data.users, total: res.pagination?.total ?? 0 }))

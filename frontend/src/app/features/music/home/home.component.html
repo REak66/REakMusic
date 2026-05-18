@@ -1,5 +1,6 @@
 <div class="home-page main-content">
   <!-- Hero Section -->
+  <app-animate-on-scroll enterClass="animate-fade-in-down" [threshold]="0.1">
   <section class="hero">
     <div class="hero-bg-orb orb-1"></div>
     <div class="hero-bg-orb orb-2"></div>
@@ -20,16 +21,25 @@
       </div>
     </div>
   </section>
+  </app-animate-on-scroll>
 
   <!-- Featured Songs -->
   <section class="section container">
+    <app-animate-on-scroll enterClass="animate-fade-in-up" [threshold]="0.15">
     <div class="section-header">
       <h2 class="section-title">{{ 'music.featured' | translate }}</h2>
       <a class="section-link" routerLink="/home/songs">View all <i class="fa-solid fa-arrow-right"></i></a>
     </div>
-    <div class="loading-spinner" *ngIf="loading"></div>
-    <div class="grid-songs" *ngIf="!loading">
-      <div class="song-card" *ngFor="let song of featuredSongs" [routerLink]="['/home/songs', song._id]">
+    </app-animate-on-scroll>
+    <app-skeleton type="song-cards" [count]="6" *ngIf="loading" />
+    <ng-container *ngIf="!loading">
+    <div class="grid-songs">
+      <div class="song-card"
+        *ngFor="let song of featuredSongs"
+        [routerLink]="['/home/songs', song._id]"
+        pAnimateOnScroll
+        enterClass="animate-zoom-in"
+        [threshold]="0.1">
         <div class="song-thumbnail">
           <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
           <div class="play-overlay">
@@ -47,16 +57,25 @@
       </div>
       <p *ngIf="featuredSongs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
     </div>
+    </ng-container>
   </section>
 
   <!-- Trending Section -->
   <section class="section container">
+    <app-animate-on-scroll enterClass="animate-fade-in-up" [threshold]="0.15">
     <div class="section-header">
       <h2 class="section-title">{{ 'music.trending' | translate }} <span class="fire"><i class="fa-solid fa-fire"></i></span></h2>
       <a class="section-link" routerLink="/home/songs">View all <i class="fa-solid fa-arrow-right"></i></a>
     </div>
-    <div class="trending-list">
-      <div class="trending-item" *ngFor="let song of trendingSongs; let i = index" [routerLink]="['/home/songs', song._id]">
+    </app-animate-on-scroll>
+    <app-skeleton type="trending" [count]="10" *ngIf="trendingLoading" />
+    <div class="trending-list" *ngIf="!trendingLoading">
+      <div class="trending-item"
+        *ngFor="let song of trendingSongs; let i = index"
+        [routerLink]="['/home/songs', song._id]"
+        pAnimateOnScroll
+        enterClass="animate-slide-in-left"
+        [threshold]="0.1">
         <span class="rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">{{ i + 1 }}</span>
         <div class="trending-thumb">
           <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />

@@ -1,5 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { trigger, transition, style, animate } from '@angular/animations';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ConfirmationService } from 'primeng/api';
 import { SongService } from '../../../core/services/song.service';
 import { ArtistService } from '../../../core/services/artist.service';
 import { GenreService } from '../../../core/services/genre.service';
@@ -11,7 +13,21 @@ import { SelectOption } from '../../../shared/components/select-dropdown/select-
   selector: 'app-song-management',
   templateUrl: './song-management.component.html',
   styleUrls: ['./song-management.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('slideUp', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(22px)' }),
+        animate('450ms cubic-bezier(0.35, 0, 0.25, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ]),
+    trigger('tableEnter', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(16px)' }),
+        animate('400ms 60ms cubic-bezier(0.35, 0, 0.25, 1)', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ])
+  ]
 })
 export class SongManagementComponent implements OnInit {
   songs: Song[] = [];
@@ -23,6 +39,9 @@ export class SongManagementComponent implements OnInit {
   form!: FormGroup;
   error = '';
   saving = false;
+  page = 1;
+  pageSize = 10;
+  total = 0;
 
   selectedFile: File | null = null;
   dragOver = false;
@@ -32,7 +51,8 @@ export class SongManagementComponent implements OnInit {
     private artistService: ArtistService,
     private genreService: GenreService,
     private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
@@ -55,9 +75,10 @@ export class SongManagementComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    this.songService.getSongs({ limit: 50 }).subscribe({
+    this.songService.getSongs({ page: this.page, limit: this.pageSize }).subscribe({
       next: (res: any) => {
         this.songs = res.data || [];
+        this.total = res.total || 0;
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -172,9 +193,16 @@ export class SongManagementComponent implements OnInit {
   }
 
   delete(id: string): void {
-    if (!confirm('Delete this song?')) return;
-    this.songService.deleteSong(id).subscribe({
-      next: () => { this.loadData(); }
+    this.confirmationService.confirm({
+      header: 'Delete Song',
+      message: 'Are you sure you want to delete this song? This action cannot be undone.',
+      acceptLabel: 'Delete',
+      rejectLabel: 'Cancel',
+      accept: () => {
+        this.songService.deleteSong(id).subscribe({
+          next: () => { this.loadData(); }
+        });
+      }
     });
   }
 
@@ -189,5 +217,16 @@ export class SongManagementComponent implements OnInit {
   getArtistName(song: Song): string {
     return typeof song.artistId === 'object' && song.artistId
       ? (song.artistId as Artist).name : '';
+  }
+
+  onPageChange(page: number): void {
+    this.page = page;
+    this.loadData();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.page = 1;
+    this.loadData();
   }
 }

@@ -1,5 +1,5 @@
 <div class="admin-page">
-    <div class="page-header">
+    <div class="page-header" [@slideUp]>
       <div>
         <h1 class="page-title">{{ 'admin.songs' | translate }}</h1>
         <p class="page-sub">Manage your music catalog</p>
@@ -12,7 +12,7 @@
 
     <div class="loading-spinner" *ngIf="loading"></div>
 
-    <div class="table-wrap" *ngIf="!loading">
+    <div class="table-wrap" *ngIf="!loading" [@tableEnter]>
       <table class="data-table">
         <thead>
           <tr>
@@ -43,6 +43,14 @@
       </table>
       <p *ngIf="songs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
     </div>
+
+    <app-pagination
+      [total]="total"
+      [pageSize]="pageSize"
+      [currentPage]="page"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-pagination>
 </div>
 
 <!-- Modal -->
@@ -129,3 +137,5 @@
     </form>
   </div>
 </div>
+
+<app-confirm-dialog></app-confirm-dialog>

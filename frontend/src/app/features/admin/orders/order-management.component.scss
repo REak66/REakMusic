@@ -1,1 +1,41 @@
 @use '../admin-shared' as *;
+
+// ─── Row entrance animation ───────────────────────────────────────────────────
+
+.data-table tbody tr {
+  animation: fadeInUp 0.35s ease both;
+
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) { animation-delay: #{($i - 1) * 35}ms; }
+  }
+}
+
+// ─── Action buttons ───────────────────────────────────────────────────────────
+
+.btn-xs {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+  margin-right: 0.25rem;
+
+  &.btn-success {
+    background: var(--color-success);
+    color: #fff;
+    border-color: var(--color-success);
+    &:hover:not(:disabled) { opacity: 0.85; }
+  }
+
+  &.btn-danger {
+    background: var(--color-error);
+    color: #fff;
+    border-color: var(--color-error);
+    &:hover:not(:disabled) { opacity: 0.85; }
+  }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.badge-muted {
+  background: var(--color-surface-2, rgba(255,255,255,.08));
+  color: var(--color-text-secondary);
+}

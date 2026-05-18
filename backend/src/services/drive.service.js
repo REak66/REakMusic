@@ -56,13 +56,22 @@ const generateSignedUrl = async (fileId, expiryMinutes = 10) => {
   return res.data.webContentLink;
 };
 
+const makeFilePublic = async (fileId) => {
+  const auth = getAuth();
+  const drive = google.drive({ version: 'v3', auth });
+  await drive.permissions.create({
+    fileId,
+    requestBody: { role: 'reader', type: 'anyone' },
+  });
+};
+
 const deleteFile = async (fileId) => {
   const auth = getAuth();
   const drive = google.drive({ version: 'v3', auth });
   await drive.files.delete({ fileId });
 };
 
-const streamFile = async (fileId, req, res) => {
+const streamFile = async (fileId, req, res, filename = null) => {
   const axios = require('axios');
   const auth = getAuth();
   const client = await auth.getClient();
@@ -85,9 +94,12 @@ const streamFile = async (fileId, req, res) => {
   res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN || '*');
   res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length, Content-Type');
+  if (filename) {
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  }
 
   driveRes.data.pipe(res);
   req.on('close', () => driveRes.data.destroy());
 };
 
-module.exports = { uploadFile, generateSignedUrl, deleteFile, streamFile };
+module.exports = { uploadFile, generateSignedUrl, makeFilePublic, deleteFile, streamFile };

@@ -1,0 +1,37 @@
+<p-confirmDialog [style]="{ width: '420px' }" [baseZIndex]="10000">
+  <ng-template pTemplate="headless" let-message #content>
+    <div class="confirm-dialog">
+      <!-- Icon -->
+      <div class="confirm-dialog__icon-wrapper">
+        <i *ngIf="message.icon; else defaultIcon" [class]="message.icon + ' confirm-dialog__icon'"></i>
+        <ng-template #defaultIcon>
+          <i class="fa-solid fa-triangle-exclamation confirm-dialog__icon"></i>
+        </ng-template>
+      </div>
+
+      <!-- Content -->
+      <div class="confirm-dialog__body">
+        <h3 class="confirm-dialog__header">{{ message.header }}</h3>
+        <p class="confirm-dialog__message">{{ message.message }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="confirm-dialog__footer">
+        <button
+          class="btn btn--ghost"
+          (click)="reject()"
+          type="button">
+          <i class="fa-solid fa-xmark btn__icon"></i>
+          {{ message.rejectLabel || 'Cancel' }}
+        </button>
+        <button
+          class="btn btn--danger"
+          (click)="accept()"
+          type="button">
+          <i class="fa-solid fa-check btn__icon"></i>
+          {{ message.acceptLabel || 'Confirm' }}
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</p-confirmDialog>

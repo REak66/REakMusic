@@ -1,4 +1,4 @@
-const Order = require('../models/Order');
+const Subscription = require('../models/Subscription');
 const User = require('../models/User');
 const Song = require('../models/Song');
 const Download = require('../models/Download');
@@ -7,9 +7,8 @@ const { successResponse, errorResponse } = require('../utils/apiResponse');
 exports.getSummary = async (req, res, next) => {
   try {
     const [revenueResult, totalUsers, totalSongs] = await Promise.all([
-      Order.aggregate([
-        { $match: { status: 'paid' } },
-        { $group: { _id: null, total: { $sum: '$totalPrice' } } },
+      Subscription.aggregate([
+        { $group: { _id: null, total: { $sum: '$price' } } },
       ]),
       User.countDocuments(),
       Song.countDocuments(),
@@ -53,12 +52,11 @@ exports.getRevenueByPeriod = async (req, res, next) => {
     else if (period === 'week') dateFormat = '%Y-%U';
     else dateFormat = '%Y-%m-%d';
 
-    const revenue = await Order.aggregate([
-      { $match: { status: 'paid' } },
+    const revenue = await Subscription.aggregate([
       {
         $group: {
           _id: { $dateToString: { format: dateFormat, date: '$createdAt' } },
-          total: { $sum: '$totalPrice' },
+          total: { $sum: '$price' },
           count: { $sum: 1 },
         },
       },

@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
     role: { type: String, enum: ['customer', 'admin'], default: 'customer' },
     isVerified: { type: Boolean, default: false },
     purchasedSongs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Song' }],
+    avatarUrl: { type: String, default: null },
     failedAttempts: { type: Number, default: 0 },
     lockedUntil: { type: Date, default: null },
   },

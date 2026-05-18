@@ -14,9 +14,8 @@
       </a>
 
       <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
-        <a routerLink="/cart" routerLinkActive="active">
-          {{ 'nav.cart' | translate }}
-          <span class="cart-badge" *ngIf="cartCount > 0">{{ cartCount }}</span>
+        <a routerLink="/subscribe" routerLinkActive="active">
+          {{ 'nav.subscribe' | translate }}
         </a>
         <a routerLink="/dashboard/profile" routerLinkActive="active">
           {{ 'nav.dashboard' | translate }}

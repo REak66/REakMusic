@@ -1,8 +1,11 @@
 <div class="song-list-page main-content">
   <div class="container">
-    <h1 class="page-title">{{ 'nav.browse' | translate }}</h1>
+    <app-animate-on-scroll enterClass="animate-fade-in-down" [threshold]="0.1">
+      <h1 class="page-title">{{ 'nav.browse' | translate }}</h1>
+    </app-animate-on-scroll>
 
     <!-- Filters -->
+    <app-animate-on-scroll enterClass="animate-fade-in" [threshold]="0.1">
     <form [formGroup]="filterForm" class="filters-bar">
       <div class="search-wrap">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -27,18 +30,24 @@
         <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
       </select>
     </form>
+    </app-animate-on-scroll>
 
     <!-- Results info -->
     <p class="results-info" *ngIf="!loading">
       <strong>{{ total }}</strong> songs found
     </p>
 
-    <!-- Loading -->
-    <div class="loading-spinner" *ngIf="loading"></div>
+    <!-- Skeleton -->
+    <app-skeleton type="song-cards" [count]="12" *ngIf="loading" />
 
     <!-- Grid -->
     <div class="grid-songs" *ngIf="!loading">
-      <div class="song-card" *ngFor="let song of songs" [routerLink]="['/home/songs', song._id]">
+      <div class="song-card"
+        *ngFor="let song of songs"
+        [routerLink]="['/home/songs', song._id]"
+        pAnimateOnScroll
+        enterClass="animate-zoom-in"
+        [threshold]="0.1">
         <div class="song-thumbnail">
           <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
           <div class="play-overlay">
@@ -51,11 +60,6 @@
           <div class="song-footer">
             <span class="song-price" *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
             <span class="badge badge-success" *ngIf="song.price === 0">{{ 'music.free' | translate }}</span>
-            <button
-              class="btn btn-primary add-btn"
-              (click)="cartService.addToCart(song); $event.stopPropagation()"
-              *ngIf="song.price > 0 && !cartService.isInCart(song._id)"
-            ><i class="fa-solid fa-plus"></i></button>
           </div>
         </div>
       </div>
@@ -64,14 +68,12 @@
     <p class="no-results" *ngIf="!loading && songs.length === 0">{{ 'common.noResults' | translate }}</p>
 
     <!-- Pagination -->
-    <div class="pagination" *ngIf="totalPages > 1">
-      <button [disabled]="page === 1" (click)="onPageChange(page - 1)"><i class="fa-solid fa-chevron-left"></i></button>
-      <button
-        *ngFor="let p of pages"
-        [class.active]="p === page"
-        (click)="onPageChange(p)"
-      >{{ p }}</button>
-      <button [disabled]="page === totalPages" (click)="onPageChange(page + 1)"><i class="fa-solid fa-chevron-right"></i></button>
-    </div>
+    <app-pagination
+      [total]="total"
+      [pageSize]="limit"
+      [currentPage]="page"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onLimitChange($event)"
+    ></app-pagination>
   </div>
 </div>

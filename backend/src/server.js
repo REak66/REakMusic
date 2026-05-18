@@ -1,10 +1,14 @@
 require('dotenv').config();
 const app = require('./app');
 const connectDB = require('./config/db');
+const { startPolling } = require('./services/telegram.service');
 require('./utils/scheduler');
 
 const PORT = process.env.PORT || 3000;
 
 connectDB().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    startPolling();
+  });
 });

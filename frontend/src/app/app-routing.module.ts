@@ -14,7 +14,7 @@ const routes: Routes = [
     loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
   },
   {
-    path: 'cart',
+    path: 'subscribe',
     loadChildren: () => import('./features/cart/cart.module').then(m => m.CartModule),
     canActivate: [AuthGuard]
   },
@@ -35,4 +35,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

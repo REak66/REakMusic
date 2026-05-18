@@ -1,0 +1,11 @@
+<div class="pb-wrapper" [ngClass]="'pb--' + color">
+  <div class="pb-header" *ngIf="label || (showPercentage && mode === 'determinate')">
+    <span class="pb-label" *ngIf="label">{{ label }}</span>
+    <span class="pb-pct" *ngIf="showPercentage && mode === 'determinate'">{{ value }}%</span>
+  </div>
+  <p-progressbar
+    [value]="value"
+    [mode]="mode"
+    [showValue]="false">
+  </p-progressbar>
+</div>

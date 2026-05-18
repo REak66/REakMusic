@@ -6,6 +6,7 @@ export interface User {
   role: 'customer' | 'admin';
   isVerified: boolean;
   purchasedSongs: string[];
+  avatarUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -66,15 +67,14 @@ export interface Genre {
   updatedAt: string;
 }
 
-export interface Order {
+export interface Subscription {
   _id: string;
   userId: string;
-  songs: Song[] | string[];
-  total: number;
-  status: 'pending' | 'paid' | 'expired' | 'failed';
-  qrCode?: string;
-  paymentRef?: string;
-  expiresAt?: string;
+  plan: 'weekly' | 'monthly';
+  status: 'pending' | 'active' | 'expired' | 'cancelled' | 'rejected';
+  startDate?: string;
+  endDate?: string;
+  price: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -105,10 +105,6 @@ export interface SongQueryParams {
   artistId?: string;
   albumId?: string;
   featured?: boolean;
-}
-
-export interface AuthTokens {
-  accessToken: string;
 }
 
 export interface LoginRequest {

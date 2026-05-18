@@ -16,6 +16,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export interface SelectOption {
     value: any;
     label: string;
+    icon?: string;
     disabled?: boolean;
 }
 
@@ -62,6 +63,11 @@ export class SelectDropdownComponent implements ControlValueAccessor, OnChanges 
     get selectedLabel(): string {
         const opt = this.options.find(o => o.value === this.selectedValue);
         return opt ? opt.label : '';
+    }
+
+    get selectedIcon(): string {
+        const opt = this.options.find(o => o.value === this.selectedValue);
+        return opt?.icon ?? '';
     }
 
     toggle(): void {

@@ -1,7 +1,26 @@
 <div class="library-page main-content">
   <div class="container">
     <h1 class="page-title">{{ 'dashboard.library' | translate }}</h1>
-    <div class="loading-spinner" *ngIf="loading"></div>
+
+    <!-- Loading: indeterminate spinner when total is unknown, determinate when fetching songs -->
+    <div class="library-loading" *ngIf="loading">
+      <div class="loading-spinner"></div>
+      <app-progress-bar
+        *ngIf="loadTotal > 0"
+        [value]="loadProgress"
+        [label]="'Loading songs (' + loadedCount + ' / ' + loadTotal + ')'"
+        mode="determinate"
+        color="primary"
+        [showPercentage]="true">
+      </app-progress-bar>
+      <app-progress-bar
+        *ngIf="loadTotal === 0"
+        mode="indeterminate"
+        color="primary"
+        [showPercentage]="false">
+      </app-progress-bar>
+    </div>
+
     <p class="empty-msg" *ngIf="!loading && songs.length === 0">
       You haven't purchased any songs yet. <a routerLink="/home/songs">Browse songs</a>
     </p>
@@ -13,9 +32,28 @@
         <div class="lib-info">
           <span class="lib-title">{{ song.title }}</span>
           <span class="lib-artist" *ngIf="$any(song.artistId)?.name">{{ $any(song.artistId).name }}</span>
+
+          <!-- Download progress bar — visible only for the active download -->
+          <div class="lib-download-progress" *ngIf="downloadingId === song._id">
+            <app-progress-bar
+              [value]="downloadProgress >= 0 ? downloadProgress : 0"
+              [mode]="downloadProgress >= 0 ? 'determinate' : 'indeterminate'"
+              color="success"
+              [label]="downloadProgress >= 0 ? 'Downloading' : 'Preparing'"
+              [showPercentage]="downloadProgress >= 0">
+            </app-progress-bar>
+          </div>
         </div>
-        <button class="btn btn-primary lib-download" (click)="download(song._id)">
-          <i class="fa-solid fa-download"></i> {{ 'dashboard.downloadSong' | translate }}
+        <button class="btn btn-primary lib-download"
+          (click)="download(song)"
+          [disabled]="!!downloadingId">
+          <ng-container *ngIf="downloadingId !== song._id">
+            <i class="fa-solid fa-download"></i> {{ 'dashboard.downloadSong' | translate }}
+          </ng-container>
+          <ng-container *ngIf="downloadingId === song._id">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            {{ downloadProgress >= 0 ? downloadProgress + '%' : ('dashboard.downloading' | translate) }}
+          </ng-container>
         </button>
       </div>
     </div>

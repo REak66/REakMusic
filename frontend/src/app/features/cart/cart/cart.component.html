@@ -1,40 +1,96 @@
-<div class="cart-page main-content">
+<div class="subscribe-page main-content">
   <div class="container">
-    <h1 class="page-title">{{ 'cart.title' | translate }}</h1>
+    <div class="page-hero">
+      <h1 class="page-title">{{ 'subscription.title' | translate }}</h1>
+      <p class="page-subtitle">{{ 'subscription.subtitle' | translate }}</p>
+    </div>
 
-    <ng-container *ngIf="cart$ | async as cart">
-      <p class="empty-msg" *ngIf="cart.length === 0">{{ 'cart.empty' | translate }}</p>
+    <div class="loading-spinner" *ngIf="loading"></div>
 
-      <div *ngIf="cart.length > 0">
-        <div class="cart-items">
-          <div class="cart-item" *ngFor="let item of cart; trackBy: trackById">
-            <div class="item-thumb">
-              <img *ngIf="$any(item.song).thumbnailUrl" [src]="$any(item.song).thumbnailUrl" [alt]="item.song.title" />
-              <span *ngIf="!$any(item.song).thumbnailUrl"><i class="fa-solid fa-music"></i></span>
-            </div>
-            <div class="item-info">
-              <span class="item-title">{{ item.song.title }}</span>
-              <span class="item-artist" *ngIf="$any(item.song.artistId)?.name">
-                {{ $any(item.song.artistId).name }}
-              </span>
-            </div>
-            <span class="item-price">${{ item.song.price.toFixed(2) }}</span>
-            <button class="btn btn-ghost remove-btn" (click)="remove(item.song._id)">
-              {{ 'cart.remove' | translate }}
-            </button>
-          </div>
-        </div>
-
-        <div class="cart-footer">
-          <div class="cart-total">
-            <span class="total-label">{{ 'cart.total' | translate }}</span>
-            <strong>${{ cartService.getTotal().toFixed(2) }}</strong>
-          </div>
-          <button class="btn btn-primary checkout-btn" (click)="checkout()">
-            {{ 'cart.checkout' | translate }} <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </div>
+    <!-- Active subscription banner: outside renew window -->
+    <div class="status-banner banner-active" *ngIf="!loading && currentSubscription?.status === 'active' && !canRenew">
+      <div class="status-icon"><i class="fa-solid fa-circle-check"></i></div>
+      <div class="status-body">
+        <strong>{{ 'subscription.active' | translate }}</strong>
+        <p>{{ currentSubscription!.plan | titlecase }} &nbsp;·&nbsp; {{ 'subscription.expiresOn' | translate }} {{ currentSubscription!.endDate | date: 'mediumDate' }} &nbsp;·&nbsp; {{ daysUntilRenewWindow }} {{ 'subscription.daysUntilRenew' | translate }}</p>
       </div>
-    </ng-container>
+      <a class="status-link" routerLink="/dashboard/subscription">{{ 'subscription.viewStatus' | translate }} <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <!-- Active subscription banner: renew window open -->
+    <div class="status-banner banner-renew" *ngIf="!loading && currentSubscription?.status === 'active' && canRenew">
+      <div class="status-icon"><i class="fa-solid fa-rotate"></i></div>
+      <div class="status-body">
+        <strong>{{ 'subscription.renewWindowOpen' | translate }}</strong>
+        <p>{{ 'subscription.renewWindowDesc' | translate : { days: daysRemaining } }}</p>
+      </div>
+      <a class="status-link" routerLink="/dashboard/subscription">{{ 'subscription.viewStatus' | translate }} <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <!-- Pending subscription banner -->
+    <div class="status-banner banner-pending" *ngIf="!loading && currentSubscription?.status === 'pending'">
+      <div class="status-icon"><i class="fa-solid fa-clock"></i></div>
+      <div class="status-body">
+        <strong>{{ 'subscription.pending' | translate }}</strong>
+        <p>{{ 'subscription.pendingDesc' | translate }}</p>
+      </div>
+      <a class="status-link" routerLink="/dashboard/subscription">{{ 'subscription.viewStatus' | translate }} <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+
+    <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
+    <div class="plans-grid" *ngIf="!loading">
+
+      <!-- Weekly Plan -->
+      <div class="plan-card">
+        <div class="plan-icon"><i class="fa-solid fa-calendar-week"></i></div>
+        <h2 class="plan-name">{{ 'subscription.weekly' | translate }}</h2>
+        <div class="plan-price">
+          <span class="price-amount">$0.99</span>
+          <span class="price-period">/ {{ 'subscription.week' | translate }}</span>
+        </div>
+        <ul class="plan-features">
+          <li><i class="fa-solid fa-check"></i> {{ 'subscription.feature1' | translate }}</li>
+          <li><i class="fa-solid fa-check"></i> {{ 'subscription.feature2' | translate }}</li>
+          <li><i class="fa-solid fa-check"></i> {{ 'subscription.feature3' | translate }}</li>
+        </ul>
+        <button class="btn btn-outline btn-block"
+          [disabled]="!!subscribing || (!!currentSubscription && !canRenew)"
+          (click)="subscribe('weekly')">
+          <span class="spinner-sm" *ngIf="subscribing === 'weekly'"></span>
+          <ng-container *ngIf="currentSubscription?.status === 'active' && !canRenew">{{ 'subscription.active' | translate }}</ng-container>
+          <ng-container *ngIf="currentSubscription?.status === 'active' && canRenew">{{ 'subscription.renew' | translate }}</ng-container>
+          <ng-container *ngIf="currentSubscription?.status === 'pending'">{{ 'subscription.pending' | translate }}</ng-container>
+          <ng-container *ngIf="!currentSubscription">{{ 'subscription.subscribe' | translate }}</ng-container>
+        </button>
+      </div>
+
+      <!-- Monthly Plan -->
+      <div class="plan-card plan-featured">
+        <div class="plan-badge">{{ 'subscription.popular' | translate }}</div>
+        <div class="plan-icon"><i class="fa-solid fa-calendar-days"></i></div>
+        <h2 class="plan-name">{{ 'subscription.monthly' | translate }}</h2>
+        <div class="plan-price">
+          <span class="price-amount">$4.99</span>
+          <span class="price-period">/ {{ 'subscription.month' | translate }}</span>
+        </div>
+        <ul class="plan-features">
+          <li><i class="fa-solid fa-check"></i> {{ 'subscription.feature1' | translate }}</li>
+          <li><i class="fa-solid fa-check"></i> {{ 'subscription.feature2' | translate }}</li>
+          <li><i class="fa-solid fa-check"></i> {{ 'subscription.feature3' | translate }}</li>
+          <li><i class="fa-solid fa-check"></i> {{ 'subscription.feature4' | translate }}</li>
+        </ul>
+        <button class="btn btn-primary btn-block"
+          [disabled]="!!subscribing || (!!currentSubscription && !canRenew)"
+          (click)="subscribe('monthly')">
+          <span class="spinner-sm" *ngIf="subscribing === 'monthly'"></span>
+          <ng-container *ngIf="currentSubscription?.status === 'active' && !canRenew">{{ 'subscription.active' | translate }}</ng-container>
+          <ng-container *ngIf="currentSubscription?.status === 'active' && canRenew">{{ 'subscription.renew' | translate }}</ng-container>
+          <ng-container *ngIf="currentSubscription?.status === 'pending'">{{ 'subscription.pending' | translate }}</ng-container>
+          <ng-container *ngIf="!currentSubscription">{{ 'subscription.subscribe' | translate }}</ng-container>
+        </button>
+      </div>
+
+    </div>
   </div>
 </div>

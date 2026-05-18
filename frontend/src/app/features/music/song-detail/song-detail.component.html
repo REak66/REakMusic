@@ -1,78 +1,160 @@
 <div class="song-detail-page main-content">
+
+  <!-- Skeleton / Error -->
   <div class="container">
-    <div class="loading-spinner" *ngIf="loading"></div>
+    <app-skeleton type="song-detail" *ngIf="loading" />
     <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+  </div>
 
-    <div class="song-detail" *ngIf="song && !loading">
-      <div class="song-cover">
-        <img [src]="thumbnail" [alt]="song.title" />
-      </div>
+  <ng-container *ngIf="song && !loading">
 
-      <div class="song-content">
-        <div class="song-meta-tags">
-          <span class="badge badge-primary" *ngFor="let g of genres">{{ g.name }}</span>
-        </div>
+    <!-- Blurred hero backdrop -->
+    <div class="hero-backdrop" [style.backgroundImage]="'url(' + thumbnail + ')'"></div>
+    <div class="hero-overlay"></div>
 
-        <h1 class="song-title">{{ song.title }}</h1>
+    <div class="container sd-container">
+      <div class="song-detail">
 
-        <div class="song-meta">
-          <div class="meta-item" *ngIf="artist">
-            <span class="meta-label">{{ 'music.artist' | translate }}</span>
-            <a class="meta-value" [routerLink]="['/home/artists', artist._id]">{{ artist.name }}</a>
-          </div>
-          <div class="meta-item" *ngIf="song.releaseYear">
-            <span class="meta-label">{{ 'music.releaseYear' | translate }}</span>
-            <span class="meta-value">{{ song.releaseYear }}</span>
-          </div>
-          <div class="meta-item" *ngIf="song.duration">
-            <span class="meta-label">{{ 'music.duration' | translate }}</span>
-            <span class="meta-value">{{ playerService.formatTime(song.duration) }}</span>
-          </div>
-          <div class="meta-item">
-            <span class="meta-label">{{ 'music.downloads' | translate }}</span>
-            <span class="meta-value">{{ song.downloadCount }}</span>
-          </div>
-        </div>
+        <!-- ── Left: Cover + Stats ─────────────────────────── -->
+        <div class="cover-col">
 
-        <p class="song-description" *ngIf="song.description">{{ song.description }}</p>
-
-        <div class="song-price-section">
-          <span class="price-label" *ngIf="song.price > 0">
-            {{ 'music.price' | translate }}: <strong>${{ song.price.toFixed(2) }}</strong>
-          </span>
-          <span class="badge badge-success" *ngIf="song.price === 0">{{ 'music.free' | translate }}</span>
-        </div>
-
-        <div class="song-actions">
-          <button class="btn btn-outline" (click)="playPreview()" *ngIf="song.previewUrl || song.driveFileId || song.driveLink">
-            <i class="fa-solid fa-play"></i> {{ 'music.preview' | translate }}
-          </button>
-
-          <ng-container *ngIf="isOwned">
-            <span class="badge badge-success">{{ 'music.alreadyOwned' | translate }}</span>
-            <button class="btn btn-primary" (click)="download()">
-              <i class="fa-solid fa-download"></i> {{ 'music.download' | translate }}
-            </button>
-          </ng-container>
-
-          <ng-container *ngIf="!isOwned && song.price > 0">
+          <div class="cover-wrapper">
+            <img [src]="thumbnail" [alt]="song.title" class="cover-img" />
+            <div class="cover-shine"></div>
             <button
-              class="btn btn-primary"
-              (click)="cartService.addToCart(song)"
-              [disabled]="cartService.isInCart(song._id)"
-            >
-              <span *ngIf="!cartService.isInCart(song._id)"><i class="fa-solid fa-cart-shopping"></i> {{ 'music.addToCart' | translate }}</span>
-              <span *ngIf="cartService.isInCart(song._id)">In Cart</span>
+              class="cover-play-btn"
+              *ngIf="song.previewUrl || song.driveFileId || song.driveLink"
+              (click)="playPreview()"
+              [attr.aria-label]="'music.preview' | translate">
+              <i class="fa-solid fa-play"></i>
             </button>
-          </ng-container>
+          </div>
 
-          <ng-container *ngIf="!isOwned && song.price === 0">
-            <button class="btn btn-primary" (click)="download()">
-              <i class="fa-solid fa-download"></i> {{ 'music.download' | translate }}
+          <!-- Stat cards -->
+          <div class="stats-row">
+            <div class="stat-card">
+              <i class="fa-solid fa-download"></i>
+              <span class="stat-value">{{ song.downloadCount }}</span>
+              <span class="stat-label">{{ 'music.downloads' | translate }}</span>
+            </div>
+            <div class="stat-card" *ngIf="song.releaseYear">
+              <i class="fa-solid fa-calendar-days"></i>
+              <span class="stat-value">{{ song.releaseYear }}</span>
+              <span class="stat-label">{{ 'music.releaseYear' | translate }}</span>
+            </div>
+            <div class="stat-card" *ngIf="song.duration">
+              <i class="fa-solid fa-clock"></i>
+              <span class="stat-value">{{ playerService.formatTime(song.duration) }}</span>
+              <span class="stat-label">{{ 'music.duration' | translate }}</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── Right: Content ─────────────────────────────── -->
+        <div class="song-content">
+
+          <!-- Genre chips -->
+          <div class="genre-row" *ngIf="genres.length">
+            <span class="genre-chip" *ngFor="let g of genres">{{ g.name }}</span>
+          </div>
+
+          <!-- Title -->
+          <h1 class="song-title">{{ song.title }}</h1>
+
+          <!-- Artist -->
+          <div class="artist-row" *ngIf="artist">
+            <div class="artist-avatar">
+              <i class="fa-solid fa-music"></i>
+            </div>
+            <div class="artist-info">
+              <span class="artist-label">{{ 'music.artist' | translate }}</span>
+              <a class="artist-name" [routerLink]="['/home/artists', artist._id]">{{ artist.name }}</a>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <p class="song-description" *ngIf="song.description">{{ song.description }}</p>
+
+          <div class="section-divider"></div>
+
+          <!-- Price & Access badges -->
+          <div class="price-access-row">
+            <div class="price-block">
+              <!-- Price removed -->
+              <span class="free-tag" *ngIf="song.price === 0">
+                <i class="fa-solid fa-gift"></i> {{ 'music.free' | translate }}
+              </span>
+            </div>
+
+            <div class="access-badges" *ngIf="isLoggedIn">
+              <!-- Subscriber badge removed -->
+              <span class="access-badge badge-owned" *ngIf="isOwned">
+                <i class="fa-solid fa-circle-check"></i> {{ 'music.alreadyOwned' | translate }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="song-actions">
+
+            <!-- Progress bar -->
+            <app-progress-bar
+              *ngIf="downloading"
+              [value]="downloadProgress >= 0 ? downloadProgress : 0"
+              [mode]="downloadProgress >= 0 ? 'determinate' : 'indeterminate'"
+              color="success"
+              [label]="downloadProgress >= 0 ? 'Downloading' : 'Preparing'"
+              [showPercentage]="downloadProgress >= 0"
+              class="download-bar">
+            </app-progress-bar>
+
+            <!-- Download (subscriber / owner) -->
+            <button
+              class="btn-action btn-download"
+              *ngIf="canDownload"
+              (click)="download()"
+              [disabled]="downloading">
+              <i class="fa-solid"
+                 [class.fa-download]="!downloading"
+                 [class.fa-spinner]="downloading"
+                 [class.fa-spin]="downloading"></i>
+              <span>{{ downloading ? ('music.downloading' | translate) : ('music.download' | translate) }}</span>
             </button>
-          </ng-container>
+
+            <!-- Subscribe CTA -->
+            <ng-container *ngIf="!canDownload && isLoggedIn && song.price > 0">
+              <div class="subscribe-cta">
+                <div class="cta-hint">
+                  <i class="fa-solid fa-lock"></i>
+                  <span>{{ 'subscription.requiredToDownload' | translate }}</span>
+                </div>
+                <a class="btn-action btn-subscribe" routerLink="/subscribe">
+                  <i class="fa-solid fa-star"></i>
+                  <span>{{ 'subscription.subscribe' | translate }}</span>
+                </a>
+              </div>
+            </ng-container>
+
+            <!-- Login CTA -->
+            <ng-container *ngIf="!isLoggedIn">
+              <a class="btn-action btn-ghost" routerLink="/auth/login">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>{{ 'auth.login' | translate }}</span>
+              </a>
+            </ng-container>
+
+          </div>
+
+          <!-- Download error -->
+          <div class="download-error" *ngIf="downloadError">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>{{ downloadError }}</span>
+          </div>
+
         </div>
       </div>
     </div>
-  </div>
+
+  </ng-container>
 </div>

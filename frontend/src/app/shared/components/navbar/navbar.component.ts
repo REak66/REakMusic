@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
-import { CartService } from '../../../core/services/cart.service';
 import { User } from '../../../core/models';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -19,17 +18,12 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     public authService: AuthService,
-    public cartService: CartService,
     private router: Router,
     private translate: TranslateService
   ) { }
 
   ngOnInit(): void {
     this.currentUser$ = this.authService.currentUser$;
-  }
-
-  get cartCount(): number {
-    return this.cartService.getCount();
   }
 
   logout(): void {

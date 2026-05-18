@@ -5,11 +5,11 @@ import { CheckoutComponent } from './checkout/checkout.component';
 
 const routes: Routes = [
   { path: '', component: CartComponent },
-  { path: 'checkout', component: CheckoutComponent }
+  { path: 'confirm', component: CheckoutComponent }
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class CartRoutingModule {}
+export class CartRoutingModule { }

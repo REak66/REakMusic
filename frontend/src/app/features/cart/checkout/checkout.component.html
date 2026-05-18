@@ -1,90 +1,74 @@
-<div class="checkout-page main-content">
+<div class="confirm-page main-content">
   <div class="container">
-    <h1 class="page-title">{{ 'checkout.title' | translate }}</h1>
-
     <div class="loading-spinner" *ngIf="loading"></div>
-    <div class="alert alert-error" *ngIf="error">{{ error }}</div>
 
-    <div class="checkout-card card" *ngIf="order && !loading">
-      <!-- Pending state -->
-      <ng-container *ngIf="order.status === 'pending'">
+    <!-- Pending approval -->
+    <div class="confirm-wrap" *ngIf="!loading && subscription?.status === 'pending'">
+      <div class="confirm-card">
+        <div class="icon-ring pending-ring">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <h1>{{ 'subscription.pendingTitle' | translate }}</h1>
+        <p class="plan-label">{{ subscription!.plan | titlecase }} {{ 'subscription.plan' | translate }}</p>
 
-        <!-- KHQR Branded Card -->
-        <div class="khqr-card">
-          <!-- Red header -->
-          <div class="khqr-header">
-            <div class="khqr-logo">
-              <span>KH</span>
-              <svg viewBox="0 0 22 22" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
-                <rect x="1.5" y="1.5" width="19" height="19" fill="none" stroke="white" stroke-width="2.5" rx="2"/>
-                <rect x="6" y="6" width="10" height="10" fill="none" stroke="white" stroke-width="2" transform="rotate(45 11 11)"/>
-              </svg>
-              <span>R</span>
-            </div>
+        <div class="detail-list">
+          <div class="detail-item">
+            <span>{{ 'subscription.price' | translate }}</span>
+            <strong>${{ subscription!.price.toFixed(2) }}</strong>
           </div>
-
-          <!-- Merchant info -->
-          <div class="khqr-body">
-            <p class="khqr-merchant-name">REakMusic</p>
-            <p class="khqr-amount">
-              <span class="khqr-amount-value">{{ order.total.toFixed(2) }}</span>
-              <span class="khqr-currency">USD</span>
-            </p>
-          </div>
-
-          <!-- Dashed divider -->
-          <div class="khqr-divider"></div>
-
-          <!-- QR code with KHQR center badge -->
-          <div class="khqr-qr-section">
-            <div class="khqr-qr-placeholder" *ngIf="!order.qrCode">
-              <span>Loading QR...</span>
-            </div>
-            <div class="khqr-qr-wrap" *ngIf="order.qrCode">
-              <img [src]="order.qrCode" alt="KHQR Payment" class="khqr-qr-img" />
-              <div class="khqr-badge">
-                <svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="22" cy="22" r="22" fill="#e31b23"/>
-                  <g fill="white" transform="translate(22,22)">
-                    <ellipse cx="0" cy="-9" rx="2.5" ry="5.5"/>
-                    <ellipse cx="0" cy="-9" rx="2.5" ry="5.5" transform="rotate(45)"/>
-                    <ellipse cx="0" cy="-9" rx="2.5" ry="5.5" transform="rotate(90)"/>
-                    <ellipse cx="0" cy="-9" rx="2.5" ry="5.5" transform="rotate(135)"/>
-                  </g>
-                  <circle cx="22" cy="22" r="5.5" fill="#e31b23"/>
-                  <circle cx="22" cy="22" r="3" fill="white"/>
-                </svg>
-              </div>
-            </div>
+          <div class="detail-item">
+            <span>{{ 'subscription.requestedOn' | translate }}</span>
+            <strong>{{ subscription!.createdAt | date: 'mediumDate' }}</strong>
           </div>
         </div>
 
-        <p class="waiting-text">{{ 'checkout.waiting' | translate }}</p>
-        <p class="time-left" *ngIf="timeLeft">
-          {{ 'checkout.timeLeft' | translate }}: <strong>{{ timeLeft }}</strong>
-        </p>
-        <div class="payment-pulse"></div>
-      </ng-container>
-
-      <!-- Paid state -->
-      <ng-container *ngIf="order.status === 'paid'">
-        <div class="success-state">
-          <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
-          <h2>{{ 'checkout.success' | translate }}</h2>
-          <a class="btn btn-primary" routerLink="/dashboard/library">
-            Go to My Library <i class="fa-solid fa-arrow-right"></i>
-          </a>
+        <div class="notice notice-warning">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          {{ 'subscription.pendingDesc' | translate }}
         </div>
-      </ng-container>
 
-      <!-- Expired state -->
-      <ng-container *ngIf="order.status === 'expired'">
-        <div class="expired-state">
-          <div class="expired-icon"><i class="fa-solid fa-circle-xmark"></i></div>
-          <h2>{{ 'checkout.expired' | translate }}</h2>
-          <a class="btn btn-primary" routerLink="/cart">Back to Cart</a>
+        <a class="btn btn-outline btn-block" routerLink="/dashboard/subscription">
+          {{ 'subscription.viewStatus' | translate }} <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Active subscription -->
+    <div class="confirm-wrap" *ngIf="!loading && subscription?.status === 'active'">
+      <div class="confirm-card">
+        <div class="icon-ring success-ring">
+          <i class="fa-solid fa-circle-check"></i>
         </div>
-      </ng-container>
+        <h1>{{ 'subscription.confirmed' | translate }}</h1>
+        <p class="plan-label">{{ subscription!.plan | titlecase }} {{ 'subscription.plan' | translate }}</p>
+
+        <div class="detail-list">
+          <div class="detail-item">
+            <span>{{ 'subscription.price' | translate }}</span>
+            <strong>${{ subscription!.price.toFixed(2) }}</strong>
+          </div>
+          <div class="detail-item">
+            <span>{{ 'subscription.startDate' | translate }}</span>
+            <strong>{{ subscription!.startDate | date: 'mediumDate' }}</strong>
+          </div>
+          <div class="detail-item">
+            <span>{{ 'subscription.endDate' | translate }}</span>
+            <strong>{{ subscription!.endDate | date: 'mediumDate' }}</strong>
+          </div>
+        </div>
+
+        <a class="btn btn-primary btn-block" routerLink="/home">
+          {{ 'subscription.startListening' | translate }} <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- No subscription -->
+    <div class="confirm-wrap" *ngIf="!loading && !subscription">
+      <div class="confirm-card">
+        <p style="color:var(--color-text-muted); margin-bottom:1.5rem">{{ 'subscription.noActive' | translate }}</p>
+        <a class="btn btn-primary btn-block" routerLink="/subscribe">{{ 'subscription.subscribe' | translate }}</a>
+      </div>
     </div>
   </div>
 </div>

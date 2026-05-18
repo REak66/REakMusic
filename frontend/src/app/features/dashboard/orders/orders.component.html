@@ -1,34 +1,115 @@
-<div class="orders-page main-content">
+<div class="subscription-page main-content">
   <div class="container">
-    <h1 class="page-title">{{ 'dashboard.orders' | translate }}</h1>
 
-    <div class="loading-spinner" *ngIf="loading"></div>
+    <div class="orders-loading" *ngIf="loading">
+      <div class="loading-spinner"></div>
+    </div>
 
-    <p class="empty-msg" *ngIf="!loading && orders.length === 0">{{ 'common.noResults' | translate }}</p>
+    <ng-container *ngIf="!loading">
 
-    <div class="orders-list" *ngIf="!loading && orders.length > 0">
-      <div class="order-card card" *ngFor="let order of orders">
-        <div class="order-header">
-          <span class="order-id">Order #{{ order._id.slice(-8).toUpperCase() }}</span>
-          <span class="badge"
-            [ngClass]="{
-              'badge-success': order.status === 'paid',
-              'badge-warning': order.status === 'pending',
-              'badge-error': order.status === 'expired' || order.status === 'failed'
-            }">
-            {{ order.status }}
-          </span>
-        </div>
-        <div class="order-songs">
-          <span *ngFor="let song of $any(order.songs)" class="song-tag">
-            {{ $any(song).title || '...' }}
-          </span>
-        </div>
-        <div class="order-footer">
-          <span class="order-date">{{ order.createdAt | date: 'mediumDate' }}</span>
-          <span class="order-total">${{ order.total.toFixed(2) }}</span>
+      <!-- No subscription -->
+      <div class="no-sub-wrap" *ngIf="!subscription">
+        <div class="no-sub-card">
+          <div class="no-sub-icon"><i class="fa-solid fa-music"></i></div>
+          <h2>No Active Subscription</h2>
+          <p>{{ 'subscription.noActive' | translate }}</p>
+          <a class="btn btn-primary" routerLink="/subscribe">{{ 'subscription.subscribe' | translate }}</a>
         </div>
       </div>
-    </div>
+
+      <!-- Pending subscription -->
+      <div class="sub-wrap" *ngIf="subscription?.status === 'pending'">
+        <div class="sub-card pending">
+          <div class="sub-card-header">
+            <div class="plan-info">
+              <span class="plan-label">{{ subscription!.plan | titlecase }} {{ 'subscription.plan' | translate }}</span>
+              <div class="plan-price">${{ subscription!.price.toFixed(2) }}</div>
+            </div>
+            <span class="status-chip chip-pending">
+              <i class="fa-solid fa-clock"></i> {{ 'subscription.pending' | translate }}
+            </span>
+          </div>
+
+          <div class="pending-steps">
+            <div class="step done"><div class="step-dot"><i class="fa-solid fa-check"></i></div><span>Request Submitted</span></div>
+            <div class="step-line"></div>
+            <div class="step active"><div class="step-dot pulse"><i class="fa-solid fa-clock"></i></div><span>Admin Review</span></div>
+            <div class="step-line"></div>
+            <div class="step"><div class="step-dot"></div><span>Activated</span></div>
+          </div>
+
+          <p class="pending-note">{{ 'subscription.pendingDesc' | translate }}</p>
+
+          <div class="sub-actions">
+            <button class="btn btn-ghost btn-danger-outline" [disabled]="cancelling" (click)="cancel()">
+              <i class="fa-solid fa-xmark"></i> {{ 'subscription.cancel' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active subscription -->
+      <div class="sub-wrap" *ngIf="subscription?.status === 'active'">
+        <div class="sub-card active">
+          <div class="sub-card-header">
+            <div class="plan-info">
+              <span class="plan-label">{{ subscription!.plan | titlecase }} {{ 'subscription.plan' | translate }}</span>
+              <div class="plan-price">${{ subscription!.price.toFixed(2) }}</div>
+            </div>
+            <span class="status-chip chip-active">
+              <i class="fa-solid fa-circle-check"></i> {{ 'subscription.active' | translate }}
+            </span>
+          </div>
+
+          <div class="days-ring-row">
+            <div class="days-ring">
+              <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="32"/><circle class="fill" cx="40" cy="40" r="32" [style.stroke-dashoffset]="201 - (201 * (100 - progressPct) / 100)"/></svg>
+              <div class="ring-label"><span class="ring-num">{{ daysRemaining }}</span><span class="ring-unit">days</span></div>
+            </div>
+            <div class="days-info">
+              <div class="info-row">
+                <span>{{ 'subscription.startDate' | translate }}</span>
+                <strong>{{ subscription!.startDate | date: 'mediumDate' }}</strong>
+              </div>
+              <div class="info-row">
+                <span>{{ 'subscription.endDate' | translate }}</span>
+                <strong>{{ subscription!.endDate | date: 'mediumDate' }}</strong>
+              </div>
+              <div class="info-row">
+                <span>Remaining</span>
+                <strong>{{ daysRemaining }} / {{ totalDays }} days</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="progress-bar-wrap">
+            <div class="progress-bar"><div class="progress-fill" [style.width.%]="100 - progressPct"></div></div>
+            <span class="progress-label">{{ 100 - progressPct }}% remaining</span>
+          </div>
+
+          <div class="sub-actions">
+            <a class="btn btn-outline" routerLink="/subscribe" [class.disabled]="!canRenew" [attr.tabindex]="canRenew ? null : -1"
+              [title]="canRenew ? '' : ('subscription.renewTooEarly' | translate : { days: daysUntilRenewWindow })">
+              <i class="fa-solid fa-rotate"></i> {{ 'subscription.renew' | translate }}
+            </a>
+            <button class="btn btn-ghost btn-danger-outline" [disabled]="cancelling || !canCancel"
+              [title]="canCancel ? '' : ('subscription.cancelExpired' | translate)"
+              (click)="cancel()">
+              <i class="fa-solid fa-xmark"></i> {{ 'subscription.cancel' | translate }}
+            </button>
+          </div>
+
+          <p class="window-hint" *ngIf="!canRenew">
+            <i class="fa-solid fa-circle-info"></i>
+            {{ 'subscription.renewTooEarly' | translate : { days: daysUntilRenewWindow } }}
+          </p>
+          <p class="window-hint hint-warn" *ngIf="!canCancel">
+            <i class="fa-solid fa-circle-info"></i>
+            {{ 'subscription.cancelExpired' | translate }}
+          </p>
+        </div>
+      </div>
+
+    </ng-container>
   </div>
 </div>

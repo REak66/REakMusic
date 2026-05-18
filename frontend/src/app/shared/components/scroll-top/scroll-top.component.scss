@@ -1,0 +1,18 @@
+::ng-deep .scroll-top-btn {
+  background: var(--p-primary-color) !important;
+  color: var(--p-primary-contrast-color) !important;
+  border-radius: 50% !important;
+  width: 2.75rem !important;
+  height: 2.75rem !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  transition: background 0.2s, transform 0.2s !important;
+
+  &:hover {
+    background: var(--p-primary-hover-color) !important;
+    transform: translateY(-2px) !important;
+  }
+
+  .p-icon {
+    font-size: 1.1rem !important;
+  }
+}
