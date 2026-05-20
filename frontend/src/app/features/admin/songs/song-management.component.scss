@@ -112,3 +112,125 @@
     &:nth-child(#{$i}) { animation-delay: #{($i - 1) * 35}ms; }
   }
 }
+
+// ─── Genre chips (table) ─────────────────────────────────────────────────────
+
+.genre-chips {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.genre-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 2rem;
+  border: 1px solid;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &--empty {
+    color: var(--color-text-muted);
+    background: transparent !important;
+    border-color: transparent !important;
+  }
+}
+
+// ─── Genre multi-select (modal) ──────────────────────────────────────────────
+
+.selected-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.625rem;
+}
+
+.selected-genre-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem 0.25rem 0.75rem;
+  border-radius: 2rem;
+  border: 1px solid;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  .tag-remove {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: currentColor;
+    opacity: 0.6;
+    font-size: 0.7rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 1; }
+  }
+}
+
+.genre-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.genre-pick-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+
+  .pick-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .pick-check {
+    font-size: 0.65rem;
+    color: #fff;
+  }
+
+  &:hover {
+    border-color: var(--gc, #7c3aed);
+    color: var(--gc, #7c3aed);
+    background: color-mix(in srgb, var(--gc, #7c3aed) 10%, transparent);
+  }
+
+  &.active {
+    background: color-mix(in srgb, var(--gc, #7c3aed) 18%, transparent);
+    border-color: var(--gc, #7c3aed);
+    color: var(--gc, #7c3aed);
+    font-weight: 700;
+  }
+}
+
+.no-genres-hint {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  a {
+    color: var(--color-accent-light);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}

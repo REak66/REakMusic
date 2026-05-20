@@ -18,7 +18,7 @@
           <tr>
             <th>Title</th>
             <th>Producer</th>
-            <th>Price</th>
+            <th>Genres</th>
             <th>Downloads</th>
             <th>Featured</th>
             <th>Actions</th>
@@ -28,7 +28,18 @@
           <tr *ngFor="let song of songs">
             <td class="cell-title">{{ song.title }}</td>
             <td>{{ getArtistName(song) }}</td>
-            <td class="cell-price">${{ song.price.toFixed(2) }}</td>
+            <td>
+              <div class="genre-chips">
+                <span
+                  class="genre-chip"
+                  *ngFor="let g of getSongGenres(song)"
+                  [style.background]="(g.color || '#7c3aed') + '22'"
+                  [style.color]="g.color || '#7c3aed'"
+                  [style.border-color]="(g.color || '#7c3aed') + '55'"
+                >{{ g.name }}</span>
+                <span class="genre-chip genre-chip--empty" *ngIf="getSongGenres(song).length === 0">—</span>
+              </div>
+            </td>
             <td>{{ song.downloadCount }}</td>
             <td>
               <span *ngIf="song.isFeatured" class="badge badge-success">Featured</span>
@@ -70,10 +81,6 @@
           [options]="artistOptions"
           placeholder="Select producer"
         ></app-select-dropdown>
-      </div>
-      <div class="form-group">
-        <label>Price ($)</label>
-        <input type="number" formControlName="price" step="0.01" />
       </div>
       <div class="form-group">
         <label>Release Year</label>
@@ -121,6 +128,43 @@
       <div class="form-group">
         <label>Preview URL</label>
         <input type="url" formControlName="previewUrl" placeholder="https://..." />
+      </div>
+      <div class="form-group">
+        <label>Genres</label>
+        <!-- Selected genre tags -->
+        <div class="selected-genres" *ngIf="selectedGenreIds.length > 0">
+          <span
+            class="selected-genre-tag"
+            *ngFor="let id of selectedGenreIds"
+            [style.background]="getGenreColor(id) + '22'"
+            [style.color]="getGenreColor(id)"
+            [style.border-color]="getGenreColor(id) + '55'"
+          >
+            {{ getGenreName(id) }}
+            <button type="button" class="tag-remove" (click)="removeGenre(id)" title="Remove">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </span>
+        </div>
+        <!-- Genre picker chips -->
+        <div class="genre-picker">
+          <button
+            type="button"
+            class="genre-pick-btn"
+            *ngFor="let g of genres"
+            [class.active]="isGenreSelected(g._id)"
+            [style.--gc]="g.color || '#7c3aed'"
+            (click)="toggleGenre(g._id)"
+          >
+            <span class="pick-dot" [style.background]="g.color || '#7c3aed'"></span>
+            {{ g.name }}
+            <i class="fa-solid fa-check pick-check" *ngIf="isGenreSelected(g._id)"></i>
+          </button>
+          <p class="no-genres-hint" *ngIf="genres.length === 0">
+            <i class="fa-solid fa-tags"></i> No genres yet —
+            <a routerLink="/admin/genres" (click)="showModal = false">add some first</a>
+          </p>
+        </div>
       </div>
       <div class="form-group checkbox-group">
         <label>

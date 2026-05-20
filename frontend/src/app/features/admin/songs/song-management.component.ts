@@ -5,6 +5,7 @@ import { ConfirmationService } from 'primeng/api';
 import { SongService } from '../../../core/services/song.service';
 import { ArtistService } from '../../../core/services/artist.service';
 import { GenreService } from '../../../core/services/genre.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { Song, Artist, Genre } from '../../../core/models';
 import { SelectOption } from '../../../shared/components/select-dropdown/select-dropdown.component';
 
@@ -45,6 +46,7 @@ export class SongManagementComponent implements OnInit {
 
   selectedFile: File | null = null;
   dragOver = false;
+  selectedGenreIds: string[] = [];
 
   constructor(
     private songService: SongService,
@@ -52,7 +54,8 @@ export class SongManagementComponent implements OnInit {
     private genreService: GenreService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    public authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -64,7 +67,6 @@ export class SongManagementComponent implements OnInit {
     this.form = this.fb.group({
       title: ['', Validators.required],
       artistId: ['', Validators.required],
-      price: [0, [Validators.required, Validators.min(0)]],
       releaseYear: [''],
       description: [''],
       isFeatured: [false],
@@ -75,7 +77,12 @@ export class SongManagementComponent implements OnInit {
 
   loadData(): void {
     this.loading = true;
-    this.songService.getSongs({ page: this.page, limit: this.pageSize }).subscribe({
+    // Admins see all songs, producers see only their own songs
+    const params: any = { page: this.page, limit: this.pageSize };
+    if (this.authService.isProducer()) {
+      params.ownerOnly = true;
+    }
+    this.songService.getSongs(params).subscribe({
       next: (res: any) => {
         this.songs = res.data || [];
         this.total = res.total || 0;
@@ -95,7 +102,8 @@ export class SongManagementComponent implements OnInit {
   openAdd(): void {
     this.editingSong = null;
     this.selectedFile = null;
-    this.form.reset({ price: 0, isFeatured: false });
+    this.selectedGenreIds = [];
+    this.form.reset({ isFeatured: false });
     this.showModal = true;
     this.error = '';
     this.cdr.markForCheck();
@@ -104,10 +112,13 @@ export class SongManagementComponent implements OnInit {
   openEdit(song: Song): void {
     this.editingSong = song;
     this.selectedFile = null;
+    // Resolve genre IDs from populated objects or plain IDs
+    this.selectedGenreIds = (song.genre || []).map((g: any) =>
+      typeof g === 'object' ? g._id : g
+    );
     this.form.patchValue({
       title: song.title,
       artistId: typeof song.artistId === 'object' ? (song.artistId as Artist)._id : song.artistId,
-      price: song.price,
       releaseYear: song.releaseYear || '',
       description: song.description || '',
       isFeatured: song.isFeatured,
@@ -168,6 +179,8 @@ export class SongManagementComponent implements OnInit {
         formData.append(key, String(val));
       }
     });
+    // Append each selected genre ID
+    this.selectedGenreIds.forEach(id => formData.append('genre', id));
     if (this.selectedFile) {
       formData.append('songFile', this.selectedFile, this.selectedFile.name);
     }
@@ -212,6 +225,39 @@ export class SongManagementComponent implements OnInit {
 
   get genreOptions(): SelectOption[] {
     return this.genres.map(g => ({ value: (g as any)._id, label: g.name }));
+  }
+
+  isGenreSelected(genreId: string): boolean {
+    return this.selectedGenreIds.includes(genreId);
+  }
+
+  toggleGenre(genreId: string): void {
+    const idx = this.selectedGenreIds.indexOf(genreId);
+    if (idx === -1) {
+      this.selectedGenreIds = [...this.selectedGenreIds, genreId];
+    } else {
+      this.selectedGenreIds = this.selectedGenreIds.filter(id => id !== genreId);
+    }
+    this.cdr.markForCheck();
+  }
+
+  removeGenre(genreId: string): void {
+    this.selectedGenreIds = this.selectedGenreIds.filter(id => id !== genreId);
+    this.cdr.markForCheck();
+  }
+
+  getGenreName(id: string): string {
+    const g = this.genres.find(x => (x as any)._id === id);
+    return g ? g.name : id;
+  }
+
+  getGenreColor(id: string): string {
+    const g = this.genres.find(x => (x as any)._id === id) as any;
+    return g?.color || '#7c3aed';
+  }
+
+  getSongGenres(song: Song): any[] {
+    return (song.genre || []) as any[];
   }
 
   getArtistName(song: Song): string {

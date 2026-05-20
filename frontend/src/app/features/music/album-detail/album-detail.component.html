@@ -39,8 +39,6 @@
             <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
           </div>
           <span class="track-title">{{ song.title }}</span>
-          <span class="track-price" *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
-          <span class="badge badge-success" *ngIf="song.price === 0">Free</span>
         </div>
       </div>
       <p *ngIf="songs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>

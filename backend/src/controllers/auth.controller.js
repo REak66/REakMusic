@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const otpService = require('../services/otp.service');
@@ -28,18 +29,47 @@ exports.register = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
 
-    const { fullName, email, password, phone } = req.body;
+    const { fullName, email, password, phone, role } = req.body;
 
     const existing = await User.findOne({ email });
     if (existing) return errorResponse(res, 'Email already registered', 409);
 
+    // Sanitize role to prevent registering as admin
+    let userRole = 'customer';
+    if (role && ['customer', 'producer', 'guest', 'guest_user'].includes(role)) {
+      userRole = role;
+    }
+
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await User.create({ fullName, email, passwordHash, phone, isVerified: false });
+    
+    // Assign default permissions based on role
+    const defaultPermissions = {
+      admin: ['songs:create', 'songs:update', 'songs:delete', 'analytics:view', 'downloads:all', 'users:manage'],
+      producer: ['songs:create', 'songs:update', 'songs:delete', 'analytics:view'],
+      customer: ['downloads:all'],
+      guest: [],
+      guest_user: [],
+    };
+    const permissions = defaultPermissions[userRole] || [];
 
-    const otp = otpService.generateOtp(email, 'otp:register');
-    await emailService.sendOtpEmail(email, otp);
+    let artistId = undefined;
+    if (userRole === 'producer') {
+      const Artist = require('../models/Artist');
+      const artist = await Artist.create({ name: fullName });
+      artistId = artist._id;
+    }
 
-    return successResponse(res, { userId: user._id }, 'Registration successful. Check your email for OTP.', 201);
+    const newUser = new User({
+      fullName,
+      email,
+      passwordHash,
+      phone,
+      role: userRole,
+      permissions,
+    });
+
+    await newUser.save();
+    return successResponse(res, { message: 'Registration successful' });
   } catch (err) {
     next(err);
   }
@@ -118,24 +148,31 @@ exports.login = async (req, res, next) => {
     user.failedAttempts = 0;
     await user.save();
 
-    req.session.user = { id: user._id, role: user.role, email: user.email };
-    return successResponse(res, { user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role } }, 'Login successful');
+    const token = jwt.sign(
+      { id: user._id, role: user.role, email: user.email },
+      process.env.JWT_SECRET || 'fallback_secret_key',
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
+
+    return successResponse(res, { token, user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role } }, 'Login successful');
   } catch (err) {
     next(err);
   }
 };
 
-exports.me = (req, res) => {
-  if (!req.session || !req.session.user) return errorResponse(res, 'Not authenticated', 401);
-  return successResponse(res, { user: req.session.user }, 'OK');
+exports.me = async (req, res, next) => {
+  try {
+    if (!req.user) return errorResponse(res, 'Not authenticated', 401);
+    const user = await User.findById(req.user.id).select('-passwordHash');
+    if (!user) return errorResponse(res, 'User not found', 404);
+    return successResponse(res, user, 'OK');
+  } catch (err) {
+    next(err);
+  }
 };
 
 exports.logout = (req, res, next) => {
-  req.session.destroy((err) => {
-    if (err) return next(err);
-    res.clearCookie('connect.sid');
-    return successResponse(res, null, 'Logged out successfully');
-  });
+  return successResponse(res, null, 'Logged out successfully');
 };
 
 exports.forgotPassword = async (req, res, next) => {

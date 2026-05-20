@@ -31,6 +31,7 @@ async function seed() {
     phone: ADMIN.phone,
     role: ADMIN.role,
     isVerified: ADMIN.isVerified,
+    permissions: ['songs:create', 'songs:update', 'songs:delete', 'analytics:view', 'downloads:all', 'users:manage'],
   });
 
   console.log(`Admin seeded successfully:`);

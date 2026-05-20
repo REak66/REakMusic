@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
     standalone: false,
@@ -8,6 +9,8 @@ import { Component } from '@angular/core';
 })
 export class AdminLayoutComponent {
     sidebarOpen = false;
+
+    constructor(public authService: AuthService) { }
 
     toggleSidebar(): void {
         this.sidebarOpen = !this.sidebarOpen;

@@ -3,10 +3,12 @@ export interface User {
   fullName: string;
   email: string;
   phone?: string;
-  role: 'customer' | 'admin';
+  role: 'guest' | 'guest_user' | 'customer' | 'admin' | 'producer';
   isVerified: boolean;
   purchasedSongs: string[];
   avatarUrl?: string;
+  artistId?: string;
+  permissions?: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -17,7 +19,6 @@ export interface Song {
   artistId: Artist | string;
   albumId?: Album | string;
   genre: Genre[] | string[];
-  price: number;
   duration?: number;
   previewUrl?: string;
   driveFileId?: string;
@@ -27,6 +28,8 @@ export interface Song {
   releaseYear?: number;
   description?: string;
   isFeatured: boolean;
+  uploadedBy?: string;
+  price?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -63,6 +66,7 @@ export interface Genre {
   name: string;
   slug: string;
   description?: string;
+  color?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -94,17 +98,18 @@ export interface ApiResponse<T> {
 }
 
 export interface SongQueryParams {
-  page?: number;
-  limit?: number;
   search?: string;
-  genre?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  releaseYear?: number;
+  limit?: number;
+  page?: number;
   sort?: string;
-  artistId?: string;
-  albumId?: string;
+  role?: string;
+  owner?: string;
   featured?: boolean;
+  ownerOnly?: boolean;
+  albumId?: string;
+  artistId?: string;
+  genre?: string;
+  releaseYear?: number;
 }
 
 export interface LoginRequest {
@@ -117,6 +122,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   phone?: string;
+  role?: string;
 }
 
 export interface CartItem {

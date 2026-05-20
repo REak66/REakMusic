@@ -6,6 +6,51 @@
   display: flex;
   justify-content: flex-end;
   padding: 12px 0;
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  // Animate PrimeNG paginator buttons
+  ::ng-deep {
+    .p-paginator {
+      background: transparent;
+      border: none;
+      gap: 0.25rem;
+    }
+
+    .p-paginator-page,
+    .p-paginator-prev,
+    .p-paginator-next,
+    .p-paginator-first,
+    .p-paginator-last {
+      transition:
+        background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+        color 0.2s ease,
+        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.2s ease;
+      border-radius: 8px !important;
+
+      &:hover:not(.p-disabled):not(.p-highlight) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+      }
+
+      &:active:not(.p-disabled) {
+        transform: translateY(0) scale(0.95);
+      }
+
+      &.p-highlight {
+        animation: paginatorPageIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+    }
+  }
 }
 
-
+@keyframes paginatorPageIn {
+  from {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

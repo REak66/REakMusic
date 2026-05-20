@@ -31,6 +31,14 @@
       </div>
 
       <div class="form-group">
+        <label>Account Type</label>
+        <select formControlName="role">
+          <option value="customer">Listener (Customer)</option>
+          <option value="producer">Creator (Producer)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label>{{ 'auth.password' | translate }}</label>
         <input type="password" formControlName="password" placeholder="Min 8 characters"
           [class.is-invalid]="form.get('password')?.invalid && form.get('password')?.touched" autocomplete="new-password" />

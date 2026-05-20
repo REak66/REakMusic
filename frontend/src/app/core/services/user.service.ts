@@ -31,6 +31,22 @@ export class UserService {
     );
   }
 
+  createUser(payload: any): Observable<User> {
+    return this.http.post<{ data: User }>(this.apiUrl, payload).pipe(
+      map(res => res.data)
+    );
+  }
+
+  updateUser(id: string, payload: any): Observable<User> {
+    return this.http.patch<{ data: User }>(`${this.apiUrl}/${id}`, payload).pipe(
+      map(res => res.data)
+    );
+  }
+
+  deleteUser(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  }
+
   getUsers(params: { page?: number; limit?: number } = {}): Observable<{ data: User[]; total: number }> {
     return this.http.get<{ data: { users: User[] }; pagination: { total: number } }>(this.apiUrl, { params: params as Record<string, string> }).pipe(
       map(res => ({ data: res.data.users, total: res.pagination?.total ?? 0 }))
@@ -54,6 +70,17 @@ export class UserService {
       }
     }>(`${environment.apiUrl}/analytics`).pipe(
       map(res => res.data)
+    );
+  }
+
+  getDownloadHistory(page = 1, limit = 10): Observable<{ data: any[]; total: number }> {
+    return this.http.get<any>(`${environment.apiUrl}/analytics/download-history`, {
+      params: { page: String(page), limit: String(limit) }
+    }).pipe(
+      map(res => ({
+        data: res.data?.downloads || [],
+        total: res.pagination?.total ?? 0
+      }))
     );
   }
 }

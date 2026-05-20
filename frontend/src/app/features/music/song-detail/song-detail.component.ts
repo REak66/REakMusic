@@ -79,14 +79,12 @@ export class SongDetailComponent implements OnInit {
   }
 
   get isOwned(): boolean {
-    return this.song ? this.authService.hasPurchased(this.song._id) : false;
+    return false;
   }
 
-  /** Subscriber or purchased owner can download paid songs; free songs need only login */
+  /** Any logged-in user can download songs now */
   get canDownload(): boolean {
-    if (!this.song) return false;
-    if (this.song.price === 0) return this.isLoggedIn;
-    return this.isOwned || this.hasActiveSubscription;
+    return this.isLoggedIn;
   }
 
   get isLoggedIn(): boolean {

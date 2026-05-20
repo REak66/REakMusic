@@ -1,16 +1,27 @@
 <div class="admin-layout">
-
   <!-- Mobile overlay -->
-  <div class="sidebar-overlay" [class.active]="sidebarOpen" (click)="closeSidebar()"></div>
+  <div
+    class="sidebar-overlay"
+    [class.active]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></div>
 
   <!-- Sidebar -->
   <aside class="admin-sidebar" [class.open]="sidebarOpen">
     <div class="sidebar-header">
-      <a routerLink="/admin" class="sidebar-logo" (click)="closeSidebar()">
+      <a
+        [routerLink]="authService.isProducer() ? '/admin/songs' : '/admin'"
+        class="sidebar-logo"
+        (click)="closeSidebar()"
+      >
         <i class="fa-solid fa-music"></i>
         <span>REak<strong>Music</strong></span>
       </a>
-      <button class="sidebar-close btn" (click)="closeSidebar()" aria-label="Close sidebar">
+      <button
+        class="sidebar-close btn"
+        (click)="closeSidebar()"
+        aria-label="Close sidebar"
+      >
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
@@ -18,28 +29,78 @@
     <div class="sidebar-section-label">MANAGEMENT</div>
 
     <nav class="sidebar-nav">
-      <a class="sidebar-nav-item" routerLink="/admin" routerLinkActive="active"
-         [routerLinkActiveOptions]="{exact: true}" (click)="closeSidebar()">
+      <a
+        *ngIf="authService.isAdmin()"
+        class="sidebar-nav-item"
+        routerLink="/admin"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeSidebar()"
+      >
         <i class="fa-solid fa-gauge-high"></i>
         <span>Dashboard</span>
       </a>
 
-      <a class="sidebar-nav-item" routerLink="/admin/songs" routerLinkActive="active" (click)="closeSidebar()">
+      <a
+        class="sidebar-nav-item"
+        routerLink="/admin/songs"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
         <i class="fa-solid fa-music"></i>
         <span>Songs</span>
       </a>
 
-      <a class="sidebar-nav-item" routerLink="/admin/artists" routerLinkActive="active" (click)="closeSidebar()">
+      <a
+        *ngIf="authService.isAdmin()"
+        class="sidebar-nav-item"
+        routerLink="/admin/genres"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
+        <i class="fa-solid fa-tags"></i>
+        <span>Genres</span>
+      </a>
+
+      <a
+        class="sidebar-nav-item"
+        routerLink="/admin/download-history"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <span>Download History</span>
+      </a>
+
+      <a
+        *ngIf="authService.isAdmin()"
+        class="sidebar-nav-item"
+        routerLink="/admin/artists"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
         <i class="fa-solid fa-microphone-lines"></i>
         <span>Producers</span>
       </a>
 
-      <a class="sidebar-nav-item" routerLink="/admin/subscriptions" routerLinkActive="active" (click)="closeSidebar()">
+      <a
+        *ngIf="authService.isAdmin()"
+        class="sidebar-nav-item"
+        routerLink="/admin/subscriptions"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
         <i class="fa-solid fa-credit-card"></i>
         <span>Subscriptions</span>
       </a>
 
-      <a class="sidebar-nav-item" routerLink="/admin/users" routerLinkActive="active" (click)="closeSidebar()">
+      <a
+        *ngIf="authService.isAdmin()"
+        class="sidebar-nav-item"
+        routerLink="/admin/users"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
         <i class="fa-solid fa-users"></i>
         <span>Users</span>
       </a>
@@ -57,10 +118,16 @@
   <div class="admin-main">
     <!-- Mobile topbar -->
     <div class="admin-topbar">
-      <button class="mobile-menu-btn btn" (click)="toggleSidebar()" aria-label="Open menu">
+      <button
+        class="mobile-menu-btn btn"
+        (click)="toggleSidebar()"
+        aria-label="Open menu"
+      >
         <i class="fa-solid fa-bars"></i>
       </button>
-      <span class="topbar-title">Admin Panel</span>
+      <span class="topbar-title">{{
+        authService.isProducer() ? "Producer Panel" : "Admin Panel"
+      }}</span>
       <a routerLink="/home" class="topbar-site-link">
         <i class="fa-solid fa-house"></i>
         Site
@@ -71,5 +138,4 @@
       <router-outlet></router-outlet>
     </div>
   </div>
-
 </div>

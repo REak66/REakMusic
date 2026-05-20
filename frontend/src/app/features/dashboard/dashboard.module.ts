@@ -7,14 +7,12 @@ import { ImageCropperComponent } from 'ngx-image-cropper';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { ProfileComponent } from './profile/profile.component';
 import { OrdersComponent } from './orders/orders.component';
-import { LibraryComponent } from './library/library.component';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   declarations: [
     ProfileComponent,
-    OrdersComponent,
-    LibraryComponent
+    OrdersComponent
   ],
   imports: [
     CommonModule,

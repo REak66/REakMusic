@@ -1,0 +1,158 @@
+<div class="admin-page">
+  <div class="page-header" [@slideUp]>
+    <div>
+      <h1 class="page-title">Genre Management</h1>
+      <p class="page-sub">Manage music genres and categories</p>
+    </div>
+    <button class="btn btn-primary" (click)="openAdd()">
+      <i class="fa-solid fa-plus"></i>
+      Add Genre
+    </button>
+  </div>
+
+  <!-- Stats Bar -->
+  <div class="stats-bar" *ngIf="!loading" [@slideUp]>
+    <div class="stat-chip">
+      <i class="fa-solid fa-tags"></i>
+      <span>{{ genres.length }} Genre{{ genres.length !== 1 ? 's' : '' }}</span>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar" *ngIf="!loading" [@slideUp]>
+    <div class="search-input-wrap">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search genres..."
+        [value]="searchQuery"
+        (input)="setSearch($any($event.target).value)"
+      />
+      <button class="search-clear" *ngIf="searchQuery" (click)="setSearch('')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading"></div>
+
+  <!-- Genre Grid -->
+  <div class="genre-grid" *ngIf="!loading && pagedGenres.length > 0" [@tableEnter]>
+    <div class="genre-card card" *ngFor="let genre of pagedGenres; let i = index">
+      <div class="genre-color-bar" [style.background]="getGenreColor(genre)"></div>
+      <div class="genre-card-body">
+        <div class="genre-avatar" [style.background]="getGenreColor(genre) + '22'" [style.color]="getGenreColor(genre)">
+          <span>{{ getGenreInitial(genre) }}</span>
+        </div>
+        <div class="genre-info">
+          <span class="genre-name">{{ genre.name }}</span>
+          <span class="genre-desc" *ngIf="genre['description']">{{ genre['description'] }}</span>
+          <span class="genre-desc genre-desc--empty" *ngIf="!genre['description']">No description</span>
+        </div>
+        <div class="genre-actions">
+          <button class="btn-icon btn-edit" (click)="openEdit(genre)" title="Edit genre">
+            <i class="fa-solid fa-pen-to-square"></i>
+          </button>
+          <button class="btn-icon btn-delete" (click)="delete(genre['_id'])" title="Delete genre">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table fallback for many genres -->
+  <div class="table-wrap" *ngIf="false"><!-- reserved --></div>
+
+  <!-- Empty States -->
+  <div class="empty-state" *ngIf="!loading && filteredGenres.length === 0 && searchQuery" [@tableEnter]>
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <p>No genres match "<strong>{{ searchQuery }}</strong>"</p>
+    <button class="btn btn-outline btn-sm" (click)="setSearch('')">Clear Search</button>
+  </div>
+  <div class="empty-state" *ngIf="!loading && genres.length === 0 && !searchQuery" [@tableEnter]>
+    <i class="fa-solid fa-tags"></i>
+    <p>No genres yet. Add your first genre!</p>
+  </div>
+
+  <app-pagination
+    [total]="filteredGenres.length"
+    [pageSize]="pageSize"
+    [currentPage]="page"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  ></app-pagination>
+</div>
+
+<!-- Add / Edit Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal card modal-genre" (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="modal-icon">
+          <i class="fa-solid fa-tags"></i>
+        </div>
+        <div>
+          <h2>{{ editingGenre ? 'Edit' : 'Add' }} Genre</h2>
+          <p class="modal-subtitle">{{ editingGenre ? 'Update genre details' : 'Add a new genre to your catalog' }}</p>
+        </div>
+      </div>
+      <button type="button" class="modal-close" (click)="showModal = false" title="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+
+      <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+
+      <!-- Genre Name -->
+      <div class="form-group">
+        <label>Name <span class="required">*</span></label>
+        <input type="text" formControlName="name" placeholder="e.g. Hip Hop, Jazz, Rock..." />
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description</label>
+        <textarea formControlName="description" rows="3" placeholder="Brief description of this genre..."></textarea>
+      </div>
+
+      <!-- Color Picker -->
+      <div class="form-group">
+        <label>Accent Color</label>
+        <div class="color-picker">
+          <div
+            class="color-swatch"
+            *ngFor="let color of GENRE_COLORS"
+            [style.background]="color"
+            [class.selected]="form.value.color === color"
+            (click)="selectColor(color)"
+            [title]="color"
+          >
+            <i class="fa-solid fa-check" *ngIf="form.value.color === color"></i>
+          </div>
+        </div>
+        <div class="color-preview" *ngIf="form.value.name">
+          <div class="color-preview-chip" [style.background]="form.value.color + '22'" [style.color]="form.value.color" [style.border-color]="form.value.color + '44'">
+            <span>{{ form.value.name }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" (click)="showModal = false">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">
+          <i class="fa-solid fa-spinner fa-spin" *ngIf="saving"></i>
+          <i class="fa-solid fa-floppy-disk" *ngIf="!saving"></i>
+          <span>{{ saving ? 'Saving...' : 'Save Genre' }}</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<app-confirm-dialog></app-confirm-dialog>

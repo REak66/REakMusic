@@ -2,22 +2,89 @@
   <!-- Hero Section -->
   <app-animate-on-scroll enterClass="animate-fade-in-down" [threshold]="0.1">
   <section class="hero">
-    <div class="hero-bg-orb orb-1"></div>
-    <div class="hero-bg-orb orb-2"></div>
+    <div class="hero-grid-overlay"></div>
+    
+    <!-- Soundwave Equalizer Background -->
+    <div class="hero-soundwave">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 200" fill="none" preserveAspectRatio="none">
+        <path class="wave-line wave-line-1" d="M0,100 C150,150 250,50 400,100 C550,150 650,50 800,100 C950,150 1050,50 1200,100 C1350,150 1440,100 1440,100" stroke="url(#gradient-wave-1)" stroke-width="3" stroke-linecap="round"/>
+        <path class="wave-line wave-line-2" d="M0,120 C180,70 280,170 450,120 C620,70 720,170 890,120 C1060,70 1160,170 1330,120 C1400,90 1440,120 1440,120" stroke="url(#gradient-wave-2)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+        <path class="wave-line wave-line-3" d="M0,80 C120,130 220,30 350,80 C480,130 580,30 710,80 C840,130 940,30 1070,80 C1200,130 1320,30 1440,80" stroke="url(#gradient-wave-3)" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+        <defs>
+          <linearGradient id="gradient-wave-1" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--color-accent)"/>
+            <stop offset="50%" stop-color="var(--color-accent-light)"/>
+            <stop offset="100%" stop-color="#ec4899"/>
+          </linearGradient>
+          <linearGradient id="gradient-wave-2" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ec4899"/>
+            <stop offset="50%" stop-color="var(--color-accent)"/>
+            <stop offset="100%" stop-color="var(--color-accent-light)"/>
+          </linearGradient>
+          <linearGradient id="gradient-wave-3" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="var(--color-accent-light)"/>
+            <stop offset="50%" stop-color="#3b82f6"/>
+            <stop offset="100%" stop-color="var(--color-accent)"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
     <div class="container hero-content">
-      <div class="hero-eyebrow"><i class="fa-solid fa-music"></i> The Music Marketplace</div>
-      <h1 class="hero-title">Discover &amp; Own<br><span>Music Forever</span></h1>
-      <p class="hero-subtitle">Buy DRM-free tracks and keep them forever. Support independent producers directly.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary btn-lg" routerLink="/home/songs">{{ 'nav.browse' | translate }}</a>
-        <a class="btn btn-outline btn-lg" routerLink="/home">Explore Producers</a>
+      <div class="hero-eyebrow">
+        <span class="pulse-indicator"></span>
+        <i class="fa-solid fa-music"></i> The Music Marketplace
       </div>
-      <div class="hero-stats">
-        <div class="hero-stat"><span class="stat-num">10K+</span><span class="stat-lbl">Songs</span></div>
-        <div class="hero-divider"></div>
-        <div class="hero-stat"><span class="stat-num">500+</span><span class="stat-lbl">Producers</span></div>
-        <div class="hero-divider"></div>
-        <div class="hero-stat"><span class="stat-num">50K+</span><span class="stat-lbl">Downloads</span></div>
+      
+      <h1 class="hero-title">
+        Discover &amp; Own<br>
+        <span class="gradient-text-animate">Music Forever</span>
+      </h1>
+      
+      <p class="hero-subtitle">Buy DRM-free tracks and keep them forever. Support independent producers directly.</p>
+      
+      <div class="hero-actions">
+        <a class="btn btn-primary btn-lg shine-button" routerLink="/home/songs">
+          <i class="fa-solid fa-compass"></i> {{ 'nav.browse' | translate }}
+        </a>
+        <a class="btn btn-outline btn-lg explore-button" routerLink="/home">
+          <i class="fa-solid fa-users"></i> Explore Producers
+        </a>
+      </div>
+      
+      <div class="hero-stats-glass">
+        <div class="hero-stat-card">
+          <div class="stat-icon-wrapper">
+            <i class="fa-solid fa-music"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-num">10K+</span>
+            <span class="stat-lbl">Songs</span>
+          </div>
+          <div class="stat-card-glow"></div>
+        </div>
+        
+        <div class="hero-stat-card">
+          <div class="stat-icon-wrapper">
+            <i class="fa-solid fa-record-vinyl"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-num">500+</span>
+            <span class="stat-lbl">Producers</span>
+          </div>
+          <div class="stat-card-glow"></div>
+        </div>
+        
+        <div class="hero-stat-card">
+          <div class="stat-icon-wrapper">
+            <i class="fa-solid fa-circle-down"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-num">50K+</span>
+            <span class="stat-lbl">Downloads</span>
+          </div>
+          <div class="stat-card-glow"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -49,10 +116,6 @@
         <div class="song-info">
           <div class="song-title">{{ song.title }}</div>
           <div class="song-artist">{{ getArtistName(song) }}</div>
-          <div class="song-price">
-            <span *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
-            <span *ngIf="song.price === 0" class="badge badge-success">{{ 'music.free' | translate }}</span>
-          </div>
         </div>
       </div>
       <p *ngIf="featuredSongs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
@@ -85,8 +148,6 @@
           <span class="trending-artist">{{ getArtistName(song) }}</span>
         </div>
         <span class="trending-downloads">{{ song.downloadCount }} downloads</span>
-        <span class="trending-price" *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
-        <span class="badge badge-success" *ngIf="song.price === 0">{{ 'music.free' | translate }}</span>
       </div>
     </div>
   </section>

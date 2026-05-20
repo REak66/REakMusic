@@ -1,0 +1,64 @@
+<div class="admin-page">
+  <div class="page-header" [@slideUp]>
+    <div>
+      <h1 class="page-title">Download History</h1>
+      <p class="page-sub">Audit and track downloads of songs on the platform</p>
+    </div>
+  </div>
+
+  <!-- Search / Filters bar -->
+  <div class="search-filter-bar" [@slideUp]>
+    <div class="search-input-wrap">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        placeholder="Search by song, user, email, or IP address..."
+        class="form-control search-input"
+      />
+    </div>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading"></div>
+
+  <div class="table-wrap" *ngIf="!loading" [@tableEnter]>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Song Title</th>
+          <th>IP Address</th>
+          <th>Date & Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredDownloads">
+          <td>
+            <div class="user-cell">
+              <span class="user-name cell-title">{{ item.userId?.fullName || 'Anonymous' }}</span>
+              <span class="user-email">{{ item.userId?.email || '—' }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="song-title cell-title">{{ item.songId?.title || 'Unknown Song' }}</span>
+          </td>
+          <td>
+            <span class="ip-address badge-muted">{{ item.ip || '—' }}</span>
+          </td>
+          <td>{{ item.createdAt | date: 'medium' }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="filteredDownloads.length === 0" class="no-results">No download history found.</p>
+  </div>
+
+  <app-pagination
+    *ngIf="total > 0"
+    [total]="total"
+    [pageSize]="pageSize"
+    [currentPage]="page"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  ></app-pagination>
+</div>

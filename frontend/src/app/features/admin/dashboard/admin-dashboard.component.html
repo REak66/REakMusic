@@ -1,5 +1,4 @@
 <div class="admin-dashboard">
-
   <!-- Welcome Banner -->
   <div class="welcome-banner" [@slideUp]>
     <div class="welcome-content">
@@ -8,8 +7,10 @@
           <i class="fa-solid fa-gauge-high"></i>
           Admin Control Panel
         </p>
-        <h1 class="page-title">{{ 'admin.dashboard' | translate }}</h1>
-        <p class="dash-subtitle">Monitor and manage your music platform in real time</p>
+        <h1 class="page-title">{{ "admin.dashboard" | translate }}</h1>
+        <p class="dash-subtitle">
+          Monitor and manage your music platform in real time
+        </p>
       </div>
       <div class="dash-quick-links">
         <a class="quick-link" routerLink="/admin/songs">
@@ -32,11 +33,10 @@
 
   <!-- Loading skeleton -->
   <div *ngIf="loading" class="skeleton-grid">
-    <div class="skeleton-card" *ngFor="let i of [1,2,3,4]"></div>
+    <div class="skeleton-card" *ngFor="let i of [1, 2, 3, 4]"></div>
   </div>
 
   <ng-container *ngIf="analytics && !loading">
-
     <!-- Section label -->
     <div class="section-label">
       <span class="section-label__dot"></span>
@@ -56,15 +56,15 @@
         </div>
         <div class="stat-info">
           <span class="stat-value">${{ animatedRevenue.toFixed(2) }}</span>
-          <span class="stat-label">{{ 'admin.totalRevenue' | translate }}</span>
+          <span class="stat-label">{{ "admin.totalRevenue" | translate }}</span>
         </div>
         <div class="stat-sparkline">
-          <div class="spark-bar" style="height:40%"></div>
-          <div class="spark-bar" style="height:65%"></div>
-          <div class="spark-bar" style="height:50%"></div>
-          <div class="spark-bar" style="height:80%"></div>
-          <div class="spark-bar" style="height:60%"></div>
-          <div class="spark-bar active" style="height:100%"></div>
+          <div class="spark-bar" style="height: 40%"></div>
+          <div class="spark-bar" style="height: 65%"></div>
+          <div class="spark-bar" style="height: 50%"></div>
+          <div class="spark-bar" style="height: 80%"></div>
+          <div class="spark-bar" style="height: 60%"></div>
+          <div class="spark-bar active" style="height: 100%"></div>
         </div>
       </div>
 
@@ -78,16 +78,16 @@
           </span>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ animatedUsers | number:'1.0-0' }}</span>
-          <span class="stat-label">{{ 'admin.totalUsers' | translate }}</span>
+          <span class="stat-value">{{ animatedUsers | number: "1.0-0" }}</span>
+          <span class="stat-label">{{ "admin.totalUsers" | translate }}</span>
         </div>
         <div class="stat-sparkline">
-          <div class="spark-bar" style="height:30%"></div>
-          <div class="spark-bar" style="height:55%"></div>
-          <div class="spark-bar" style="height:45%"></div>
-          <div class="spark-bar" style="height:70%"></div>
-          <div class="spark-bar" style="height:85%"></div>
-          <div class="spark-bar active" style="height:100%"></div>
+          <div class="spark-bar" style="height: 30%"></div>
+          <div class="spark-bar" style="height: 55%"></div>
+          <div class="spark-bar" style="height: 45%"></div>
+          <div class="spark-bar" style="height: 70%"></div>
+          <div class="spark-bar" style="height: 85%"></div>
+          <div class="spark-bar active" style="height: 100%"></div>
         </div>
       </div>
 
@@ -101,16 +101,16 @@
           </span>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ animatedSongs | number:'1.0-0' }}</span>
-          <span class="stat-label">{{ 'admin.totalSongs' | translate }}</span>
+          <span class="stat-value">{{ animatedSongs | number: "1.0-0" }}</span>
+          <span class="stat-label">{{ "admin.totalSongs" | translate }}</span>
         </div>
         <div class="stat-sparkline">
-          <div class="spark-bar" style="height:55%"></div>
-          <div class="spark-bar" style="height:60%"></div>
-          <div class="spark-bar" style="height:75%"></div>
-          <div class="spark-bar" style="height:65%"></div>
-          <div class="spark-bar" style="height:90%"></div>
-          <div class="spark-bar active" style="height:100%"></div>
+          <div class="spark-bar" style="height: 55%"></div>
+          <div class="spark-bar" style="height: 60%"></div>
+          <div class="spark-bar" style="height: 75%"></div>
+          <div class="spark-bar" style="height: 65%"></div>
+          <div class="spark-bar" style="height: 90%"></div>
+          <div class="spark-bar active" style="height: 100%"></div>
         </div>
       </div>
 
@@ -124,23 +124,24 @@
           </span>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ animatedDownloads | number:'1.0-0' }}</span>
+          <span class="stat-value">{{
+            animatedDownloads | number: "1.0-0"
+          }}</span>
           <span class="stat-label">Total Downloads</span>
         </div>
         <div class="stat-sparkline">
-          <div class="spark-bar" style="height:25%"></div>
-          <div class="spark-bar" style="height:50%"></div>
-          <div class="spark-bar" style="height:40%"></div>
-          <div class="spark-bar" style="height:75%"></div>
-          <div class="spark-bar" style="height:88%"></div>
-          <div class="spark-bar active" style="height:100%"></div>
+          <div class="spark-bar" style="height: 25%"></div>
+          <div class="spark-bar" style="height: 50%"></div>
+          <div class="spark-bar" style="height: 40%"></div>
+          <div class="spark-bar" style="height: 75%"></div>
+          <div class="spark-bar" style="height: 88%"></div>
+          <div class="spark-bar active" style="height: 100%"></div>
         </div>
       </div>
     </div>
 
     <!-- Bottom section -->
     <div class="dash-bottom">
-
       <!-- Top songs -->
       <div class="top-songs card" [@slideLeft]>
         <div class="section-header">
@@ -148,24 +149,45 @@
             <div class="section-header__icon section-header__icon--purple">
               <i class="fa-solid fa-chart-bar"></i>
             </div>
-            <h2>{{ 'admin.topSongs' | translate }}</h2>
+            <h2>{{ "admin.topSongs" | translate }}</h2>
           </div>
           <a routerLink="/admin/songs" class="section-link">
             View all <i class="fa-solid fa-arrow-right"></i>
           </a>
         </div>
 
-        <div class="top-song-item" *ngFor="let s of analytics.topSongs; let i = index">
-          <span class="rank" [class.gold]="i===0" [class.silver]="i===1" [class.bronze]="i===2">
-            <ng-container *ngIf="i === 0"><i class="fa-solid fa-trophy"></i></ng-container>
-            <ng-container *ngIf="i === 1"><i class="fa-solid fa-medal"></i></ng-container>
-            <ng-container *ngIf="i === 2"><i class="fa-solid fa-award"></i></ng-container>
+        <div
+          class="top-song-item"
+          *ngFor="let s of analytics.topSongs; let i = index"
+        >
+          <span
+            class="rank"
+            [class.gold]="i === 0"
+            [class.silver]="i === 1"
+            [class.bronze]="i === 2"
+          >
+            <ng-container *ngIf="i === 0"
+              ><i class="fa-solid fa-trophy"></i
+            ></ng-container>
+            <ng-container *ngIf="i === 1"
+              ><i class="fa-solid fa-medal"></i
+            ></ng-container>
+            <ng-container *ngIf="i === 2"
+              ><i class="fa-solid fa-award"></i
+            ></ng-container>
             <ng-container *ngIf="i >= 3">{{ i + 1 }}</ng-container>
           </span>
           <div class="song-details">
             <span class="song-name">{{ s.title }}</span>
             <div class="bar-container">
-              <div class="bar" [style.width.%]="(s.downloadCount / (analytics.topSongs[0].downloadCount || 1)) * 100"></div>
+              <div
+                class="bar"
+                [style.width.%]="
+                  (s.downloadCount /
+                    (analytics.topSongs[0].downloadCount || 1)) *
+                  100
+                "
+              ></div>
             </div>
           </div>
           <span class="count">
@@ -198,9 +220,13 @@
             </div>
             <div class="action-text">
               <span class="action-title">Manage Songs</span>
-              <span class="action-sub">{{ analytics.totalSongs }} tracks in catalog</span>
+              <span class="action-sub"
+                >{{ analytics.totalSongs }} tracks in catalog</span
+              >
             </div>
-            <span class="action-badge action-badge--purple">{{ analytics.totalSongs }}</span>
+            <span class="action-badge action-badge--purple">{{
+              analytics.totalSongs
+            }}</span>
             <i class="fa-solid fa-chevron-right action-arrow"></i>
           </a>
           <a routerLink="/admin/artists" class="action-item">
@@ -210,6 +236,20 @@
             <div class="action-text">
               <span class="action-title">Manage Artists</span>
               <span class="action-sub">Producers & creators</span>
+            </div>
+            <i class="fa-solid fa-chevron-right action-arrow"></i>
+          </a>
+          <a
+            *ngIf="authService.isAdmin()"
+            routerLink="/admin/genres"
+            class="action-item"
+          >
+            <div class="action-icon action-icon--indigo">
+              <i class="fa-solid fa-tags"></i>
+            </div>
+            <div class="action-text">
+              <span class="action-title">Manage Genres</span>
+              <span class="action-sub">Music categories & tags</span>
             </div>
             <i class="fa-solid fa-chevron-right action-arrow"></i>
           </a>
@@ -229,9 +269,13 @@
             </div>
             <div class="action-text">
               <span class="action-title">Manage Users</span>
-              <span class="action-sub">{{ analytics.totalUsers }} registered members</span>
+              <span class="action-sub"
+                >{{ analytics.totalUsers }} registered members</span
+              >
             </div>
-            <span class="action-badge action-badge--amber">{{ analytics.totalUsers }}</span>
+            <span class="action-badge action-badge--amber">{{
+              analytics.totalUsers
+            }}</span>
             <i class="fa-solid fa-chevron-right action-arrow"></i>
           </a>
         </div>
@@ -242,8 +286,6 @@
           All systems operational
         </div>
       </div>
-
     </div>
-
   </ng-container>
 </div>

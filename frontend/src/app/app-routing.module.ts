@@ -26,7 +26,8 @@ const routes: Routes = [
   {
     path: 'admin',
     loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule),
-    canActivate: [AdminGuard]
+    canActivate: [AdminGuard],
+    data: { roles: ['admin'] } // Restrict to admin only
   },
   { path: '**', redirectTo: '/home' }
 ];

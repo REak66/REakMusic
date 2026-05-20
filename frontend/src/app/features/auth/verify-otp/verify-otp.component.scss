@@ -1,10 +1,17 @@
 @use '../auth-shared' as *;
 
+@keyframes otpBounce {
+  0%   { transform: scale(0.85) translateY(8px); opacity: 0; }
+  60%  { transform: scale(1.04) translateY(-2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
 .otp-hint {
   font-size: 0.875rem;
   color: var(--color-text-secondary);
   text-align: center;
   margin-bottom: 1.5rem;
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
 }
 
 .otp-input {
@@ -12,14 +19,49 @@
   font-size: 1.5rem;
   letter-spacing: 0.5em;
   font-weight: 700;
+  animation: otpBounce 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+  &:focus {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
+  }
 }
 
 .resend-section {
   text-align: center;
   margin-top: 1.25rem;
+  animation: fadeInUp 0.4s ease 0.35s both;
 
   .countdown {
     font-size: 0.875rem;
     color: var(--color-text-muted);
   }
+
+  button, a {
+    transition: color 0.2s ease, transform 0.15s ease;
+    &:hover { transform: translateY(-1px); }
+  }
+}
+
+.auth-logo   { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both; }
+.auth-title  { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.10s both; }
+.auth-subtitle { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both; }
+
+.btn-full {
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+  }
+}
+
+.auth-switch {
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
+  a { transition: color 0.2s ease; }
 }

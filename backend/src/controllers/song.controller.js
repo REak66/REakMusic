@@ -1,6 +1,7 @@
 const Song = require('../models/Song');
 const Download = require('../models/Download');
 const User = require('../models/User');
+const mongoose = require('mongoose');
 const driveService = require('../services/drive.service');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 
@@ -15,16 +16,50 @@ exports.listSongs = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
+    const filter = {};
+    
+    // If ownerOnly is requested, authentication is required
+    if (req.query.ownerOnly === 'true') {
+      if (!req.user) {
+        return errorResponse(res, 'Authentication required to filter by owner', 401);
+      }
+      const user = await User.findById(req.user.id);
+      if (user && user.artistId) {
+        filter.$or = [
+          { uploadedBy: new mongoose.Types.ObjectId(req.user.id) },
+          { artistId: user.artistId }
+        ];
+      } else {
+        filter.uploadedBy = new mongoose.Types.ObjectId(req.user.id);
+      }
+    }
+    
+    if (req.query.artistId) {
+      filter.artistId = req.query.artistId;
+    }
+    if (req.query.albumId) {
+      filter.albumId = req.query.albumId;
+    }
+    if (req.query.genre) {
+      filter.genre = req.query.genre;
+    }
+
     const [songs, total] = await Promise.all([
-      Song.find()
+      Song.find(filter)
         .populate('artistId', 'name imageUrl')
         .populate('albumId', 'title coverImage')
         .populate('genre', 'name slug')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit),
-      Song.countDocuments(),
+      Song.countDocuments(filter),
     ]);
+
+    // Debug log to verify filter
+    console.log('Song filter:', filter);
+    console.log('User role:', req.user?.role);
+    console.log('User ID:', req.user?.id);
+    console.log('Songs found:', songs.length);
 
     return successResponse(res, { songs }, 'Songs retrieved', 200, {
       page, limit, total, pages: Math.ceil(total / limit),
@@ -39,23 +74,16 @@ exports.searchSongs = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 20;
     const skip = (page - 1) * limit;
-    const { q, genre, minPrice, maxPrice, year, sort } = req.query;
+    const { q, genre, year, sort } = req.query;
 
     const filter = {};
     if (q) filter.$text = { $search: q };
     if (genre) filter.genre = genre;
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      filter.price = {};
-      if (minPrice !== undefined) filter.price.$gte = parseFloat(minPrice);
-      if (maxPrice !== undefined) filter.price.$lte = parseFloat(maxPrice);
-    }
     if (year) filter.releaseYear = parseInt(year);
 
     let sortOption = { createdAt: -1 };
     if (sort === 'new') sortOption = { createdAt: -1 };
     else if (sort === 'top-downloads') sortOption = { downloadCount: -1 };
-    else if (sort === 'price-asc') sortOption = { price: 1 };
-    else if (sort === 'price-desc') sortOption = { price: -1 };
     else if (sort === 'trending') {
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const trending = await Download.aggregate([
@@ -119,6 +147,9 @@ exports.createSong = async (req, res, next) => {
     } else if (body.driveLink && !body.driveFileId) {
       body.driveFileId = extractDriveFileId(body.driveLink);
     }
+    if (req.user) {
+      body.uploadedBy = req.user.id;
+    }
     const song = await Song.create(body);
     return successResponse(res, { song }, 'Song created', 201);
   } catch (err) {
@@ -128,11 +159,22 @@ exports.createSong = async (req, res, next) => {
 
 exports.updateSong = async (req, res, next) => {
   try {
+    const existing = await Song.findById(req.params.id);
+    if (!existing) return errorResponse(res, 'Song not found', 404);
+
+    if (req.user.role === 'producer') {
+      const user = await User.findById(req.user.id);
+      const isOwner = existing.uploadedBy && existing.uploadedBy.toString() === req.user.id.toString();
+      const isLinkedArtist = user && user.artistId && existing.artistId && existing.artistId.toString() === user.artistId.toString();
+      if (!isOwner && !isLinkedArtist) {
+        return errorResponse(res, 'You are not authorized to manage this song', 403);
+      }
+    }
+
     const body = { ...req.body };
     if (req.file) {
       // Delete the old Drive file if one existed
-      const existing = await Song.findById(req.params.id);
-      if (existing && existing.driveFileId) {
+      if (existing.driveFileId) {
         try { await driveService.deleteFile(existing.driveFileId); } catch (_) { /* ignore */ }
       }
       const fileId = await driveService.uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype);
@@ -142,7 +184,6 @@ exports.updateSong = async (req, res, next) => {
       body.driveFileId = extractDriveFileId(body.driveLink);
     }
     const song = await Song.findByIdAndUpdate(req.params.id, body, { new: true, runValidators: true });
-    if (!song) return errorResponse(res, 'Song not found', 404);
     return successResponse(res, { song }, 'Song updated');
   } catch (err) {
     next(err);
@@ -151,8 +192,19 @@ exports.updateSong = async (req, res, next) => {
 
 exports.deleteSong = async (req, res, next) => {
   try {
+    const existing = await Song.findById(req.params.id);
+    if (!existing) return errorResponse(res, 'Song not found', 404);
+
+    if (req.user.role === 'producer') {
+      const user = await User.findById(req.user.id);
+      const isOwner = existing.uploadedBy && existing.uploadedBy.toString() === req.user.id.toString();
+      const isLinkedArtist = user && user.artistId && existing.artistId && existing.artistId.toString() === user.artistId.toString();
+      if (!isOwner && !isLinkedArtist) {
+        return errorResponse(res, 'You are not authorized to manage this song', 403);
+      }
+    }
+
     const song = await Song.findByIdAndDelete(req.params.id);
-    if (!song) return errorResponse(res, 'Song not found', 404);
     if (song.driveFileId) {
       try { await driveService.deleteFile(song.driveFileId); } catch (_) { /* ignore */ }
     }
@@ -178,23 +230,6 @@ exports.downloadSong = async (req, res, next) => {
   try {
     const song = await Song.findById(req.params.id);
     if (!song) return errorResponse(res, 'Song not found', 404);
-
-    const Subscription = require('../models/Subscription');
-    const user = await User.findById(req.user.id);
-
-    // Free songs: any authenticated user can download
-    // Paid songs: must own the song or have an active subscription
-    if (song.price > 0) {
-      const owned = user.purchasedSongs.some((id) => id.toString() === song._id.toString());
-      const activeSubscription = await Subscription.findOne({
-        userId: req.user.id,
-        status: 'active',
-        endDate: { $gt: new Date() },
-      });
-      if (!owned && !activeSubscription) {
-        return errorResponse(res, 'An active subscription is required to download this song.', 403);
-      }
-    }
 
     if (!song.driveFileId) return errorResponse(res, 'File not available for download', 404);
 

@@ -29,7 +29,7 @@ export class GenreService {
     return this.http.put<Genre>(`${this.apiUrl}/${id}`, data);
   }
 
-  deleteGenre(id: string): Observable<ApiResponse<null>> {
-    return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/${id}`);
+  deleteGenre(id: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

@@ -6,7 +6,6 @@ const songSchema = new mongoose.Schema(
     artistId: { type: mongoose.Schema.Types.ObjectId, ref: 'Artist', required: true },
     albumId: { type: mongoose.Schema.Types.ObjectId, ref: 'Album' },
     genre: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Genre' }],
-    price: { type: Number, required: true, min: 0 },
     duration: Number,
     previewUrl: String,
     driveFileId: String,
@@ -16,6 +15,7 @@ const songSchema = new mongoose.Schema(
     releaseYear: Number,
     description: String,
     isFeatured: { type: Boolean, default: false },
+    uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );

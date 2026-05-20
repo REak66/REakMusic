@@ -1,12 +1,14 @@
+const bcrypt = require('bcrypt');
 const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
+
 
 exports.getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id)
       .select('-passwordHash')
-      .populate('purchasedSongs', 'title artistId price thumbnailId duration');
+      .populate('purchasedSongs', 'title artistId thumbnailId duration');
     if (!user) return errorResponse(res, 'User not found', 404);
     return successResponse(res, { user });
   } catch (err) {
@@ -67,6 +69,80 @@ exports.uploadAvatar = async (req, res, next) => {
     if (!updated) return errorResponse(res, 'User not found', 404);
 
     return successResponse(res, { user: updated }, 'Avatar updated');
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.createUser = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
+
+    const { fullName, email, password, phone, role, artistId, permissions } = req.body;
+
+    const existing = await User.findOne({ email });
+    if (existing) return errorResponse(res, 'Email already registered', 409);
+
+    const defaultPermissions = {
+      admin: ['songs:create', 'songs:update', 'songs:delete', 'analytics:view', 'downloads:all', 'users:manage'],
+      producer: ['songs:create', 'songs:update', 'songs:delete', 'analytics:view'],
+      customer: ['downloads:all'],
+      guest: [],
+      guest_user: [],
+    };
+
+    const userPermissions = permissions || defaultPermissions[role] || [];
+
+    const newUser = new User({
+      fullName,
+      email,
+      passwordHash: password ? await bcrypt.hash(password, 12) : undefined,
+      phone,
+      role,
+      artistId,
+      permissions: userPermissions,
+      isVerified: true,
+    });
+
+    await newUser.save();
+    return successResponse(res, { message: 'User created successfully', user: newUser });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
+
+    const { fullName, email, phone, role, artistId, isVerified, permissions } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { fullName, email, phone, role, artistId, isVerified, permissions },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) return errorResponse(res, 'User not found', 404);
+
+    return successResponse(res, { message: 'User updated successfully', user: updatedUser });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteUser = async (req, res, next) => {
+  try {
+    if (req.user.id === req.params.id) {
+      return errorResponse(res, 'You cannot delete yourself', 400);
+    }
+
+    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    if (!deletedUser) return errorResponse(res, 'User not found', 404);
+
+    return successResponse(res, { message: 'User deleted successfully' });
   } catch (err) {
     next(err);
   }

@@ -20,7 +20,7 @@
         <a routerLink="/dashboard/profile" routerLinkActive="active">
           {{ 'nav.dashboard' | translate }}
         </a>
-        <a *ngIf="user.role === 'admin'" routerLink="/admin" routerLinkActive="active">
+        <a *ngIf="user.role === 'admin' || user.role === 'producer'" routerLink="/admin" routerLinkActive="active">
           {{ 'nav.admin' | translate }}
         </a>
         <button class="btn btn-ghost" (click)="logout()">{{ 'nav.logout' | translate }}</button>

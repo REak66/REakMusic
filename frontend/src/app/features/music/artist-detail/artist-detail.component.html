@@ -1,32 +1,58 @@
 <div class="artist-detail-page main-content">
+  <!-- Blurred hero backdrop -->
+  <ng-container *ngIf="artist && !loading">
+    <div class="hero-backdrop" [style.background-image]="artist.imageUrl ? 'url(' + artist.imageUrl + ')' : ''" [class.no-image]="!artist.imageUrl"></div>
+    <div class="hero-overlay"></div>
+  </ng-container>
+
   <div class="container">
     <app-skeleton type="artist-detail" *ngIf="loading" />
 
-    <div *ngIf="artist && !loading">
+    <div *ngIf="artist && !loading" class="glass-panel main-panel">
+      <!-- ── Artist Header ────────────────────────────────────── -->
       <app-animate-on-scroll enterClass="animate-fade-in" [threshold]="0.1">
-      <div class="artist-header">
-        <div class="artist-avatar"
-          pAnimateOnScroll
-          enterClass="animate-slide-in-left"
-          [threshold]="0.15">
-          <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" [alt]="artist.name" />
-          <span *ngIf="!artist.imageUrl" class="avatar-placeholder"><i class="fa-solid fa-microphone-lines"></i></span>
+        <div class="artist-header">
+          <div class="artist-avatar"
+            pAnimateOnScroll
+            enterClass="animate-slide-in-left"
+            [threshold]="0.15">
+            <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" [alt]="artist.name" />
+            <span *ngIf="!artist.imageUrl" class="avatar-placeholder">
+              <i class="fa-solid fa-microphone-lines"></i>
+            </span>
+          </div>
+          <div class="artist-info"
+            pAnimateOnScroll
+            enterClass="animate-slide-in-right"
+            [threshold]="0.15">
+            <span class="role-badge">PRODUCER</span>
+            <h1>{{ artist.name }}</h1>
+            
+            <p *ngIf="artist.country" class="artist-country">
+              <i class="fa-solid fa-location-dot"></i>
+              <span>{{ artist.country }}</span>
+            </p>
+
+            <p *ngIf="artist.bio" class="artist-bio">{{ artist.bio }}</p>
+
+            <div class="artist-stats">
+              <div class="artist-stat-item">
+                <span class="stat-number">{{ songs.length }}</span>
+                <span class="stat-label">Tracks Uploaded</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="artist-info"
-          pAnimateOnScroll
-          enterClass="animate-slide-in-right"
-          [threshold]="0.15">
-          <h1>{{ artist.name }}</h1>
-          <p *ngIf="artist.country" class="artist-country">{{ artist.country }}</p>
-          <p *ngIf="artist.bio" class="artist-bio">{{ artist.bio }}</p>
-        </div>
-      </div>
       </app-animate-on-scroll>
 
+      <div class="section-divider"></div>
+
+      <!-- ── Songs Section ────────────────────────────────────── -->
       <app-animate-on-scroll enterClass="animate-fade-in-up" [threshold]="0.1">
         <h2 class="section-title">Songs by {{ artist.name }}</h2>
       </app-animate-on-scroll>
-      <div class="grid-songs">
+
+      <div class="grid-songs" *ngIf="songs.length > 0">
         <div class="song-card"
           *ngFor="let song of songs"
           [routerLink]="['/home/songs', song._id]"
@@ -34,19 +60,34 @@
           enterClass="animate-zoom-in"
           [threshold]="0.1">
           <div class="song-thumbnail">
-            <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
-            <div class="play-overlay"><div class="play-icon"><i class="fa-solid fa-play"></i></div></div>
+            <img *ngIf="getThumbnail(song) as thumb" [src]="thumb" [alt]="song.title" loading="lazy" />
+            <div *ngIf="!getThumbnail(song)" class="fallback-glass-disc">
+              <div class="disc-groove groove-1"></div>
+              <div class="disc-groove groove-2"></div>
+              <div class="disc-center">
+                <div class="center-badge">
+                  <i class="fa-solid fa-compact-disc"></i>
+                </div>
+              </div>
+            </div>
+            <div class="play-overlay">
+              <div class="play-icon">
+                <i class="fa-solid fa-play"></i>
+              </div>
+            </div>
           </div>
           <div class="song-info">
             <div class="song-title">{{ song.title }}</div>
-            <div class="song-price">
-              <span *ngIf="song.price > 0">${{ song.price.toFixed(2) }}</span>
-              <span *ngIf="song.price === 0" class="badge badge-success">Free</span>
+            <div class="song-meta" *ngIf="song.releaseYear">
+              <i class="fa-solid fa-calendar-days"></i>
+              <span>{{ song.releaseYear }}</span>
             </div>
           </div>
         </div>
       </div>
+      
       <p *ngIf="songs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
     </div>
   </div>
 </div>
+

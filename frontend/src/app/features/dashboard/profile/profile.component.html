@@ -53,9 +53,9 @@
         <!-- Stats Strip -->
         <div class="stats-strip">
           <div class="stat-item">
-            <div class="stat-icon stat-icon--purple"><i class="fa-solid fa-music"></i></div>
-            <span class="stat-num">{{ user.purchasedSongs.length }}</span>
-            <span class="stat-desc">Songs Owned</span>
+            <div class="stat-icon stat-icon--blue"><i class="fa-regular fa-calendar"></i></div>
+            <span class="stat-num">{{ user.createdAt | date:'yyyy' }}</span>
+            <span class="stat-desc">Member Since</span>
           </div>
           <div class="stat-sep"></div>
           <div class="stat-item">
@@ -199,10 +199,6 @@
             <li class="info-row">
               <span class="info-row-label">Last Updated</span>
               <span class="info-row-val">{{ user.updatedAt | date:'MMM d, yyyy' }}</span>
-            </li>
-            <li class="info-row">
-              <span class="info-row-label">Songs Owned</span>
-              <span class="info-row-val info-row-val--accent">{{ user.purchasedSongs.length }}</span>
             </li>
           </ul>
         </section>

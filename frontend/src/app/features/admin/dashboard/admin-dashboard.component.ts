@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { UserService } from '../../../core/services/user.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Analytics {
   totalRevenue: number;
@@ -48,7 +49,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   private rafIds: number[] = [];
 
-  constructor(private userService: UserService, private cdr: ChangeDetectorRef) { }
+  constructor(private userService: UserService, private cdr: ChangeDetectorRef, public authService: AuthService) { }
 
   ngOnInit(): void {
     this.userService.getAnalytics().subscribe({

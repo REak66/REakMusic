@@ -34,6 +34,7 @@ export class RegisterComponent implements OnInit {
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
+      role: ['customer', Validators.required],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required]
     }, { validators: passwordsMatch });
@@ -43,10 +44,10 @@ export class RegisterComponent implements OnInit {
     if (this.form.invalid) return;
     this.loading = true;
     this.error = '';
-    const { fullName, email, phone, password } = this.form.value as {
-      fullName: string; email: string; phone: string; password: string;
+    const { fullName, email, phone, role, password } = this.form.value as {
+      fullName: string; email: string; phone: string; role: string; password: string;
     };
-    this.authService.register({ fullName, email, phone: phone || undefined, password }).subscribe({
+    this.authService.register({ fullName, email, phone: phone || undefined, role, password }).subscribe({
       next: () => {
         this.pendingEmail = email;
         this.router.navigate(['/auth/verify-otp'], { queryParams: { email } });

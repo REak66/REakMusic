@@ -1,6 +1,12 @@
 const Genre = require('../models/Genre');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 
+const slugify = (text) =>
+  text.toString().toLowerCase().trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-');
+
 exports.listGenres = async (req, res, next) => {
   try {
     const genres = await Genre.find().sort({ name: 1 });
@@ -22,7 +28,15 @@ exports.getGenre = async (req, res, next) => {
 
 exports.createGenre = async (req, res, next) => {
   try {
-    const genre = await Genre.create(req.body);
+    const { name, description, color } = req.body;
+    const baseSlug = slugify(name || '');
+    // ensure unique slug
+    let slug = baseSlug;
+    let count = 1;
+    while (await Genre.findOne({ slug })) {
+      slug = `${baseSlug}-${count++}`;
+    }
+    const genre = await Genre.create({ name, description, color, slug });
     return successResponse(res, { genre }, 'Genre created', 201);
   } catch (err) {
     next(err);
@@ -31,7 +45,13 @@ exports.createGenre = async (req, res, next) => {
 
 exports.updateGenre = async (req, res, next) => {
   try {
-    const genre = await Genre.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const { name, description, color } = req.body;
+    const update = { description, color };
+    if (name) {
+      update.name = name;
+      update.slug = slugify(name);
+    }
+    const genre = await Genre.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
     if (!genre) return errorResponse(res, 'Genre not found', 404);
     return successResponse(res, { genre }, 'Genre updated');
   } catch (err) {

@@ -10,6 +10,8 @@ import { SongManagementComponent } from './songs/song-management.component';
 import { ArtistManagementComponent } from './artists/artist-management.component';
 import { OrderManagementComponent } from './orders/order-management.component';
 import { UserManagementComponent } from './users/user-management.component';
+import { DownloadHistoryComponent } from './download-history/download-history.component';
+import { GenreManagementComponent } from './genres/genre-management.component';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
@@ -19,7 +21,9 @@ import { SharedModule } from '../../shared/shared.module';
     SongManagementComponent,
     ArtistManagementComponent,
     OrderManagementComponent,
-    UserManagementComponent
+    UserManagementComponent,
+    DownloadHistoryComponent,
+    GenreManagementComponent
   ],
   imports: [
     CommonModule,

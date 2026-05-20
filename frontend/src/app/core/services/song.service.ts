@@ -12,6 +12,9 @@ export class SongService {
   constructor(private http: HttpClient) { }
 
   getSongs(params: SongQueryParams = {}): Observable<PaginatedResponse<Song>> {
+    if (params.role === 'producer') {
+      params.owner = 'self'; // Add owner filter for producers
+    }
     let httpParams = new HttpParams();
     Object.entries(params).forEach(([key, val]) => {
       if (val !== undefined && val !== null && val !== '') {

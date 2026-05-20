@@ -1,1 +1,68 @@
 @use '../auth-shared' as *;
+
+// Stagger inner elements after card entrance
+.auth-card {
+  // Form fields slide in with stagger
+  app-form-field,
+  .form-group {
+    animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+    @for $i from 1 through 6 {
+      &:nth-child(#{$i}) {
+        animation-delay: #{0.1 + $i * 0.07}s;
+      }
+    }
+  }
+}
+
+// Logo entrance
+.auth-logo {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+
+  .logo-icon {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    &:hover { transform: rotate(-8deg) scale(1.08); }
+  }
+}
+
+// Title/subtitle entrance
+.auth-title {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.auth-subtitle {
+  animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.14s both;
+}
+
+// Actions row
+.auth-actions {
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both;
+  a { transition: color 0.2s ease, letter-spacing 0.2s ease; }
+}
+
+// Full-width button
+.btn-full {
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+  }
+}
+
+// Switch link row
+.auth-switch {
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.32s both;
+
+  a { transition: color 0.2s ease; }
+}
+
+// Divider
+.auth-divider {
+  animation: fadeIn 0.4s ease 0.2s both;
+}

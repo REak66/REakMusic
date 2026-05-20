@@ -11,10 +11,17 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) { }
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    const authReq = req.clone({ withCredentials: true });
+    let authReq = req;
+    const token = localStorage.getItem('token');
+    if (token) {
+      authReq = req.clone({
+        headers: req.headers.set('Authorization', `Bearer ${token}`)
+      });
+    }
+
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && !req.url.includes('/auth/')) {
+        if (error.status === 401 && !req.url.includes('/auth/login')) {
           this.authService.clearSession();
         }
         return throwError(() => error);

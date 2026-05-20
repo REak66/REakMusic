@@ -48,7 +48,7 @@ export class CartService {
   }
 
   getTotal(): number {
-    return this.cartSubject.value.reduce((sum, item) => sum + item.song.price, 0);
+    return this.cartSubject.value.reduce((sum, item) => sum + (item.song.price || 0), 0);
   }
 
   getCount(): number {

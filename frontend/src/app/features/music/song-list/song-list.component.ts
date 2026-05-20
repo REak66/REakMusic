@@ -25,8 +25,6 @@ export class SongListComponent implements OnInit {
   sortOptions = [
     { value: '-createdAt', label: 'Newest' },
     { value: '-downloadCount', label: 'Most Popular' },
-    { value: 'price', label: 'Price: Low to High' },
-    { value: '-price', label: 'Price: High to Low' },
     { value: 'title', label: 'Title A-Z' }
   ];
 
@@ -41,8 +39,6 @@ export class SongListComponent implements OnInit {
     this.filterForm = this.fb.group({
       search: [''],
       genre: [''],
-      minPrice: [''],
-      maxPrice: [''],
       releaseYear: [''],
       sort: ['-createdAt']
     });
@@ -66,7 +62,7 @@ export class SongListComponent implements OnInit {
   loadSongs(): void {
     this.loading = true;
     const v = this.filterForm.value as {
-      search: string; genre: string; minPrice: string; maxPrice: string; releaseYear: string; sort: string;
+      search: string; genre: string; releaseYear: string; sort: string;
     };
     const params: SongQueryParams = {
       page: this.page,
@@ -75,8 +71,6 @@ export class SongListComponent implements OnInit {
     };
     if (v.search) params.search = v.search;
     if (v.genre) params.genre = v.genre;
-    if (v.minPrice) params.minPrice = Number(v.minPrice);
-    if (v.maxPrice) params.maxPrice = Number(v.maxPrice);
     if (v.releaseYear) params.releaseYear = Number(v.releaseYear);
 
     this.songService.getSongs(params).subscribe({
