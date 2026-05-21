@@ -56,10 +56,7 @@
               <td class="producer-cell">
                 <div class="producer-identity">
                   <div class="avatar-wrap">
-                    <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" [alt]="artist.name" class="artist-thumb" />
-                    <div *ngIf="!artist.imageUrl" class="artist-thumb-placeholder">
-                      <span class="avatar-initials">{{ artist.name.charAt(0).toUpperCase() }}</span>
-                    </div>
+                    <img [src]="artist.imageUrl || 'assets/images/music.png'" [alt]="artist.name" class="artist-thumb" />
                     <span class="avatar-status"></span>
                   </div>
                   <div class="producer-info">

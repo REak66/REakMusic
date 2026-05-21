@@ -112,7 +112,7 @@ export class SongListComponent implements OnInit {
     if (artist && typeof artist === 'object' && artist.imageUrl) {
       return artist.imageUrl;
     }
-    return 'assets/images/default-cover.svg';
+    return 'assets/images/music.png';
   }
 
   onLimitChange(size: number): void {

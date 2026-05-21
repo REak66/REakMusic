@@ -16,10 +16,7 @@
             pAnimateOnScroll
             enterClass="animate-slide-in-left"
             [threshold]="0.15">
-            <img *ngIf="artist.imageUrl" [src]="artist.imageUrl" [alt]="artist.name" />
-            <span *ngIf="!artist.imageUrl" class="avatar-placeholder">
-              <i class="fa-solid fa-microphone-lines"></i>
-            </span>
+            <img [src]="artist.imageUrl || 'assets/images/music.png'" [alt]="artist.name" />
           </div>
           <div class="artist-info"
             pAnimateOnScroll
@@ -60,16 +57,7 @@
           enterClass="animate-zoom-in"
           [threshold]="0.1">
           <div class="song-thumbnail">
-            <img *ngIf="getThumbnail(song) as thumb" [src]="thumb" [alt]="song.title" loading="lazy" />
-            <div *ngIf="!getThumbnail(song)" class="fallback-glass-disc">
-              <div class="disc-groove groove-1"></div>
-              <div class="disc-groove groove-2"></div>
-              <div class="disc-center">
-                <div class="center-badge">
-                  <i class="fa-solid fa-compact-disc"></i>
-                </div>
-              </div>
-            </div>
+            <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
             <div class="play-overlay">
               <div class="play-icon">
                 <i class="fa-solid fa-play"></i>

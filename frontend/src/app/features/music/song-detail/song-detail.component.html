@@ -53,10 +53,7 @@
           <!-- Producer Card -->
           <div class="producer-card" *ngIf="artist">
             <div class="producer-avatar">
-              <img *ngIf="artist.imageUrl; else defaultArtistIcon" [src]="artist.imageUrl" [alt]="artist.name" class="producer-img" />
-              <ng-template #defaultArtistIcon>
-                <i class="fa-solid fa-music"></i>
-              </ng-template>
+              <img [src]="artist.imageUrl || 'assets/images/music.png'" [alt]="artist.name" class="producer-img" />
             </div>
             <div class="producer-info">
               <span class="producer-label">{{ "music.artist" | translate }}</span>

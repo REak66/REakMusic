@@ -33,7 +33,7 @@ export class MiniPlayerComponent implements OnInit {
       return `https://drive.google.com/thumbnail?id=${song.thumbnailId}&sz=w120`;
     }
     const artist = song.artistId as Artist;
-    return artist?.imageUrl ?? 'assets/images/default-cover.svg';
+    return artist?.imageUrl ?? 'assets/images/music.png';
   }
 
   getArtistName(song: Song): string {

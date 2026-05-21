@@ -41,13 +41,13 @@ export class ArtistDetailComponent implements OnInit {
     });
   }
 
-  getThumbnail(song: Song): string | null {
+  getThumbnail(song: Song): string {
     if (song.thumbnailId) {
       return `https://drive.google.com/thumbnail?id=${song.thumbnailId}`;
     }
     if (this.artist?.imageUrl) {
       return this.artist.imageUrl;
     }
-    return null;
+    return 'assets/images/music.png';
   }
 }

@@ -70,7 +70,7 @@ export class PlayerBarComponent implements OnInit {
     }
     const artist = song.artistId as Artist;
     if (artist?.imageUrl) return artist.imageUrl;
-    return 'assets/images/default-cover.svg';
+    return 'assets/images/music.png';
   }
 
   getArtistName(song: Song): string {

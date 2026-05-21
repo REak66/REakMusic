@@ -75,7 +75,7 @@ export class SongDetailComponent implements OnInit {
     if (this.artist?.imageUrl) {
       return this.artist.imageUrl;
     }
-    return 'assets/images/default-cover.svg';
+    return 'assets/images/music.png';
   }
 
   get isOwned(): boolean {

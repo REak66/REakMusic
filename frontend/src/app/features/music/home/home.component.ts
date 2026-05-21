@@ -48,6 +48,6 @@ export class HomeComponent implements OnInit {
     if (artist && typeof artist === 'object' && artist.imageUrl) {
       return artist.imageUrl;
     }
-    return 'assets/images/default-cover.svg';
+    return 'assets/images/music.png';
   }
 }
