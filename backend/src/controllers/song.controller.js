@@ -242,3 +242,20 @@ exports.downloadSong = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.resolveDriveLink = async (req, res, next) => {
+  try {
+    const { link } = req.query;
+    if (!link) return errorResponse(res, 'Link parameter required', 400);
+
+    const fileId = extractDriveFileId(link);
+    if (!fileId) return errorResponse(res, 'Invalid Google Drive link format', 400);
+
+    const fileInfo = await driveService.getFileInfo(fileId);
+    return successResponse(res, { name: fileInfo.name }, 'Link resolved successfully');
+  } catch (err) {
+    console.error('resolveDriveLink error details:', err);
+    return errorResponse(res, 'Unable to resolve Google Drive link. Ensure the file is shared as "Anyone with the link can view".', 404);
+  }
+};
+

@@ -102,4 +102,14 @@ const streamFile = async (fileId, req, res, filename = null) => {
   req.on('close', () => driveRes.data.destroy());
 };
 
-module.exports = { uploadFile, generateSignedUrl, makeFilePublic, deleteFile, streamFile };
+const getFileInfo = async (fileId) => {
+  const auth = getAuth();
+  const drive = google.drive({ version: 'v3', auth });
+  const res = await drive.files.get({
+    fileId,
+    fields: 'id, name, mimeType, size',
+  });
+  return res.data;
+};
+
+module.exports = { uploadFile, generateSignedUrl, makeFilePublic, deleteFile, streamFile, getFileInfo };

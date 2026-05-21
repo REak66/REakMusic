@@ -29,13 +29,7 @@
     .footer-logo-icon {
       width: 28px;
       height: 28px;
-      background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      color: white;
+      object-fit: contain;
       flex-shrink: 0;
     }
 

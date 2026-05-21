@@ -62,6 +62,12 @@ export class SongService {
     });
   }
 
+  resolveDriveLink(link: string): Observable<string> {
+    return this.http.get<any>(`${this.apiUrl}/resolve-drive`, { params: { link } }).pipe(
+      map(res => res.data?.name || '')
+    );
+  }
+
   createSong(data: FormData): Observable<Song> {
     return this.http.post<Song>(this.apiUrl, data);
   }

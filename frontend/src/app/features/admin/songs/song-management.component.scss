@@ -1,6 +1,55 @@
 @use '../admin-shared' as *;
 
-// ─── File Upload Zone ────────────────────────────────────────────────────────
+// ─── Title auto-fill badge ────────────────────────────────────────────────────
+
+.title-label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+
+  label {
+    margin-bottom: 0 !important;
+  }
+}
+
+.autofill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.18rem 0.55rem 0.18rem 0.45rem;
+  border-radius: 2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: color-mix(in srgb, #a855f7 15%, transparent);
+  color: #c084fc;
+  border: 1px solid color-mix(in srgb, #a855f7 35%, transparent);
+  animation: badgePop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  white-space: nowrap;
+
+  i.fa-wand-magic-sparkles { font-size: 0.65rem; }
+}
+
+.autofill-clear {
+  background: none;
+  border: none;
+  padding: 0 0 0 0.15rem;
+  cursor: pointer;
+  color: #c084fc;
+  opacity: 0.65;
+  font-size: 0.65rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 1; }
+}
+
+@keyframes badgePop {
+  from { opacity: 0; transform: scale(0.8) translateY(-2px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
 
 .label-hint {
   font-size: 0.75rem;
@@ -100,6 +149,26 @@
   input {
     margin-top: 0.5rem;
     width: 100%;
+  }
+
+  .drive-status {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.1rem 0.2rem;
+
+    &.resolving {
+      color: #c084fc; // purple accent
+    }
+    &.success {
+      color: var(--color-success, #22c55e);
+    }
+    &.error {
+      color: var(--color-danger, #ef4444);
+    }
   }
 }
 

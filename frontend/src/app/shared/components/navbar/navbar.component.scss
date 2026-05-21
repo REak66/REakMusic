@@ -30,13 +30,7 @@
   .brand-icon {
     width: 34px;
     height: 34px;
-    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.1rem;
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
+    object-fit: contain;
   }
 
   .brand-name {

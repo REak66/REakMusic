@@ -19,6 +19,7 @@ const upload = multer({
 
 router.get('/', optionalAuth, songController.listSongs);
 router.get('/search', songController.searchSongs);
+router.get('/resolve-drive', songController.resolveDriveLink);
 router.get('/:id', songController.getSong);
 router.get('/:id/stream', songController.streamSong);
 router.get('/:id/download', authenticate, songController.downloadSong);
