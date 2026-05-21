@@ -5,6 +5,7 @@ import { ConfirmationService } from 'primeng/api';
 import { UserService } from '../../../core/services/user.service';
 import { ArtistService } from '../../../core/services/artist.service';
 import { User, Artist } from '../../../core/models';
+import { SelectOption } from '../../../shared/components/select-dropdown/select-dropdown.component';
 
 // 6 granular system permissions
 export interface PermissionDef {
@@ -57,8 +58,23 @@ export class UserManagementComponent implements OnInit {
   artists: Artist[] = [];
   allPermissions = ALL_PERMISSIONS;
 
+  readonly roleOptions: SelectOption[] = [
+    { value: 'admin', label: 'Admin', icon: 'fa-solid fa-shield-halved' },
+    { value: 'producer', label: 'Producer', icon: 'fa-solid fa-microphone' },
+    { value: 'customer', label: 'Customer', icon: 'fa-solid fa-user' },
+    { value: 'guest', label: 'Guest', icon: 'fa-solid fa-user-slash' },
+  ];
+
+  get artistOptions(): SelectOption[] {
+    return [
+      { value: '', label: 'Auto-create / None' },
+      ...this.artists.map(a => ({ value: a._id, label: a.name }))
+    ];
+  }
+
   loading = true;
   showModal = false;
+  showPassword = false;
   editingUser: User | null = null;
   saving = false;
   error = '';
@@ -140,6 +156,7 @@ export class UserManagementComponent implements OnInit {
     this.userForm.get('password')!.setValidators([Validators.required, Validators.minLength(6)]);
     this.userForm.get('password')!.updateValueAndValidity();
     this.selectedPermissions = [...ROLE_DEFAULT_PERMISSIONS['customer']];
+    this.showPassword = false;
     this.showModal = true;
     this.cdr.markForCheck();
   }
@@ -160,6 +177,7 @@ export class UserManagementComponent implements OnInit {
     this.userForm.get('password')!.clearValidators();
     this.userForm.get('password')!.updateValueAndValidity();
     this.selectedPermissions = [...(user.permissions || ROLE_DEFAULT_PERMISSIONS[user.role] || [])];
+    this.showPassword = false;
     this.showModal = true;
     this.cdr.markForCheck();
   }
@@ -235,7 +253,7 @@ export class UserManagementComponent implements OnInit {
   deleteUser(user: User): void {
     this.confirmationService.confirm({
       header: 'Delete User',
-      message: `Are you sure you want to permanently delete <strong>${user.fullName}</strong>? This action cannot be undone.`,
+      message: `Are you sure you want to permanently delete ${user.fullName}? This action cannot be undone.`,
       acceptLabel: 'Delete',
       rejectLabel: 'Cancel',
       accept: () => {

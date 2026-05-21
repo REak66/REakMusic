@@ -14,7 +14,9 @@ export class LoginComponent implements OnInit {
   form!: FormGroup;
   loading = false;
   error = '';
+  infoMessageKey = '';
   returnUrl = '/home';
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -22,7 +24,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -30,6 +32,7 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
     this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/home';
+    this.infoMessageKey = this.route.snapshot.queryParamMap.get('messageKey') || '';
   }
 
   onSubmit(): void {
@@ -47,5 +50,9 @@ export class LoginComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
   }
 }

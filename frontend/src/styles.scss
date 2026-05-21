@@ -50,11 +50,22 @@
 html,
 body {
   height: 100%;
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Advent Pro', 'Kantumruy Pro', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
-  font-size: 16px;
-  line-height: 1.5;
+  /* Responsive base font size to improve readability across viewports */
+  font-size: clamp(18px, 1.3rem + 0.3vw, 19px);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Use Kantumruy Pro for Khmer text (when document/lang or element indicates Khmer) */
+:lang(km),
+.kh {
+  font-family: 'Kantumruy Pro', 'Advent Pro', 'Inter', system-ui, -apple-system, sans-serif;
+  /* Slightly larger and more airy line-height for Khmer scripts */
+  font-size: 1.06em;
+  line-height: 1.75;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -478,7 +489,6 @@ ol {
   th, td {
     padding: 0.875rem 1rem;
     text-align: left;
-    border-bottom: 1px solid var(--color-border);
   }
 
   th {
@@ -489,21 +499,52 @@ ol {
     font-weight: 700;
     background: rgba(255,255,255,0.02);
   }
-
-  tr:hover td {
-    background: rgba(124, 58, 237, 0.04);
-  }
 }
 
 /* Page title */
 .page-title {
-  font-size: 2rem;
+  font-size: clamp(1.75rem, 2.4vw, 2.6rem);
   font-weight: 800;
   margin-bottom: 1.75rem;
   background: linear-gradient(135deg, var(--color-text-primary) 60%, var(--color-accent-light));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Larger titles when content is Khmer to improve legibility */
+:lang(km) .page-title,
+.kh .page-title {
+  font-size: clamp(1.9rem, 2.8vw, 3rem);
+}
+
+/* Menu / navbar improvements: use stronger weight and ensure Khmer font is used */
+nav,
+.navbar,
+.menu,
+.nav-item,
+.nav-link,
+.app-nav {
+  font-family: 'Advent Pro', 'Kantumruy Pro', 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 800; /* SemiBold */
+  font-size: 0.95rem;
+}
+
+/* Slightly larger nav/menu text for Khmer */
+.kh nav,
+.kh .navbar,
+.kh .menu,
+.kh .nav-item,
+.kh .nav-link,
+.kh .app-nav,
+:lang(km) nav,
+:lang(km) .navbar,
+:lang(km) .menu,
+:lang(km) .nav-item,
+:lang(km) .nav-link,
+:lang(km) .app-nav {
+  font-size: 1rem;
+  font-weight: 800; /* ensure Khmer nav uses SemiBold */
 }
 
 /* Pagination */

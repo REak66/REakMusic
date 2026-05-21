@@ -28,6 +28,10 @@ export class SongListComponent implements OnInit {
     { value: 'title', label: 'Title A-Z' }
   ];
 
+  genreOptions = [
+    { value: '', label: 'All Genres' }
+  ];
+
   constructor(
     private songService: SongService,
     private genreService: GenreService,
@@ -45,6 +49,10 @@ export class SongListComponent implements OnInit {
 
     this.genreService.getGenres().subscribe(genres => {
       this.genres = genres;
+      this.genreOptions = [
+        { value: '', label: 'All Genres' },
+        ...genres.map(g => ({ value: g._id, label: g.name }))
+      ];
       this.cdr.markForCheck();
     });
 

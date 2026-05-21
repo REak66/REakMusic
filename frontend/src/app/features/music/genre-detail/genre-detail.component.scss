@@ -39,6 +39,43 @@
     }
   }
 
+  .genre-detail-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem 0;
+
+    .genre-header-skeleton {
+      display: grid;
+      gap: 1rem;
+      max-width: 720px;
+
+      .badge-skeleton,
+      .title-skeleton,
+      .desc-skeleton {
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 999px;
+        min-height: 1rem;
+      }
+
+      .badge-skeleton {
+        width: 6rem;
+        height: 1.7rem;
+      }
+
+      .title-skeleton {
+        width: 45%;
+        height: 2.2rem;
+        border-radius: 14px;
+      }
+
+      .desc-skeleton {
+        width: 60%;
+        height: 1rem;
+      }
+    }
+  }
+
   .no-results {
     color: var(--color-text-muted);
     padding: 2rem 0;

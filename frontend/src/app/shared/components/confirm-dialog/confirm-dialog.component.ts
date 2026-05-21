@@ -15,11 +15,17 @@ export class ConfirmDialogComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void { }
 
-    accept(): void {
+    accept(message?: any): void {
+        if (message && typeof message.accept === 'function') {
+            message.accept();
+        }
         this.confirmationService.close();
     }
 
-    reject(): void {
+    reject(message?: any): void {
+        if (message && typeof message.reject === 'function') {
+            message.reject();
+        }
         this.confirmationService.close();
     }
 }

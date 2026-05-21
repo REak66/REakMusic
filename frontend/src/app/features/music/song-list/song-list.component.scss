@@ -4,12 +4,15 @@
 }
 
 .filters-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.625rem;
-  margin-bottom: 1.5rem;
-  align-items: center;
-  padding: 1rem 1.25rem;
+    position: relative;
+    z-index: 20;
+    overflow: visible;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    padding: 1rem 1.25rem;
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -52,7 +55,7 @@
     }
   }
 
-  .filter-select,
+  select.filter-select,
   .filter-num {
     background: rgba(0, 0, 0, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.06);
@@ -73,6 +76,20 @@
       background: var(--color-bg-secondary);
       color: var(--color-text-primary);
     }
+  }
+
+  .filter-dropdown {
+    position: relative;
+    z-index: 20;
+    flex: 0 0 auto;
+    min-width: 170px;
+    max-width: 220px;
+    width: 100%;
+    overflow: visible;
+  }
+
+  .filter-dropdown app-select-dropdown {
+    width: 100%;
   }
 
   .filter-num {

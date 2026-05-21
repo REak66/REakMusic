@@ -1,33 +1,39 @@
 <div class="song-list-page main-content">
   <div class="container">
     <app-animate-on-scroll enterClass="animate-fade-in-down" [threshold]="0.1">
-      <h1 class="page-title">{{ 'nav.browse' | translate }}</h1>
+      <h1 class="page-title">{{ "nav.browse" | translate }}</h1>
     </app-animate-on-scroll>
 
     <!-- Filters -->
     <app-animate-on-scroll enterClass="animate-fade-in" [threshold]="0.1">
-    <form [formGroup]="filterForm" class="filters-bar">
-      <div class="search-wrap">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input
-          type="text"
-          formControlName="search"
-          [placeholder]="'common.search' | translate"
-          class="search-input"
-        />
-      </div>
+      <form [formGroup]="filterForm" class="filters-bar">
+        <div class="search-wrap">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input
+            type="text"
+            formControlName="search"
+            [placeholder]="'common.search' | translate"
+            class="search-input"
+          />
+        </div>
 
-      <select formControlName="genre" class="filter-select">
-        <option value="">All Genres</option>
-        <option *ngFor="let g of genres" [value]="g._id">{{ g.name }}</option>
-      </select>
+        <div class="filter-dropdown">
+          <app-select-dropdown
+            formControlName="genre"
+            [options]="genreOptions"
+            placeholder="All Genres"
+            [compact]="true"
+          ></app-select-dropdown>
+        </div>
 
-      <input type="number" formControlName="releaseYear" placeholder="Year" class="filter-num filter-year" />
-
-      <select formControlName="sort" class="filter-select">
-        <option *ngFor="let opt of sortOptions" [value]="opt.value">{{ opt.label }}</option>
-      </select>
-    </form>
+        <div class="filter-dropdown">
+          <app-select-dropdown
+            formControlName="sort"
+            [options]="sortOptions"
+            [compact]="true"
+          ></app-select-dropdown>
+        </div>
+      </form>
     </app-animate-on-scroll>
 
     <!-- Results info -->
@@ -40,12 +46,14 @@
 
     <!-- Grid -->
     <div class="grid-songs" *ngIf="!loading">
-      <div class="song-card"
+      <div
+        class="song-card"
         *ngFor="let song of songs"
         [routerLink]="['/home/songs', song._id]"
         pAnimateOnScroll
         enterClass="animate-zoom-in"
-        [threshold]="0.1">
+        [threshold]="0.1"
+      >
         <div class="song-thumbnail">
           <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
           <div class="play-overlay">
@@ -59,7 +67,9 @@
       </div>
     </div>
 
-    <p class="no-results" *ngIf="!loading && songs.length === 0">{{ 'common.noResults' | translate }}</p>
+    <p class="no-results" *ngIf="!loading && songs.length === 0">
+      {{ "common.noResults" | translate }}
+    </p>
 
     <!-- Pagination -->
     <app-pagination

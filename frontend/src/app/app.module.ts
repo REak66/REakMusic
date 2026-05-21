@@ -6,6 +6,7 @@ import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
+import { firstValueFrom } from 'rxjs';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,7 +20,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
 }
 
 function initAuth(authService: AuthService) {
-  return () => authService.tryRefreshOnInit().toPromise();
+  return () => firstValueFrom(authService.tryRefreshOnInit());
 }
 
 @NgModule({

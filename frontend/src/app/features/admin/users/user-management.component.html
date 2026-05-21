@@ -138,6 +138,7 @@
 
     <div class="alert alert-error" *ngIf="error">{{ error }}</div>
 
+    <div class="modal-scroll-body">
     <form [formGroup]="userForm" (ngSubmit)="save()">
       <!-- ── Section: Identity ─────────────────────────────────────────── -->
       <div class="modal-section">
@@ -176,12 +177,23 @@
             >Password {{ editingUser ? "(leave blank to keep unchanged)" : "" }}
             <span class="req" *ngIf="!editingUser">*</span></label
           >
-          <input
-            type="password"
-            formControlName="password"
-            placeholder="{{ editingUser ? '••••••••' : 'Min. 6 characters' }}"
-            id="user-password"
-          />
+          <div class="input-password-wrap">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="{{ editingUser ? '••••••••' : 'Min. 6 characters' }}"
+              id="user-password"
+            />
+            <button
+              type="button"
+              class="btn-eye"
+              (click)="showPassword = !showPassword"
+              [title]="showPassword ? 'Hide password' : 'Show password'"
+              tabindex="-1"
+            >
+              <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -191,25 +203,24 @@
         <div class="form-row">
           <div class="form-group">
             <label>Role <span class="req">*</span></label>
-            <select formControlName="role" id="user-role">
-              <option value="admin">Admin</option>
-              <option value="producer">Producer</option>
-              <option value="customer">Customer</option>
-              <option value="guest_user">Guest User</option>
-              <option value="guest">Guest</option>
-            </select>
+            <app-select-dropdown
+              formControlName="role"
+              id="user-role"
+              [options]="roleOptions"
+              placeholder="Select a role"
+            ></app-select-dropdown>
           </div>
           <div class="form-group">
             <label>
               Artist Profile
               <span class="label-hint">(for Producer role)</span>
             </label>
-            <select formControlName="artistId" id="user-artist">
-              <option value="">Auto-create / None</option>
-              <option *ngFor="let a of artists" [value]="a._id">
-                {{ a.name }}
-              </option>
-            </select>
+            <app-select-dropdown
+              formControlName="artistId"
+              id="user-artist"
+              [options]="artistOptions"
+              placeholder="Auto-create / None"
+            ></app-select-dropdown>
           </div>
         </div>
         <div class="form-group checkbox-group">
@@ -246,7 +257,9 @@
             [for]="'perm-' + perm.key"
           >
             <div class="perm-card-header">
-              <i class="fa-solid {{ perm.icon }} perm-icon"></i>
+              <div class="perm-icon-wrap">
+                <i class="fa-solid {{ perm.icon }} perm-icon"></i>
+              </div>
               <span class="perm-name">{{ perm.label }}</span>
               <div class="perm-toggle">
                 <input
@@ -263,22 +276,7 @@
             <p class="perm-desc">{{ perm.description }}</p>
           </label>
         </div>
-        <div class="permissions-section" formGroupName="permissions">
-          <h3>Permissions</h3>
-          <div class="permissions-grid">
-            <div
-              *ngFor="let permission of allPermissions"
-              class="permission-item"
-            >
-              <input
-                type="checkbox"
-                [id]="permission.key"
-                [formControlName]="permission.key"
-              />
-              <label [for]="permission.key">{{ permission.label }}</label>
-            </div>
-          </div>
-        </div>
+
         <p class="perm-hint">
           <i class="fa-solid fa-circle-info"></i>
           <strong>Admin</strong> users bypass all permission checks regardless
@@ -310,6 +308,7 @@
         </button>
       </div>
     </form>
+    </div><!-- /.modal-scroll-body -->
   </div>
 </div>
 

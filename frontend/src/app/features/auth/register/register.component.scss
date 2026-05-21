@@ -12,6 +12,14 @@
       }
     }
   }
+
+  // Account Type group must stack ABOVE the form-groups below it.
+  // Each .form-group creates its own stacking context via the transform animation.
+  // A higher z-index ensures the open dropdown panel renders on top.
+  .role-group {
+    position: relative;
+    z-index: 20;
+  }
 }
 
 .auth-logo {
@@ -45,4 +53,45 @@
 .auth-switch {
   animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
   a { transition: color 0.2s ease; }
+}
+
+// ── Fix: select-dropdown inside glassmorphism card ─────────────────────────
+// backdrop-filter on .auth-card creates a stacking context that traps child
+// z-indexes. ::ng-deep lets us override the child component's encapsulated styles.
+:host ::ng-deep app-select-dropdown {
+
+  // Trigger should match the other form inputs exactly
+  .select-trigger {
+    background: var(--color-bg-elevated) !important;
+    min-height: 48px;
+  }
+
+  // Panel: solid background, ultra-high z-index to escape the stacking context
+  .select-panel {
+    background: #1a1a2e !important;
+    border: 1px solid var(--color-accent) !important;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.85),
+      0 0 0 1px rgba(124, 58, 237, 0.2) !important;
+    z-index: 9999 !important;
+  }
+
+  .select-list {
+    background: transparent !important;
+  }
+
+  .select-option {
+    background: transparent !important;
+
+    &:hover,
+    &.is-focused {
+      background: rgba(124, 58, 237, 0.14) !important;
+      color: var(--color-text-primary) !important;
+    }
+
+    &.is-selected {
+      background: rgba(124, 58, 237, 0.22) !important;
+      color: var(--color-accent-light) !important;
+    }
+  }
 }

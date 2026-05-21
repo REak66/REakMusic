@@ -23,7 +23,8 @@
     "otpSent": "OTP sent to your email",
     "invalidOtp": "Invalid OTP",
     "loginSuccess": "Login successful",
-    "registerSuccess": "Registration successful. Please verify your email."
+    "registerSuccess": "Registration successful. Please verify your email.",
+    "sessionExpired": "Your session has expired. Please sign in again."
   },
   "music": {
     "featured": "Featured Songs",

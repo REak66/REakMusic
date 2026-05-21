@@ -1,4 +1,4 @@
-<nav class="navbar">
+<nav class="navbar" appKhmerLang>
   <div class="navbar-inner container">
     <a class="navbar-brand" routerLink="/home">
       <i class="fa-solid fa-music brand-icon"></i>
@@ -6,34 +6,58 @@
     </a>
 
     <div class="navbar-links" [class.open]="menuOpen">
-      <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
-        {{ 'nav.home' | translate }}
+      <a
+        routerLink="/home"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        {{ "nav.home" | translate }}
       </a>
       <a routerLink="/home/songs" routerLinkActive="active">
-        {{ 'nav.browse' | translate }}
+        {{ "nav.browse" | translate }}
       </a>
 
       <ng-container *ngIf="currentUser$ | async as user; else guestLinks">
         <a routerLink="/subscribe" routerLinkActive="active">
-          {{ 'nav.subscribe' | translate }}
+          {{ "nav.subscribe" | translate }}
         </a>
         <a routerLink="/dashboard/profile" routerLinkActive="active">
-          {{ 'nav.dashboard' | translate }}
+          {{ "nav.dashboard" | translate }}
         </a>
-        <a *ngIf="user.role === 'admin' || user.role === 'producer'" routerLink="/admin" routerLinkActive="active">
-          {{ 'nav.admin' | translate }}
+        <a
+          *ngIf="user.role === 'admin' || user.role === 'producer'"
+          routerLink="/admin"
+          routerLinkActive="active"
+        >
+          {{ "nav.admin" | translate }}
         </a>
-        <button class="btn btn-ghost" (click)="logout()">{{ 'nav.logout' | translate }}</button>
+        <button class="btn btn-ghost" (click)="logout()">
+          {{ "nav.logout" | translate }}
+        </button>
       </ng-container>
 
       <ng-template #guestLinks>
-        <a routerLink="/auth/login" routerLinkActive="active">{{ 'nav.login' | translate }}</a>
-        <a class="btn btn-primary" routerLink="/auth/register">{{ 'nav.register' | translate }}</a>
+        <a routerLink="/auth/login" routerLinkActive="active">{{
+          "nav.login" | translate
+        }}</a>
+        <a class="btn btn-primary" routerLink="/auth/register">{{
+          "nav.register" | translate
+        }}</a>
       </ng-template>
 
       <div class="lang-switcher">
-        <button [class.active]="currentLang === 'en'" (click)="switchLang('en')">EN</button>
-        <button [class.active]="currentLang === 'km'" (click)="switchLang('km')">ខ្មែរ</button>
+        <button
+          [class.active]="currentLang === 'en'"
+          (click)="switchLang('en')"
+        >
+          EN
+        </button>
+        <button
+          [class.active]="currentLang === 'km'"
+          (click)="switchLang('km')"
+        >
+          ខ្មែរ
+        </button>
       </div>
     </div>
 

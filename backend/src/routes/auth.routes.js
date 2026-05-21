@@ -13,6 +13,7 @@ const { authenticate } = require('../middleware/auth.middleware');
 
 router.post('/register', authLimiter, validateRegister, authController.register);
 router.post('/verify-otp', authLimiter, validateOtp, authController.verifyOtp);
+router.post('/resend-otp', authLimiter, validateForgotPassword, authController.resendOtp);
 router.post('/login', authLimiter, validateLogin, authController.login);
 router.get('/me', authenticate, authController.me);
 router.post('/logout', authenticate, authController.logout);

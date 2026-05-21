@@ -69,6 +69,16 @@ exports.register = async (req, res, next) => {
     });
 
     await newUser.save();
+
+    // Generate and send OTP for registration
+    try {
+      const otp = otpService.generateOtp(email, 'otp:register');
+      console.log(`\n🔑 [DEV ONLY] Generated registration OTP for ${email}: ${otp}\n`);
+      await emailService.sendOtpEmail(email, otp);
+    } catch (emailErr) {
+      console.error('Error sending registration OTP email:', emailErr);
+    }
+
     return successResponse(res, { message: 'Registration successful' });
   } catch (err) {
     next(err);
@@ -102,6 +112,30 @@ exports.verifyOtp = async (req, res, next) => {
     otpService.deleteOtp(email, 'otp:register');
 
     return successResponse(res, null, 'Email verified successfully');
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.resendOtp = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
+
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) return errorResponse(res, 'User not found', 404);
+    if (user.isVerified) return errorResponse(res, 'Email already verified', 400);
+
+    const locked = otpService.isLocked(email, 'otp:register');
+    if (locked) return errorResponse(res, 'Too many requests. Please wait a few minutes.', 429);
+
+    const otp = otpService.generateOtp(email, 'otp:register');
+    console.log(`\n🔑 [DEV ONLY] Resent registration OTP for ${email}: ${otp}\n`);
+    await emailService.sendOtpEmail(email, otp);
+
+    return successResponse(res, null, 'OTP resent successfully');
   } catch (err) {
     next(err);
   }
@@ -151,7 +185,7 @@ exports.login = async (req, res, next) => {
     const token = jwt.sign(
       { id: user._id, role: user.role, email: user.email },
       process.env.JWT_SECRET || 'fallback_secret_key',
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
     );
 
     return successResponse(res, { token, user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role } }, 'Login successful');

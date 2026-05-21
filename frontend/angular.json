@@ -25,9 +25,16 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              { "glob": "**/*.json", "input": "src/app/i18n", "output": "/assets/i18n" }
+              {
+                "glob": "**/*.json",
+                "input": "src/app/i18n",
+                "output": "/assets/i18n"
+              }
             ],
-            "styles": ["src/styles.scss"],
+            "styles": [
+              "src/styles.scss",
+              "node_modules/primeicons/primeicons.css"
+            ],
             "scripts": []
           },
           "configurations": {

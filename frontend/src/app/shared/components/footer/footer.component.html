@@ -1,16 +1,28 @@
-<footer class="footer">
+<footer class="footer" appKhmerLang>
   <div class="container">
     <div class="footer-inner">
-      <div class="footer-brand">
-        <div class="footer-logo-icon"><i class="fa-solid fa-music"></i></div>
+      <a routerLink="/home" class="footer-brand">
+        <div class="footer-logo-icon">
+          <i class="fa-solid fa-music"></i>
+        </div>
         <span class="footer-logo-name">REakMusic</span>
-      </div>
-      <p class="footer-copy">&copy; {{ currentYear }} REakMusic. All rights reserved.</p>
+      </a>
+
       <div class="footer-links">
-        <a routerLink="/home">Home</a>
-        <a routerLink="/home/songs">Browse</a>
-        <a routerLink="/auth/login">Sign In</a>
+        <a routerLink="/home" class="footer-link">{{
+          "nav.home" | translate
+        }}</a>
+        <span class="footer-separator">•</span>
+        <a routerLink="/home/songs" class="footer-link">{{
+          "nav.browse" | translate
+        }}</a>
+        <span class="footer-separator">•</span>
+        <a routerLink="/subscribe" class="footer-link">{{
+          "nav.subscribe" | translate
+        }}</a>
       </div>
+
+      <p class="footer-copy">&copy; {{ currentYear }} REakMusic</p>
     </div>
   </div>
 </footer>

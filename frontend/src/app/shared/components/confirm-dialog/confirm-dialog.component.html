@@ -19,14 +19,14 @@
       <div class="confirm-dialog__footer">
         <button
           class="btn btn--ghost"
-          (click)="reject()"
+          (click)="reject(message)"
           type="button">
           <i class="fa-solid fa-xmark btn__icon"></i>
           {{ message.rejectLabel || 'Cancel' }}
         </button>
         <button
           class="btn btn--danger"
-          (click)="accept()"
+          (click)="accept(message)"
           type="button">
           <i class="fa-solid fa-check btn__icon"></i>
           {{ message.acceptLabel || 'Confirm' }}
