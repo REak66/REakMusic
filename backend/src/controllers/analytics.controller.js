@@ -6,7 +6,8 @@ const { successResponse, errorResponse } = require('../utils/apiResponse');
 
 // Helper to get song IDs associated with a producer (self-uploaded or admin-uploaded with matching artistId)
 const getProducerSongIds = async (userId) => {
-  const user = await User.findById(userId);
+  // B4: Optimize query by selecting only artistId instead of whole User document
+  const user = await User.findById(userId).select('artistId');
   let songQuery = { uploadedBy: userId };
   if (user && user.artistId) {
     songQuery = {
@@ -16,8 +17,8 @@ const getProducerSongIds = async (userId) => {
       ]
     };
   }
-  const songs = await Song.find(songQuery).select('_id');
-  return songs.map(s => s._id);
+  // Use distinct which returns a flat array of ObjectIds directly and is highly optimized by MongoDB indexes
+  return await Song.distinct('_id', songQuery);
 };
 
 exports.getDashboardAnalytics = async (req, res, next) => {
@@ -30,12 +31,26 @@ exports.getDashboardAnalytics = async (req, res, next) => {
     let songIds = [];
     if (req.user.role === 'producer') {
       songIds = await getProducerSongIds(req.user.id);
-      const downloads = await Download.find({ songId: { $in: songIds } });
-
       totalSongs = songIds.length;
-      totalDownloads = downloads.length;
-      const uniqueUsers = new Set(downloads.map(d => d.userId.toString()));
-      totalUsers = uniqueUsers.size;
+
+      // B6: Use MongoDB aggregation to compute total downloads and unique user count
+      // This avoids loading all download documents into memory (very expensive)
+      if (totalSongs > 0) {
+        const stats = await Download.aggregate([
+          { $match: { songId: { $in: songIds } } },
+          {
+            $group: {
+              _id: null,
+              total: { $sum: 1 },
+              uniqueUsers: { $addToSet: '$userId' }
+            }
+          }
+        ]);
+        if (stats.length > 0) {
+          totalDownloads = stats[0].total;
+          totalUsers = stats[0].uniqueUsers.length;
+        }
+      }
       totalRevenue = 0;
     } else {
       const [revenueResult, usersCount, songsCount, downloadsCount] = await Promise.all([
@@ -84,13 +99,28 @@ exports.getSummary = async (req, res, next) => {
   try {
     if (req.user.role === 'producer') {
       const songIds = await getProducerSongIds(req.user.id);
-      const downloads = await Download.find({ songId: { $in: songIds } });
+      const totalSongs = songIds.length;
+      let totalDownloads = 0;
+      let totalUsers = 0;
       let totalRevenue = 0;
 
-      const totalSongs = songIds.length;
-      const totalDownloads = downloads.length;
-      const uniqueUsers = new Set(downloads.map(d => d.userId.toString()));
-      const totalUsers = uniqueUsers.size;
+      // B6: Optimize by counting via aggregation instead of loading all Download docs into memory
+      if (totalSongs > 0) {
+        const stats = await Download.aggregate([
+          { $match: { songId: { $in: songIds } } },
+          {
+            $group: {
+              _id: null,
+              total: { $sum: 1 },
+              uniqueUsers: { $addToSet: '$userId' }
+            }
+          }
+        ]);
+        if (stats.length > 0) {
+          totalDownloads = stats[0].total;
+          totalUsers = stats[0].uniqueUsers.length;
+        }
+      }
 
       return successResponse(res, { totalRevenue, totalUsers, totalSongs, totalDownloads });
     }
@@ -150,24 +180,24 @@ exports.getRevenueByPeriod = async (req, res, next) => {
     else dateFormat = '%Y-%m-%d';
 
     if (req.user.role === 'producer') {
-      // For producers, calculate downloaded songs daily revenue
       const songIds = await getProducerSongIds(req.user.id);
-      const downloads = await Download.find({ songId: { $in: songIds } });
-      const groups = {};
       
-      downloads.forEach(d => {
-        const dateStr = d.createdAt.toISOString().slice(0, period === 'month' ? 7 : 10); // Simple date format
-        if (!groups[dateStr]) {
-          groups[dateStr] = { total: 0, count: 0 };
-        }
-        groups[dateStr].count += 1;
-      });
+      // B11: Replace slow in-memory JS grouping of all Download documents with direct MongoDB aggregation
+      if (songIds.length === 0) {
+        return successResponse(res, { revenue: [], period });
+      }
 
-      const revenue = Object.entries(groups).map(([date, data]) => ({
-        _id: date,
-        total: 0,
-        count: data.count
-      })).sort((a, b) => a._id.localeCompare(b._id));
+      const revenue = await Download.aggregate([
+        { $match: { songId: { $in: songIds } } },
+        {
+          $group: {
+            _id: { $dateToString: { format: dateFormat, date: '$createdAt' } },
+            total: { $sum: 0 }, // Downloads don't have direct price, so total is 0
+            count: { $sum: 1 }
+          }
+        },
+        { $sort: { _id: 1 } }
+      ]);
 
       return successResponse(res, { revenue, period });
     }

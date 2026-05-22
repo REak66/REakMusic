@@ -41,18 +41,18 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th class="col-num">#</th>
+            <th class="col-num hide-md">#</th>
             <th class="col-producer">Producer</th>
-            <th class="col-country">Country</th>
-            <th class="col-bio">Bio</th>
-            <th class="col-social">Social</th>
+            <th class="col-country hide-md">Country</th>
+            <th class="col-bio hide-sm">Bio</th>
+            <th class="col-social hide-md">Social</th>
             <th class="col-actions">Actions</th>
           </tr>
         </thead>
         <tbody>
           <ng-container *ngFor="let artist of pagedArtists; let i = index">
             <tr class="producer-row">
-              <td class="row-num">{{ (page - 1) * pageSize + i + 1 }}</td>
+              <td class="row-num hide-md">{{ (page - 1) * pageSize + i + 1 }}</td>
               <td class="producer-cell">
                 <div class="producer-identity">
                   <div class="avatar-wrap">
@@ -65,18 +65,18 @@
                   </div>
                 </div>
               </td>
-              <td class="country-cell">
+              <td class="country-cell hide-md">
                 <span class="country-badge" *ngIf="artist.country">
                   <i class="fa-solid fa-location-dot"></i>
                   {{ artist.country }}
                 </span>
                 <span class="cell-empty" *ngIf="!artist.country">—</span>
               </td>
-              <td class="bio-cell">
+              <td class="bio-cell hide-sm">
                 <span class="bio-text" [title]="artist.bio || ''" *ngIf="artist.bio">{{ artist.bio }}</span>
                 <span class="cell-empty" *ngIf="!artist.bio">—</span>
               </td>
-              <td class="social-cell">
+              <td class="social-cell hide-md">
                 <span class="social-badge" *ngIf="artist.socialLinks?.length">
                   <i class="fa-solid fa-link"></i>
                   {{ artist.socialLinks!.length }}

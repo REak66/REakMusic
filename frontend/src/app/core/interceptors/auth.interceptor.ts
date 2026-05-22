@@ -8,11 +8,23 @@ import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService) { }
+  private cachedToken: string | null = null;
+
+  constructor(private authService: AuthService) {
+    // Keep cachedToken in sync with login/logout events reactively
+    this.authService.currentUser$.subscribe(() => {
+      this.cachedToken = localStorage.getItem('token');
+    });
+  }
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     let authReq = req;
-    const token = localStorage.getItem('token');
+    
+    if (!this.cachedToken) {
+      this.cachedToken = localStorage.getItem('token');
+    }
+    
+    const token = this.cachedToken;
     if (token) {
       authReq = req.clone({
         headers: req.headers.set('Authorization', `Bearer ${token}`)

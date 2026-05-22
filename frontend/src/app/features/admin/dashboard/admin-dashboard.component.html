@@ -140,6 +140,19 @@
       </div>
     </div>
 
+    <!-- Catalog Genre Distribution -->
+    <div class="genre-meter-section card" [@slideUp] style="margin-bottom: 1.5rem;">
+      <div class="section-header" style="margin-bottom: 1.25rem;">
+        <div class="section-header__left">
+          <div class="section-header__icon section-header__icon--purple">
+            <i class="fa-solid fa-chart-pie"></i>
+          </div>
+          <h2>Catalog Genre Distribution</h2>
+        </div>
+      </div>
+      <p-metergroup [value]="genreStats"></p-metergroup>
+    </div>
+
     <!-- Bottom section -->
     <div class="dash-bottom">
       <!-- Top songs -->

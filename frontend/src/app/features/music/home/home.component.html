@@ -67,24 +67,55 @@
   <section class="section container">
     <app-animate-on-scroll enterClass="animate-fade-in-up" [threshold]="0.15">
       <div class="section-header">
-        <h2 class="section-title">{{ 'music.featured' | translate }}</h2>
-        <a class="section-link" routerLink="/home/songs">View all <i class="fa-solid fa-arrow-right"></i></a>
+        <div class="section-title-wrap">
+          <span class="pulse-indicator-section"></span>
+          <h2 class="section-title">{{ 'music.featured' | translate }}</h2>
+        </div>
+        <a class="section-link glow-link" routerLink="/home/songs">View all <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </app-animate-on-scroll>
     <app-skeleton type="song-cards" [count]="6" *ngIf="loading" />
-    <ng-container *ngIf="!loading">
-      <div class="grid-songs">
-        <div class="song-card" *ngFor="let song of featuredSongs" [routerLink]="['/home/songs', song._id]"
-          pAnimateOnScroll enterClass="animate-zoom-in" [threshold]="0.1">
+    <ng-container
+      *ngIf="!loading && { currentSong: playerService.currentSong$ | async, isPlaying: playerService.isPlaying$ | async } as playerState">
+      <div class="grid-songs featured-songs-grid">
+        <div class="song-card featured-song-card" *ngFor="let song of featuredSongs"
+          [routerLink]="['/home/songs', song._id]" pAnimateOnScroll enterClass="animate-zoom-in" [threshold]="0.1">
           <div class="song-thumbnail">
             <img [src]="getThumbnail(song)" [alt]="song.title" loading="lazy" />
+
+            <!-- Glassmorphic Badges Overlay on Cover -->
+            <div class="thumbnail-badges">
+              <span class="card-badge badge-featured"><i class="fa-solid fa-star"></i> Featured</span>
+              <span class="card-badge badge-genre" *ngIf="getGenreName(song)">
+                {{ getGenreName(song) }}
+              </span>
+            </div>
+
+            <!-- Custom Play and Add-to-Cart Overlays -->
             <div class="play-overlay">
-              <div class="play-icon"><i class="fa-solid fa-play"></i></div>
+              <div class="action-buttons-wrap">
+                <!-- Circular Play/Pause Button -->
+                <button class="overlay-action-btn play-btn"
+                  [class.playing]="playerState.currentSong?._id === song._id && playerState.isPlaying"
+                  (click)="playSong($event, song)"
+                  [title]="playerState.currentSong?._id === song._id && playerState.isPlaying ? 'Pause' : 'Play'">
+                  <i class="fa-solid"
+                    [class.fa-play]="playerState.currentSong?._id !== song._id || !playerState.isPlaying"
+                    [class.fa-pause]="playerState.currentSong?._id === song._id && playerState.isPlaying"></i>
+                </button>
+              </div>
             </div>
           </div>
           <div class="song-info">
-            <div class="song-title">{{ song.title }}</div>
+            <div class="song-title-row">
+              <div class="song-title" [title]="song.title">{{ song.title }}</div>
+            </div>
             <div class="song-artist">{{ getArtistName(song) }}</div>
+
+            <div class="song-footer-row">
+              <span class="song-stats"><i class="fa-solid fa-circle-down"></i> {{ song.downloadCount || 0 }}
+                downloads</span>
+            </div>
           </div>
         </div>
         <p *ngIf="featuredSongs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>

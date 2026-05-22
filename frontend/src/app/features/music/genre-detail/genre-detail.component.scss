@@ -5,6 +5,10 @@
     margin-bottom: 2rem;
     animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
 
+    @media (max-width: 500px) {
+      margin-bottom: 1.5rem;
+    }
+
     .genre-badge {
       display: inline-flex;
       align-items: center;
@@ -31,11 +35,19 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+
+      @media (max-width: 500px) {
+        font-size: clamp(1.5rem, 6vw, 1.85rem);
+      }
     }
 
     .genre-desc {
       color: var(--color-text-secondary);
       animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+
+      @media (max-width: 500px) {
+        font-size: 0.875rem;
+      }
     }
   }
 

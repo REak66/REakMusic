@@ -1,204 +1,145 @@
 <div class="admin-page">
-    <div class="page-header" [@slideUp]>
-      <div>
-        <h1 class="page-title">{{ 'admin.songs' | translate }}</h1>
-        <p class="page-sub">Manage your music catalog</p>
+  <div class="page-header" [@slideUp]>
+    <div>
+      <h1 class="page-title">{{ 'admin.songs' | translate }}</h1>
+      <p class="page-sub">Manage your music catalog</p>
+    </div>
+    <button class="btn btn-primary" (click)="openAdd()">
+      <i class="fa-solid fa-plus"></i>
+      {{ 'common.add' | translate }} Song
+    </button>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading"></div>
+
+  <div class="table-wrap" *ngIf="!loading" [@tableEnter]>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Producer</th>
+          <th class="hide-md">Genres</th>
+          <th class="hide-sm">Downloads</th>
+          <th class="hide-md">Featured</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let song of songs">
+          <td class="cell-title">{{ song.title }}</td>
+          <td>{{ getArtistName(song) }}</td>
+          <td class="hide-md">
+            <div class="genre-chips">
+              <span class="genre-chip" *ngFor="let g of getSongGenres(song)"
+                [style.background]="(g.color || '#7c3aed') + '22'" [style.color]="g.color || '#7c3aed'"
+                [style.border-color]="(g.color || '#7c3aed') + '55'">{{ g.name }}</span>
+              <span class="genre-chip genre-chip--empty" *ngIf="getSongGenres(song).length === 0">—</span>
+            </div>
+          </td>
+          <td class="hide-sm">{{ song.downloadCount }}</td>
+          <td class="hide-md">
+            <span *ngIf="song.isFeatured" class="badge badge-success">Featured</span>
+            <span *ngIf="!song.isFeatured" class="badge badge-muted">—</span>
+          </td>
+          <td class="actions">
+            <button class="btn btn-ghost btn-sm" (click)="openEdit(song)">{{ 'common.edit' | translate }}</button>
+            <button class="btn btn-danger btn-sm" (click)="delete(song._id)">{{ 'common.delete' | translate }}</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="songs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
+  </div>
+
+  <app-pagination [total]="total" [pageSize]="pageSize" [currentPage]="page" (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
+</div>
+
+<!-- Add / Edit Modal -->
+<p-dialog [(visible)]="showModal" [modal]="true"
+  [header]="(editingSong ? ('common.edit' | translate) : ('common.add' | translate)) + ' Song'" [draggable]="false"
+  [resizable]="false" [style]="{ width: '100%', maxWidth: '600px' }">
+  <div class="alert alert-error" *ngIf="error" style="margin-bottom: 1.25rem;">{{ error }}</div>
+  <form [formGroup]="form" (ngSubmit)="save()" style="display: flex; flex-direction: column; gap: 1.25rem;">
+    <div class="form-group" style="margin-bottom: 0;">
+      <div class="title-label-row">
+        <label>Title</label>
+        <span class="autofill-badge" *ngIf="titleAutoFilled">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-filled from file
+          <button type="button" class="autofill-clear" (click)="form.patchValue({title:''}); titleAutoFilled=false"
+            title="Clear">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
       </div>
-      <button class="btn btn-primary" (click)="openAdd()">
-        <i class="fa-solid fa-plus"></i>
-        {{ 'common.add' | translate }} Song
+      <input type="text" formControlName="title" placeholder="Song title…" (input)="titleAutoFilled=false"
+        style="width: 100%;" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>Producer</label>
+      <p-select formControlName="artistId" [options]="artistOptions" optionLabel="label" optionValue="value"
+        [editable]="true" [filter]="true" filterBy="label" placeholder="Select producer" styleClass="w-full"></p-select>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>Release Year</label>
+      <input type="number" formControlName="releaseYear" style="width: 100%;" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>Paste a Google Drive link</label>
+      <input type="url" formControlName="driveLink" placeholder="https://drive.google.com/file/d/..."
+        style="width: 100%;" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>Preview URL</label>
+      <input type="url" formControlName="previewUrl" placeholder="https://..." style="width: 100%;" />
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+      <label>Genres</label>
+      <!-- Selected genre tags -->
+      <div class="selected-genres" *ngIf="selectedGenreIds.length > 0" style="margin-bottom: 0.75rem;">
+        <span class="selected-genre-tag" *ngFor="let id of selectedGenreIds"
+          [style.background]="getGenreColor(id) + '22'" [style.color]="getGenreColor(id)"
+          [style.border-color]="getGenreColor(id) + '55'">
+          {{ getGenreName(id) }}
+          <button type="button" class="tag-remove" (click)="removeGenre(id)" title="Remove">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+      </div>
+
+      <!-- Hierarchical TreeSelect -->
+      <p-treeselect formControlName="genres" [options]="genreTreeNodes" selectionMode="checkbox"
+        [metaKeySelection]="false" display="chip" placeholder="Select genres hierarchy..."
+        styleClass="w-full"></p-treeselect>
+      <p class="no-genres-hint" *ngIf="genres.length === 0" style="margin-top: 0.5rem; font-size: 0.8125rem;">
+        <i class="fa-solid fa-tags"></i> No genres yet —
+        <a routerLink="/admin/genres" (click)="showModal = false"
+          style="color: var(--color-accent-light); text-decoration: underline;">add some first</a>
+      </p>
+    </div>
+
+    <div class="form-group checkbox-group" style="margin-bottom: 0;">
+      <label style="display: flex; align-items: center; gap: 0.5rem;">
+        <input type="checkbox" formControlName="isFeatured" /> Featured
+      </label>
+    </div>
+
+    <div class="modal-actions"
+      style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.5rem; padding-top: 1rem; border-top: 1px solid var(--color-border-light);">
+      <button type="button" class="btn btn-outline" (click)="showModal = false">{{ 'common.cancel' | translate
+        }}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">
+        <i class="fa-solid fa-spinner fa-spin" *ngIf="saving" style="margin-right: 0.25rem;"></i>
+        <i class="fa-solid fa-floppy-disk" *ngIf="!saving" style="margin-right: 0.25rem;"></i>
+        <span>{{ saving ? ('common.loading' | translate) : ('common.save' | translate) }}</span>
       </button>
     </div>
-
-    <div class="loading-spinner" *ngIf="loading"></div>
-
-    <div class="table-wrap" *ngIf="!loading" [@tableEnter]>
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Producer</th>
-            <th>Genres</th>
-            <th>Downloads</th>
-            <th>Featured</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let song of songs">
-            <td class="cell-title">{{ song.title }}</td>
-            <td>{{ getArtistName(song) }}</td>
-            <td>
-              <div class="genre-chips">
-                <span
-                  class="genre-chip"
-                  *ngFor="let g of getSongGenres(song)"
-                  [style.background]="(g.color || '#7c3aed') + '22'"
-                  [style.color]="g.color || '#7c3aed'"
-                  [style.border-color]="(g.color || '#7c3aed') + '55'"
-                >{{ g.name }}</span>
-                <span class="genre-chip genre-chip--empty" *ngIf="getSongGenres(song).length === 0">—</span>
-              </div>
-            </td>
-            <td>{{ song.downloadCount }}</td>
-            <td>
-              <span *ngIf="song.isFeatured" class="badge badge-success">Featured</span>
-              <span *ngIf="!song.isFeatured" class="badge badge-muted">—</span>
-            </td>
-            <td class="actions">
-              <button class="btn btn-ghost btn-sm" (click)="openEdit(song)">{{ 'common.edit' | translate }}</button>
-              <button class="btn btn-danger btn-sm" (click)="delete(song._id)">{{ 'common.delete' | translate }}</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <p *ngIf="songs.length === 0" class="no-results">{{ 'common.noResults' | translate }}</p>
-    </div>
-
-    <app-pagination
-      [total]="total"
-      [pageSize]="pageSize"
-      [currentPage]="page"
-      (pageChange)="onPageChange($event)"
-      (pageSizeChange)="onPageSizeChange($event)"
-    ></app-pagination>
-</div>
-
-<!-- Modal -->
-<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
-  <div class="modal card" (click)="$event.stopPropagation()">
-    <h2>{{ editingSong ? ('common.edit' | translate) : ('common.add' | translate) }} Song</h2>
-    <div class="alert alert-error" *ngIf="error">{{ error }}</div>
-    <form [formGroup]="form" (ngSubmit)="save()">
-      <div class="form-group">
-        <div class="title-label-row">
-          <label>Title</label>
-          <span class="autofill-badge" *ngIf="titleAutoFilled">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-filled from file
-            <button type="button" class="autofill-clear" (click)="form.patchValue({title:''}); titleAutoFilled=false" title="Clear">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </span>
-        </div>
-        <input type="text" formControlName="title" placeholder="Song title…" (input)="titleAutoFilled=false" />
-      </div>
-      <div class="form-group">
-        <label>Producer</label>
-        <app-select-dropdown
-          formControlName="artistId"
-          [options]="artistOptions"
-          placeholder="Select producer"
-        ></app-select-dropdown>
-      </div>
-      <div class="form-group">
-        <label>Release Year</label>
-        <input type="number" formControlName="releaseYear" />
-      </div>
-      <div class="form-group">
-        <label>Description</label>
-        <textarea formControlName="description" rows="3"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Song File <span class="label-hint">(MP3, WAV, FLAC — max 150 MB)</span></label>
-
-        <!-- Drag & Drop Zone -->
-        <div class="upload-zone"
-             [class.drag-over]="dragOver"
-             [class.has-file]="selectedFile"
-             (dragover)="onDragOver($event)"
-             (dragleave)="onDragLeave()"
-             (drop)="onDrop($event)"
-             (click)="fileInput.click()">
-
-          <ng-container *ngIf="!selectedFile">
-            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-            <p class="upload-text">Drag &amp; drop your audio file here, or <span class="upload-link">browse</span></p>
-            <p class="upload-hint" *ngIf="editingSong && existingDriveLink">
-              Current file saved. Upload a new one to replace it.
-            </p>
-          </ng-container>
-
-          <ng-container *ngIf="selectedFile">
-            <i class="fa-solid fa-file-audio upload-icon file-ok"></i>
-            <p class="upload-text file-name">{{ selectedFile.name }}</p>
-            <p class="upload-hint">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB · Click or drag to replace</p>
-          </ng-container>
-        </div>
-
-        <input #fileInput type="file" accept="audio/*" style="display:none" (change)="onFileSelected($event)" />
-
-        <!-- Fallback: manual Drive link -->
-        <details class="drive-fallback">
-          <summary>Or paste a Google Drive link</summary>
-          <input type="url" formControlName="driveLink" placeholder="https://drive.google.com/file/d/..." />
-          <div class="drive-status" [ngClass]="driveResolveStatus" *ngIf="driveResolveStatus !== 'idle'">
-            <span *ngIf="driveResolveStatus === 'resolving'">
-              <i class="fa-solid fa-spinner fa-spin"></i> Resolving file title from Google Drive...
-            </span>
-            <span *ngIf="driveResolveStatus === 'success'">
-              <i class="fa-solid fa-circle-check"></i> Title successfully auto-filled!
-            </span>
-            <span *ngIf="driveResolveStatus === 'error'">
-              <i class="fa-solid fa-triangle-exclamation"></i> File is private. Share as "Anyone with the link can view".
-            </span>
-          </div>
-        </details>
-      </div>
-      <div class="form-group">
-        <label>Preview URL</label>
-        <input type="url" formControlName="previewUrl" placeholder="https://..." />
-      </div>
-      <div class="form-group">
-        <label>Genres</label>
-        <!-- Selected genre tags -->
-        <div class="selected-genres" *ngIf="selectedGenreIds.length > 0">
-          <span
-            class="selected-genre-tag"
-            *ngFor="let id of selectedGenreIds"
-            [style.background]="getGenreColor(id) + '22'"
-            [style.color]="getGenreColor(id)"
-            [style.border-color]="getGenreColor(id) + '55'"
-          >
-            {{ getGenreName(id) }}
-            <button type="button" class="tag-remove" (click)="removeGenre(id)" title="Remove">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </span>
-        </div>
-        <!-- Genre picker chips -->
-        <div class="genre-picker">
-          <button
-            type="button"
-            class="genre-pick-btn"
-            *ngFor="let g of genres"
-            [class.active]="isGenreSelected(g._id)"
-            [style.--gc]="g.color || '#7c3aed'"
-            (click)="toggleGenre(g._id)"
-          >
-            <span class="pick-dot" [style.background]="g.color || '#7c3aed'"></span>
-            {{ g.name }}
-            <i class="fa-solid fa-check pick-check" *ngIf="isGenreSelected(g._id)"></i>
-          </button>
-          <p class="no-genres-hint" *ngIf="genres.length === 0">
-            <i class="fa-solid fa-tags"></i> No genres yet —
-            <a routerLink="/admin/genres" (click)="showModal = false">add some first</a>
-          </p>
-        </div>
-      </div>
-      <div class="form-group checkbox-group">
-        <label>
-          <input type="checkbox" formControlName="isFeatured" /> Featured
-        </label>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-outline" (click)="showModal = false">{{ 'common.cancel' | translate }}</button>
-        <button type="submit" class="btn btn-primary" [disabled]="saving || form.invalid">
-          <span *ngIf="saving">{{ 'common.loading' | translate }}</span>
-          <span *ngIf="!saving">{{ 'common.save' | translate }}</span>
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+  </form>
+</p-dialog>
 
 <app-confirm-dialog></app-confirm-dialog>

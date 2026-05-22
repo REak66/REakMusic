@@ -22,11 +22,11 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>Email</th>
+          <th class="hide-sm-md">Email</th>
           <th>Role</th>
-          <th>Permissions</th>
-          <th>Verified</th>
-          <th>Joined</th>
+          <th class="hide-lg">Permissions</th>
+          <th class="hide-md">Verified</th>
+          <th class="hide-md-lg">Joined</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -38,7 +38,7 @@
             }}</span>
             <span>{{ user.fullName }}</span>
           </td>
-          <td class="cell-email">{{ user.email }}</td>
+          <td class="cell-email hide-sm-md">{{ user.email }}</td>
           <td>
             <span
               class="badge"
@@ -53,7 +53,7 @@
               {{ user.role }}
             </span>
           </td>
-          <td>
+          <td class="hide-lg">
             <div class="perm-pills">
               <span
                 class="perm-pill"
@@ -76,7 +76,7 @@
               >
             </div>
           </td>
-          <td>
+          <td class="hide-md">
             <span
               class="badge"
               [ngClass]="user.isVerified ? 'badge-success' : 'badge-error'"
@@ -84,7 +84,7 @@
               {{ user.isVerified ? "Verified" : "Unverified" }}
             </span>
           </td>
-          <td>{{ user.createdAt | date: "mediumDate" }}</td>
+          <td class="hide-md-lg">{{ user.createdAt | date: "mediumDate" }}</td>
           <td class="actions">
             <button
               class="btn btn-ghost btn-sm"

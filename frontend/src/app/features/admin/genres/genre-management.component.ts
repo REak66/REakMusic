@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { GenreService } from '../../../core/services/genre.service';
 import { Genre } from '../../../core/models';
 
@@ -61,7 +61,8 @@ export class GenreManagementComponent implements OnInit {
     private genreService: GenreService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
@@ -118,11 +119,13 @@ export class GenreManagementComponent implements OnInit {
         this.load();
         this.showModal = false;
         this.saving = false;
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Genre saved successfully!' });
         this.cdr.markForCheck();
       },
       error: (err: any) => {
         this.error = err.message;
         this.saving = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.message || 'Failed to save genre.' });
         this.cdr.markForCheck();
       }
     });
@@ -135,10 +138,12 @@ export class GenreManagementComponent implements OnInit {
         this.genreService.deleteGenre(id).subscribe({
           next: () => {
             this.load();
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Genre deleted successfully!' });
             this.cdr.markForCheck();
           },
           error: (err: any) => {
             this.error = err.message;
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: err.message || 'Failed to delete genre.' });
             this.cdr.markForCheck();
           }
         });

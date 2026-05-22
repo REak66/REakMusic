@@ -1,9 +1,15 @@
 const { google } = require('googleapis');
-
+const axios = require('axios');
 const path = require('path');
 const fs = require('fs');
 
+// ─── Auth client cache ────────────────────────────────────────────────────────
+// Build the GoogleAuth instance once and reuse it for every Drive call.
+let _cachedAuth = null;
+
 const getAuth = () => {
+  if (_cachedAuth) return _cachedAuth;
+
   let credentials;
   if (process.env.GOOGLE_SERVICE_ACCOUNT) {
     const json = Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT, 'base64').toString('utf8');
@@ -12,17 +18,50 @@ const getAuth = () => {
     const keyFile = path.join(__dirname, '../../reakmusic-402a021b664e.json');
     credentials = JSON.parse(fs.readFileSync(keyFile, 'utf8'));
   }
-  return new google.auth.GoogleAuth({
+
+  _cachedAuth = new google.auth.GoogleAuth({
     credentials,
     scopes: ['https://www.googleapis.com/auth/drive'],
   });
+
+  return _cachedAuth;
 };
 
-const uploadFile = async (fileBuffer, fileName, mimeType) => {
+// ─── OAuth token cache ────────────────────────────────────────────────────────
+// Service-account tokens are valid for ~1 hour. Cache and reuse them;
+// refresh only when the token is within 2 minutes of expiry.
+let _cachedToken = null;
+let _tokenExpiresAt = 0; // epoch ms
+
+const getAccessToken = async () => {
+  const now = Date.now();
+  const bufferMs = 2 * 60 * 1000; // refresh 2 min before expiry
+
+  if (_cachedToken && now < _tokenExpiresAt - bufferMs) {
+    return _cachedToken;
+  }
+
   const auth = getAuth();
-  const drive = google.drive({ version: 'v3', auth });
+  const client = await auth.getClient();
+  const { token, res: tokenRes } = await client.getAccessToken();
+
+  _cachedToken = token;
+  // Google returns expiry_date in the token response (epoch ms); fall back to 55 min
+  _tokenExpiresAt =
+    tokenRes?.data?.expiry_date ?? now + 55 * 60 * 1000;
+
+  return _cachedToken;
+};
+
+// ─── Drive helper: shared instance ───────────────────────────────────────────
+const getDrive = () => google.drive({ version: 'v3', auth: getAuth() });
+
+// ─── Public API ───────────────────────────────────────────────────────────────
+
+const uploadFile = async (fileBuffer, fileName, mimeType) => {
   const { Readable } = require('stream');
   const stream = Readable.from(fileBuffer);
+  const drive = getDrive();
 
   const res = await drive.files.create({
     requestBody: {
@@ -36,8 +75,7 @@ const uploadFile = async (fileBuffer, fileName, mimeType) => {
 };
 
 const generateSignedUrl = async (fileId, expiryMinutes = 10) => {
-  const auth = getAuth();
-  const drive = google.drive({ version: 'v3', auth });
+  const drive = getDrive();
   const expiryDate = new Date(Date.now() + expiryMinutes * 60 * 1000);
 
   await drive.permissions.create({
@@ -57,8 +95,7 @@ const generateSignedUrl = async (fileId, expiryMinutes = 10) => {
 };
 
 const makeFilePublic = async (fileId) => {
-  const auth = getAuth();
-  const drive = google.drive({ version: 'v3', auth });
+  const drive = getDrive();
   await drive.permissions.create({
     fileId,
     requestBody: { role: 'reader', type: 'anyone' },
@@ -66,16 +103,13 @@ const makeFilePublic = async (fileId) => {
 };
 
 const deleteFile = async (fileId) => {
-  const auth = getAuth();
-  const drive = google.drive({ version: 'v3', auth });
+  const drive = getDrive();
   await drive.files.delete({ fileId });
 };
 
 const streamFile = async (fileId, req, res, filename = null) => {
-  const axios = require('axios');
-  const auth = getAuth();
-  const client = await auth.getClient();
-  const { token } = await client.getAccessToken();
+  // Use the cached token — no new client/token round-trip per request
+  const token = await getAccessToken();
 
   const rangeHeader = req.headers['range'];
   const reqHeaders = { Authorization: `Bearer ${token}` };
@@ -87,7 +121,7 @@ const streamFile = async (fileId, req, res, filename = null) => {
   );
 
   res.status(rangeHeader ? 206 : 200);
-  ['content-type', 'content-length', 'content-range', 'accept-ranges'].forEach(h => {
+  ['content-type', 'content-length', 'content-range', 'accept-ranges'].forEach((h) => {
     if (driveRes.headers[h]) res.setHeader(h, driveRes.headers[h]);
   });
   res.setHeader('Accept-Ranges', 'bytes');
@@ -103,8 +137,7 @@ const streamFile = async (fileId, req, res, filename = null) => {
 };
 
 const getFileInfo = async (fileId) => {
-  const auth = getAuth();
-  const drive = google.drive({ version: 'v3', auth });
+  const drive = getDrive();
   const res = await drive.files.get({
     fileId,
     fields: 'id, name, mimeType, size',

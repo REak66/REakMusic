@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService, TreeNode } from 'primeng/api';
 import { SongService } from '../../../core/services/song.service';
 import { ArtistService } from '../../../core/services/artist.service';
 import { GenreService } from '../../../core/services/genre.service';
@@ -50,6 +50,9 @@ export class SongManagementComponent implements OnInit {
   titleAutoFilled = false;
   driveResolveStatus: 'idle' | 'resolving' | 'success' | 'error' = 'idle';
 
+  genreTreeNodes: TreeNode[] = [];
+  selectedGenreKeys: { [key: string]: any } = {};
+
   constructor(
     private songService: SongService,
     private artistService: ArtistService,
@@ -57,6 +60,7 @@ export class SongManagementComponent implements OnInit {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private confirmationService: ConfirmationService,
+    private messageService: MessageService,
     public authService: AuthService
   ) { }
 
@@ -73,7 +77,8 @@ export class SongManagementComponent implements OnInit {
       description: [''],
       isFeatured: [false],
       driveLink: [''],
-      previewUrl: ['']
+      previewUrl: [''],
+      genreSelector: [null]
     });
 
     // Extract Title from pasted links
@@ -82,6 +87,13 @@ export class SongManagementComponent implements OnInit {
     });
     this.form.get('previewUrl')?.valueChanges.subscribe(val => {
       if (val) this.extractTitleFromLink(val);
+    });
+
+    // Add selected genre and reset selector
+    this.form.get('genreSelector')?.valueChanges.subscribe(val => {
+      if (val) {
+        this.addGenreFromSelector(val);
+      }
     });
   }
 
@@ -105,7 +117,11 @@ export class SongManagementComponent implements OnInit {
       next: (res: any) => { this.artists = res.data?.artists || []; this.cdr.markForCheck(); }
     });
     this.genreService.getGenres().subscribe({
-      next: genres => { this.genres = genres; this.cdr.markForCheck(); }
+      next: genres => {
+        this.genres = genres;
+        this.buildGenreTree();
+        this.cdr.markForCheck();
+      }
     });
   }
 
@@ -113,9 +129,10 @@ export class SongManagementComponent implements OnInit {
     this.editingSong = null;
     this.selectedFile = null;
     this.selectedGenreIds = [];
+    this.selectedGenreKeys = {};
     this.titleAutoFilled = false;
     this.driveResolveStatus = 'idle';
-    this.form.reset({ isFeatured: false });
+    this.form.reset({ isFeatured: false, genreSelector: null });
     this.showModal = true;
     this.error = '';
     this.cdr.markForCheck();
@@ -130,6 +147,7 @@ export class SongManagementComponent implements OnInit {
     this.selectedGenreIds = (song.genre || []).map((g: any) =>
       typeof g === 'object' ? g._id : g
     );
+    this.updateGenreKeysFromIds();
     this.form.patchValue({
       title: song.title,
       artistId: typeof song.artistId === 'object' ? (song.artistId as Artist)._id : song.artistId,
@@ -486,25 +504,52 @@ export class SongManagementComponent implements OnInit {
         this.saving = false;
         this.selectedFile = null;
         this.loadData();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: `Song "${values.title}" has been saved successfully!`
+        });
         this.cdr.markForCheck();
       },
       error: (err: { error?: { message?: string } }) => {
         this.error = err.error?.message || 'Failed to save.';
         this.saving = false;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err.error?.message || 'Failed to save the song.'
+        });
         this.cdr.markForCheck();
       }
     });
   }
 
   delete(id: string): void {
+    const song = this.songs.find(s => s._id === id);
     this.confirmationService.confirm({
       header: 'Delete Song',
-      message: 'Are you sure you want to delete this song? This action cannot be undone.',
+      message: `Are you sure you want to delete "${song?.title || 'this song'}"? This action cannot be undone.`,
       acceptLabel: 'Delete',
       rejectLabel: 'Cancel',
       accept: () => {
         this.songService.deleteSong(id).subscribe({
-          next: () => { this.loadData(); }
+          next: () => {
+            this.loadData();
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: `Song "${song?.title || 'Song'}" was deleted successfully.`
+            });
+            this.cdr.markForCheck();
+          },
+          error: (err: any) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: err.message || 'Failed to delete the song.'
+            });
+            this.cdr.markForCheck();
+          }
         });
       }
     });
@@ -529,11 +574,77 @@ export class SongManagementComponent implements OnInit {
     } else {
       this.selectedGenreIds = this.selectedGenreIds.filter(id => id !== genreId);
     }
+    this.updateGenreKeysFromIds();
     this.cdr.markForCheck();
   }
 
   removeGenre(genreId: string): void {
     this.selectedGenreIds = this.selectedGenreIds.filter(id => id !== genreId);
+    this.updateGenreKeysFromIds();
+    this.cdr.markForCheck();
+  }
+
+  buildGenreTree(): void {
+    const electronic: TreeNode = { key: 'cat-electronic', label: 'Electronic & EDM', selectable: true, children: [] };
+    const hiphop: TreeNode = { key: 'cat-hiphop', label: 'Hip Hop & R&B', selectable: true, children: [] };
+    const rock: TreeNode = { key: 'cat-rock', label: 'Rock & Alternative', selectable: true, children: [] };
+    const pop: TreeNode = { key: 'cat-pop', label: 'Pop & Indie', selectable: true, children: [] };
+    const classical: TreeNode = { key: 'cat-classical', label: 'Classical, Jazz & Ambient', selectable: true, children: [] };
+    const other: TreeNode = { key: 'cat-other', label: 'Other Genres', selectable: true, children: [] };
+
+    this.genres.forEach(g => {
+      const name = g.name.toLowerCase();
+      const node: TreeNode = {
+        key: g._id,
+        label: g.name,
+        selectable: true
+      };
+
+      if (name.includes('synth') || name.includes('electro') || name.includes('techno') || name.includes('house') || name.includes('edm') || name.includes('dance') || name.includes('electronic') || name.includes('dubstep')) {
+        electronic.children?.push(node);
+      } else if (name.includes('hip') || name.includes('hop') || name.includes('rap') || name.includes('trap') || name.includes('r&b') || name.includes('soul') || name.includes('funk')) {
+        hiphop.children?.push(node);
+      } else if (name.includes('rock') || name.includes('metal') || name.includes('alternative') || name.includes('punk') || name.includes('grunge') || name.includes('indie')) {
+        rock.children?.push(node);
+      } else if (name.includes('pop') || name.includes('lo-fi') || name.includes('lofi') || name.includes('acoustic') || name.includes('singer')) {
+        pop.children?.push(node);
+      } else if (name.includes('class') || name.includes('jazz') || name.includes('blues') || name.includes('ambient') || name.includes('cinema') || name.includes('instrumental') || name.includes('orchestra')) {
+        classical.children?.push(node);
+      } else {
+        other.children?.push(node);
+      }
+    });
+
+    const tree: TreeNode[] = [];
+    if (electronic.children && electronic.children.length > 0) tree.push(electronic);
+    if (hiphop.children && hiphop.children.length > 0) tree.push(hiphop);
+    if (rock.children && rock.children.length > 0) tree.push(rock);
+    if (pop.children && pop.children.length > 0) tree.push(pop);
+    if (classical.children && classical.children.length > 0) tree.push(classical);
+    if (other.children && other.children.length > 0) tree.push(other);
+
+    if (tree.length === 0) {
+      this.genreTreeNodes = this.genres.map(g => ({
+        key: g._id,
+        label: g.name,
+        selectable: true
+      }));
+    } else {
+      this.genreTreeNodes = tree;
+    }
+  }
+
+  updateGenreKeysFromIds(): void {
+    this.cdr.markForCheck();
+  }
+
+  addGenreFromSelector(genreId: string): void {
+    if (!this.selectedGenreIds.includes(genreId)) {
+      this.selectedGenreIds = [...this.selectedGenreIds, genreId];
+      this.updateGenreKeysFromIds();
+    }
+    // Instantly reset selector control to null to display placeholder again
+    this.form.get('genreSelector')?.setValue(null, { emitEvent: false });
     this.cdr.markForCheck();
   }
 

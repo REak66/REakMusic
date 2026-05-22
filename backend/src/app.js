@@ -25,7 +25,10 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(mongoSanitize());
-app.use(morgan('combined'));
+// Use concise 'dev' format in development; 'combined' in production.
+// Skip noisy high-frequency routes (streaming) to reduce synchronous I/O.
+const morganSkip = (req) => req.path.includes('/stream');
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev', { skip: morganSkip }));
 app.use(globalLimiter);
 
 app.use('/api/v1', routes);

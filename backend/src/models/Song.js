@@ -22,5 +22,9 @@ const songSchema = new mongoose.Schema(
 
 songSchema.index({ title: 'text' });
 songSchema.index({ downloadCount: -1 });
+songSchema.index({ artistId: 1, createdAt: -1 }); // artist filter + default sort
+songSchema.index({ albumId: 1 });                  // album filter
+songSchema.index({ genre: 1 });                    // genre filter
+songSchema.index({ isFeatured: 1, createdAt: -1 });// featured list
 
 module.exports = mongoose.model('Song', songSchema);

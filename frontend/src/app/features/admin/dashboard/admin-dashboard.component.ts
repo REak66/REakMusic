@@ -47,6 +47,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   animatedSongs = 0;
   animatedDownloads = 0;
 
+  genreStats = [
+    { label: 'Pop', value: 35, color: '#7c3aed', icon: 'pi pi-music' },
+    { label: 'Electronic', value: 25, color: '#a78bfa', icon: 'pi pi-bolt' },
+    { label: 'Rock', value: 20, color: '#10b981', icon: 'pi pi-heart' },
+    { label: 'Hip Hop', value: 12, color: '#f59e0b', icon: 'pi pi-star' },
+    { label: 'Jazz', value: 8, color: '#ef4444', icon: 'pi pi-compass' }
+  ];
+
   private rafIds: number[] = [];
 
   constructor(private userService: UserService, private cdr: ChangeDetectorRef, public authService: AuthService) { }

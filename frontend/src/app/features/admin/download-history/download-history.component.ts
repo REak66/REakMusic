@@ -31,6 +31,7 @@ export class DownloadHistoryComponent implements OnInit {
   pageSize = 10;
   total = 0;
   searchQuery = '';
+  dateRange: Date[] | null = null;
 
   constructor(
     private userService: UserService,
@@ -59,17 +60,40 @@ export class DownloadHistoryComponent implements OnInit {
   }
 
   applyFilter(): void {
-    if (!this.searchQuery) {
-      this.filteredDownloads = this.downloads;
-    } else {
+    let result = this.downloads;
+
+    // Filter by query
+    if (this.searchQuery) {
       const q = this.searchQuery.toLowerCase();
-      this.filteredDownloads = this.downloads.filter(d => 
+      result = result.filter(d => 
         d.songId?.title?.toLowerCase().includes(q) ||
         d.userId?.fullName?.toLowerCase().includes(q) ||
         d.userId?.email?.toLowerCase().includes(q) ||
         d.ip?.includes(q)
       );
     }
+
+    // Filter by date range (DatePicker select from date to date range)
+    if (this.dateRange && this.dateRange[0]) {
+      const start = new Date(this.dateRange[0]);
+      start.setHours(0, 0, 0, 0);
+
+      const end = this.dateRange[1] ? new Date(this.dateRange[1]) : new Date(this.dateRange[0]);
+      end.setHours(23, 59, 59, 999);
+
+      result = result.filter(d => {
+        if (!d.createdAt) return false;
+        const cDate = new Date(d.createdAt);
+        return cDate >= start && cDate <= end;
+      });
+    }
+
+    this.filteredDownloads = result;
+  }
+
+  clearDateRange(): void {
+    this.dateRange = null;
+    this.applyFilter();
   }
 
   onSearch(): void {

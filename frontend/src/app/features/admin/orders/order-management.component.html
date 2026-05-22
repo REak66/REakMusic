@@ -21,18 +21,18 @@
       <table class="data-table">
         <thead>
           <tr>
-            <th>ID</th>
+            <th class="hide-md">ID</th>
             <th>User</th>
             <th>Plan</th>
             <th>Price</th>
             <th>Status</th>
-            <th>End Date</th>
+            <th class="hide-sm-md">End Date</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let sub of pagedSubscriptions">
-            <td>{{ sub._id.slice(-8).toUpperCase() }}</td>
+            <td class="hide-md">{{ sub._id.slice(-8).toUpperCase() }}</td>
             <td>{{ $any(sub.userId)?.email || sub.userId }}</td>
             <td>{{ sub.plan | titlecase }}</td>
             <td>${{ sub.price.toFixed(2) }}</td>
@@ -45,7 +45,7 @@
                   'badge-error': sub.status === 'cancelled' || sub.status === 'rejected'
                 }">{{ sub.status }}</span>
             </td>
-            <td>{{ sub.endDate ? (sub.endDate | date: 'short') : '—' }}</td>
+            <td class="hide-sm-md">{{ sub.endDate ? (sub.endDate | date: 'short') : '—' }}</td>
             <td>
               <ng-container *ngIf="sub.status === 'pending'">
                 <button class="btn btn-xs btn-success" [disabled]="actionInProgress === sub._id" (click)="approve(sub._id)">

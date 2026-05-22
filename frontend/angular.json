@@ -25,7 +25,7 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              "src/favicon.ico",
+              "src/assets/images/music.png",
               "src/assets",
               {
                 "glob": "**/*.json",
@@ -44,12 +44,12 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
+                  "maximumWarning": "1.5mb",
+                  "maximumError": "2mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "30kb",
+                  "maximumWarning": "20kb",
                   "maximumError": "50kb"
                 }
               ],
@@ -90,7 +90,7 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
-              "src/favicon.ico",
+              "src/assets/images/music.png",
               "src/assets"
             ],
             "styles": [

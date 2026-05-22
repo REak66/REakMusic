@@ -50,6 +50,10 @@
 html,
 body {
   height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
   font-family: 'Advent Pro', 'Kantumruy Pro', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
@@ -121,6 +125,10 @@ ol {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 1.5rem;
+
+  @media (max-width: 480px) {
+    padding: 0 1rem;
+  }
 }
 
 .btn {
@@ -377,6 +385,42 @@ ol {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 1.5rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+
+    .song-card {
+      border-radius: 14px;
+      
+      .song-info {
+        padding: 0.75rem;
+
+        .song-title {
+          font-size: 0.85rem;
+        }
+
+        .song-artist {
+          font-size: 0.75rem;
+          margin-bottom: 0.35rem;
+        }
+        
+        .song-price {
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
 }
 
 .song-card {
@@ -698,3 +742,455 @@ nav,
     }
   }
 }
+
+/* ── PrimeNG p-dialog overrides ── */
+.p-dialog {
+  background: var(--color-bg-card) !important;
+  border: 1px solid var(--glass-border) !important;
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) !important;
+  border-radius: var(--border-radius-lg) !important;
+  box-shadow: var(--glass-shadow-hover) !important;
+  overflow: hidden !important;
+  max-width: calc(100vw - 32px) !important;
+
+  .p-dialog-header {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border-bottom: 1px solid var(--color-border-light) !important;
+    color: var(--color-text-primary) !important;
+    padding: 1.25rem 1.5rem !important;
+
+    .p-dialog-title {
+      font-size: 1.25rem !important;
+      font-weight: 700 !important;
+      font-family: inherit !important;
+    }
+
+    .p-dialog-close-button {
+      color: var(--color-text-secondary) !important;
+      border-radius: 50% !important;
+      width: 32px !important;
+      height: 32px !important;
+      background: transparent !important;
+      transition: background var(--transition), color var(--transition) !important;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: var(--color-text-primary) !important;
+      }
+    }
+  }
+
+  .p-dialog-content {
+    background: transparent !important;
+    color: var(--color-text-primary) !important;
+    padding: 1.5rem !important;
+  }
+
+  .p-dialog-footer {
+    background: rgba(0, 0, 0, 0.1) !important;
+    border-top: 1px solid var(--color-border-light) !important;
+    padding: 1rem 1.5rem !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
+  }
+}
+
+.p-dialog-mask {
+  background: rgba(8, 8, 16, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* ── PrimeNG p-datepicker overrides ── */
+.p-datepicker {
+  background: var(--color-bg-elevated) !important;
+  border: 1px solid var(--color-border-light) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow) !important;
+  color: var(--color-text-primary) !important;
+
+  .p-datepicker-header {
+    background: rgba(255, 255, 255, 0.01) !important;
+    border-bottom: 1px solid var(--color-border-light) !important;
+    color: var(--color-text-primary) !important;
+    padding: 0.5rem !important;
+  }
+
+  .p-datepicker-title, .p-datepicker-year, .p-datepicker-month {
+    color: var(--color-text-primary) !important;
+    font-weight: 600 !important;
+  }
+
+  .p-datepicker-prev-button, .p-datepicker-next-button {
+    color: var(--color-text-secondary) !important;
+    background: transparent !important;
+    border-radius: var(--border-radius) !important;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: var(--color-text-primary) !important;
+    }
+  }
+
+  table {
+    font-size: 13px !important;
+
+    th {
+      color: var(--color-text-muted) !important;
+      font-weight: 600 !important;
+    }
+
+    td {
+      padding: 2px !important;
+
+      span {
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: var(--border-radius) !important;
+        color: var(--color-text-primary) !important;
+        transition: all var(--transition) !important;
+
+        &:hover:not(.p-datepicker-day-selected) {
+          background: rgba(124, 58, 237, 0.15) !important;
+          color: var(--color-accent-light) !important;
+        }
+
+        &.p-datepicker-day-selected {
+          background: var(--color-accent) !important;
+          color: white !important;
+          box-shadow: 0 0 8px var(--color-accent-glow) !important;
+        }
+
+        &.p-datepicker-day-today {
+          border: 1px solid var(--color-accent-light) !important;
+          background: transparent !important;
+        }
+      }
+    }
+  }
+
+  /* Range styling helper */
+  .p-datepicker-day-selected-range-start,
+  .p-datepicker-day-selected-range-end {
+    background: var(--color-accent) !important;
+    color: white !important;
+  }
+}
+
+/* ── PrimeNG p-treeselect overrides ── */
+.p-treeselect {
+  width: 100%;
+  background: var(--color-bg-elevated) !important;
+  border: 1px solid var(--color-border-light) !important;
+  border-radius: var(--border-radius) !important;
+  transition: border-color var(--transition), box-shadow var(--transition) !important;
+
+  &:hover {
+    border-color: var(--color-accent-light) !important;
+  }
+
+  &.p-focus, &:focus-within {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 3px var(--color-accent-glow) !important;
+  }
+
+  .p-treeselect-label {
+    color: var(--color-text-primary) !important;
+    padding: 0.8125rem 1rem !important;
+    font-size: 0.9375rem !important;
+  }
+
+  .p-treeselect-dropdown {
+    color: var(--color-text-secondary) !important;
+    padding-right: 1rem !important;
+  }
+}
+
+.p-treeselect-overlay {
+  background: var(--color-bg-elevated) !important;
+  border: 1px solid var(--color-border-light) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow) !important;
+
+  .p-treeselect-tree-container {
+    background: transparent !important;
+    padding: 0.5rem !important;
+  }
+
+  .p-tree {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    color: var(--color-text-primary) !important;
+
+    .p-tree-node {
+      padding: 2px 0 !important;
+
+      .p-tree-node-content {
+        border-radius: var(--border-radius) !important;
+        transition: background var(--transition) !important;
+        padding: 4px 8px !important;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.04) !important;
+        }
+
+        &.p-tree-node-selected {
+          background: rgba(124, 58, 237, 0.15) !important;
+          color: var(--color-accent-light) !important;
+        }
+
+        .p-tree-node-icon {
+          color: var(--color-accent-light) !important;
+        }
+
+        .p-tree-node-toggle-button {
+          color: var(--color-text-secondary) !important;
+          width: 24px !important;
+          height: 24px !important;
+          border-radius: 50% !important;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: var(--color-text-primary) !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* ── PrimeNG p-toast overrides ── */
+.p-toast {
+  z-index: 10000 !important;
+  top: 24px !important;
+  right: 24px !important;
+
+  .p-toast-message {
+    background: rgba(19, 19, 31, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--border-radius) !important;
+    box-shadow: var(--shadow) !important;
+    margin-bottom: 0.75rem !important;
+    color: var(--color-text-primary) !important;
+
+    .p-toast-message-content {
+      padding: 1rem !important;
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 0.75rem !important;
+    }
+
+    .p-toast-message-icon {
+      font-size: 1.25rem !important;
+    }
+
+    .p-toast-message-text {
+      margin: 0 !important;
+    }
+
+    .p-toast-summary {
+      font-weight: 700 !important;
+      font-size: 0.875rem !important;
+      color: var(--color-text-primary) !important;
+    }
+
+    .p-toast-detail {
+      font-size: 0.8125rem !important;
+      color: var(--color-text-secondary) !important;
+      margin-top: 0.25rem !important;
+    }
+
+    .p-toast-close-button {
+      color: var(--color-text-secondary) !important;
+      border-radius: 50% !important;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: var(--color-text-primary) !important;
+      }
+    }
+
+    /* Severity glowing borders */
+    &.p-toast-message-success {
+      border-left: 4px solid var(--color-success) !important;
+      .p-toast-message-icon { color: var(--color-success) !important; }
+    }
+    &.p-toast-message-info {
+      border-left: 4px solid var(--color-accent-light) !important;
+      .p-toast-message-icon { color: var(--color-accent-light) !important; }
+    }
+    &.p-toast-message-warn {
+      border-left: 4px solid var(--color-warning) !important;
+      .p-toast-message-icon { color: var(--color-warning) !important; }
+    }
+    &.p-toast-message-error {
+      border-left: 4px solid var(--color-error) !important;
+      .p-toast-message-icon { color: var(--color-error) !important; }
+    }
+  }
+}
+
+/* ── PrimeNG p-breadcrumb overrides ── */
+.p-breadcrumb {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 0 1.25rem 0 !important;
+
+  .p-breadcrumb-list {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    font-size: 0.8125rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.04em !important;
+
+    li {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.5rem !important;
+    }
+
+    .p-breadcrumb-item-link {
+      color: var(--color-text-secondary) !important;
+      transition: color var(--transition) !important;
+
+      &:hover {
+        color: var(--color-accent-light) !important;
+      }
+    }
+
+    .p-breadcrumb-separator {
+      color: var(--color-text-muted) !important;
+      font-size: 0.75rem !important;
+    }
+
+    li:last-child .p-breadcrumb-item-link {
+      color: var(--color-accent-light) !important;
+      pointer-events: none !important;
+    }
+  }
+}
+
+/* ── PrimeNG p-colorpicker overrides ── */
+.p-colorpicker-panel {
+  background: var(--color-bg-elevated) !important;
+  border: 1px solid var(--color-border-light) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow) !important;
+  padding: 0.75rem !important;
+}
+
+.p-colorpicker-inline {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* ── PrimeNG p-select overrides ── */
+.p-select {
+  width: 100%;
+  background: var(--color-bg-elevated) !important;
+  border: 1px solid var(--color-border-light) !important;
+  border-radius: var(--border-radius) !important;
+  transition: border-color var(--transition), box-shadow var(--transition) !important;
+
+  &:hover {
+    border-color: var(--color-accent-light) !important;
+  }
+
+  &.p-focus, &:focus-within {
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 0 3px var(--color-accent-glow) !important;
+  }
+
+  .p-select-label {
+    color: var(--color-text-primary) !important;
+    padding: 0.8125rem 1rem !important;
+    font-size: 0.9375rem !important;
+    background: transparent !important;
+    border: none !important;
+  }
+
+  .p-select-dropdown {
+    color: var(--color-text-secondary) !important;
+    padding-right: 1rem !important;
+  }
+
+  .p-select-input {
+    background: transparent !important;
+    border: none !important;
+    color: var(--color-text-primary) !important;
+  }
+}
+
+.p-select-overlay {
+  background: var(--color-bg-elevated) !important;
+  border: 1px solid var(--color-border-light) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: var(--shadow) !important;
+
+  .p-select-list-container {
+    background: transparent !important;
+    padding: 0.25rem !important;
+  }
+
+  .p-select-option {
+    border-radius: var(--border-radius) !important;
+    transition: background var(--transition) !important;
+    padding: 6px 12px !important;
+    color: var(--color-text-primary) !important;
+
+    &:hover, &.p-focus {
+      background: rgba(255, 255, 255, 0.04) !important;
+    }
+
+    &.p-select-option-selected {
+      background: rgba(124, 58, 237, 0.15) !important;
+      color: var(--color-accent-light) !important;
+    }
+  }
+
+  .p-select-filter-container {
+    padding: 0.5rem !important;
+    border-bottom: 1px solid var(--color-border-light) !important;
+    background: transparent !important;
+
+    .p-select-filter {
+      background: rgba(255, 255, 255, 0.03) !important;
+      border: 1px solid var(--color-border-light) !important;
+      color: var(--color-text-primary) !important;
+      border-radius: var(--border-radius) !important;
+      padding: 0.5rem 0.75rem !important;
+      width: 100% !important;
+
+      &:focus {
+        border-color: var(--color-accent) !important;
+        box-shadow: 0 0 0 2px var(--color-accent-glow) !important;
+      }
+    }
+
+    .p-select-filter-icon {
+      color: var(--color-text-secondary) !important;
+    }
+  }
+}
+
+/* Hide main navbar/footer inside admin panel to provide a clean full-screen experience */
+body:has(app-admin-layout) {
+  app-navbar {
+    display: none !important;
+  }
+  app-footer {
+    display: none !important;
+  }
+  .main-content {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+}
+

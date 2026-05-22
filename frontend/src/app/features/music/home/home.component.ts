@@ -1,6 +1,9 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { SongService } from '../../../core/services/song.service';
+import { PlayerService } from '../../player/player.service';
+import { CartService } from '../../../core/services/cart.service';
 import { Song } from '../../../core/models';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   standalone: false,
@@ -15,12 +18,18 @@ export class HomeComponent implements OnInit {
   loading = true;
   trendingLoading = true;
 
-  constructor(private songService: SongService, private cdr: ChangeDetectorRef) { }
+  constructor(
+    private songService: SongService,
+    public playerService: PlayerService,
+    public cartService: CartService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
-    this.songService.getFeatured(6).subscribe({
+    this.songService.getFeatured(10).subscribe({
       next: res => {
-        this.featuredSongs = res.data || res as unknown as Song[];
+        const data = (res && (res.data || res)) as Song[];
+        this.featuredSongs = Array.isArray(data) ? data.slice(0, 10) : [];
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -40,6 +49,12 @@ export class HomeComponent implements OnInit {
     return typeof song.artistId === 'object' && song.artistId ? (song.artistId as { name: string }).name : '';
   }
 
+  getGenreName(song: Song): string {
+    if (!song.genre || song.genre.length === 0) return '';
+    const first = song.genre[0];
+    return typeof first === 'object' && first ? (first as { name: string }).name : String(first);
+  }
+
   getThumbnail(song: Song): string {
     if (song.thumbnailId) {
       return `https://drive.google.com/thumbnail?id=${song.thumbnailId}`;
@@ -49,5 +64,35 @@ export class HomeComponent implements OnInit {
       return artist.imageUrl;
     }
     return 'assets/images/music.png';
+  }
+
+  isInCart(song: Song): boolean {
+    return this.cartService.isInCart(song._id);
+  }
+
+  toggleCart(event: Event, song: Song): void {
+    event.stopPropagation();
+    if (this.isInCart(song)) {
+      this.cartService.removeFromCart(song._id);
+    } else {
+      this.cartService.addToCart(song);
+    }
+  }
+
+  playSong(event: Event, song: Song): void {
+    event.stopPropagation();
+
+    const currentSong = (this.playerService as any).currentSongSubject?.value as Song | null;
+
+    if (currentSong && currentSong._id === song._id) {
+      this.playerService.togglePlay();
+    } else {
+      const url = (song.driveFileId || song.driveLink)
+        ? `${environment.apiUrl}/songs/${song._id}/stream`
+        : (song.previewUrl || null);
+      if (url) {
+        this.playerService.play({ ...song, previewUrl: url });
+      }
+    }
   }
 }

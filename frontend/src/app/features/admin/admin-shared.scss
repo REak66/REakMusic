@@ -1,4 +1,24 @@
+/* Enforce Angular feature component host wrappers to behave as block containers with width limits */
+app-song-management,
+app-artist-management,
+app-user-management,
+app-order-management,
+app-download-history,
+app-genre-management,
+app-admin-dashboard {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
 .admin-page {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
+
   .page-header {
     display: flex;
     align-items: center;
@@ -17,7 +37,10 @@
   // ─── Table ──────────────────────────────────────────────────────────────────
 
   .table-wrap {
+    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border-radius: var(--border-radius-lg);
     border: 1px solid var(--glass-border);
     background: linear-gradient(135deg, rgba(19, 19, 31, 0.6) 0%, rgba(14, 14, 26, 0.8) 100%);
@@ -217,4 +240,112 @@
     }
   }
 }
+
+// ─── Responsive Utilities & Overrides ───────────────────────────────────────
+
+@media (max-width: 1024px) {
+  .hide-lg {
+    display: none !important;
+  }
+}
+
+@media (max-width: 850px) {
+  .hide-md-lg {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .hide-md {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .hide-sm-md {
+    display: none !important;
+  }
+}
+
+@media (max-width: 500px) {
+  .hide-sm {
+    display: none !important;
+  }
+
+  .admin-page {
+    .page-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .page-title {
+      font-size: 1.5rem !important;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-page {
+    .table-wrap {
+      table.data-table {
+        thead tr th {
+          padding: 0.75rem 0.875rem;
+          font-size: 0.68rem;
+        }
+        tbody tr td {
+          padding: 0.875rem 0.875rem;
+          font-size: 0.8125rem;
+        }
+      }
+    }
+
+    .page-title {
+      font-size: 1.6rem !important;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .hide-xs {
+    display: none !important;
+  }
+
+  .admin-page {
+    .table-wrap {
+      table.data-table {
+        thead tr th {
+          padding: 0.625rem 0.75rem;
+        }
+        tbody tr td {
+          padding: 0.75rem 0.75rem;
+          font-size: 0.78rem;
+        }
+      }
+    }
+
+    .page-title {
+      font-size: 1.4rem !important;
+    }
+  }
+}
+
+// Global PrimeNG Dialog responsive adaptation
+::ng-deep .p-dialog {
+  max-width: 92vw !important;
+  
+  .p-dialog-content {
+    padding: 0 1.25rem 1.25rem !important;
+  }
+  
+  .p-dialog-header {
+    padding: 1.25rem 1.25rem 1rem !important;
+  }
+}
+
 

@@ -7,7 +7,8 @@ $sidebar-width: 240px;
 .admin-layout {
   display: flex;
   min-height: 100vh;
-  padding-top: var(--navbar-height);
+  width: 100%;
+  overflow-x: hidden;
 }
 
 // ─── Sidebar Overlay (mobile) ────────────────────────────────────────────────
@@ -30,7 +31,7 @@ $sidebar-width: 240px;
 
 .admin-sidebar {
   position: fixed;
-  top: var(--navbar-height);
+  top: 0;
   left: 0;
   bottom: 0;
   width: $sidebar-width;
@@ -174,6 +175,7 @@ $sidebar-width: 240px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  min-width: 0;
 
   .admin-topbar {
     display: none;
@@ -184,7 +186,7 @@ $sidebar-width: 240px;
     background: var(--color-bg-card);
     border-bottom: 1px solid var(--color-border);
     position: sticky;
-    top: var(--navbar-height);
+    top: 0;
     z-index: 100;
     flex-shrink: 0;
 
@@ -250,6 +252,10 @@ $sidebar-width: 240px;
 
   .admin-main {
     margin-left: 0;
+    width: 100%;
+    min-width: 0;
+    max-width: 100vw;
+    overflow-x: hidden;
 
     .admin-topbar {
       display: flex;
@@ -258,6 +264,17 @@ $sidebar-width: 240px;
     .admin-content {
       padding: 1.5rem 1.25rem;
       padding-bottom: calc(var(--player-height) + 1.5rem);
+      min-width: 0;
+      overflow-x: hidden;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-main {
+    .admin-content {
+      padding: 1rem 0.875rem;
+      padding-bottom: calc(var(--player-height) + 1rem);
     }
   }
 }

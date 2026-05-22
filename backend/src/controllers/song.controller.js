@@ -55,12 +55,6 @@ exports.listSongs = async (req, res, next) => {
       Song.countDocuments(filter),
     ]);
 
-    // Debug log to verify filter
-    console.log('Song filter:', filter);
-    console.log('User role:', req.user?.role);
-    console.log('User ID:', req.user?.id);
-    console.log('Songs found:', songs.length);
-
     return successResponse(res, { songs }, 'Songs retrieved', 200, {
       page, limit, total, pages: Math.ceil(total / limit),
     });

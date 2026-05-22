@@ -8,15 +8,32 @@
 
   <!-- Search / Filters bar -->
   <div class="search-filter-bar" [@slideUp]>
-    <div class="search-input-wrap">
-      <i class="fa-solid fa-magnifying-glass search-icon"></i>
-      <input
-        type="text"
-        [(ngModel)]="searchQuery"
-        (ngModelChange)="onSearch()"
-        placeholder="Search by song, user, email, or IP address..."
-        class="form-control search-input"
-      />
+    <div class="filters-row" style="display: flex; gap: 1rem; align-items: center; width: 100%; flex-wrap: wrap;">
+      <div class="search-input-wrap" style="flex: 1; min-width: 250px;">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearch()"
+          placeholder="Search by song, user, email, or IP..."
+          class="form-control search-input"
+        />
+      </div>
+
+      <div class="datepicker-wrap" style="display: flex; gap: 0.5rem; align-items: center; min-width: 280px; position: relative;">
+        <p-datepicker
+          [(ngModel)]="dateRange"
+          selectionMode="range"
+          [showIcon]="true"
+          placeholder="Filter by Date Range"
+          (ngModelChange)="applyFilter()"
+          [readonlyInput]="true"
+          [style]="{ width: '100%' }"
+        ></p-datepicker>
+        <button class="btn btn-ghost" *ngIf="dateRange" (click)="clearDateRange()" title="Clear date filter" style="padding: 0.5rem; font-size: 0.8125rem;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -28,7 +45,7 @@
         <tr>
           <th>User</th>
           <th>Song Title</th>
-          <th>IP Address</th>
+          <th class="hide-sm-md">IP Address</th>
           <th>Date & Time</th>
         </tr>
       </thead>
@@ -43,7 +60,7 @@
           <td>
             <span class="song-title cell-title">{{ item.songId?.title || 'Unknown Song' }}</span>
           </td>
-          <td>
+          <td class="hide-sm-md">
             <span class="ip-address badge-muted">{{ item.ip || '—' }}</span>
           </td>
           <td>{{ item.createdAt | date: 'medium' }}</td>
