@@ -47,8 +47,7 @@ export class GenreManagementComponent implements OnInit {
     if (!this.searchQuery.trim()) return this.genres;
     const q = this.searchQuery.toLowerCase();
     return this.genres.filter(g =>
-      g.name.toLowerCase().includes(q) ||
-      ((g as any).description || '').toLowerCase().includes(q)
+      g.name.toLowerCase().includes(q)
     );
   }
 
@@ -68,7 +67,6 @@ export class GenreManagementComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       name: ['', Validators.required],
-      description: [''],
       color: [this.GENRE_COLORS[0]]
     });
     this.load();
@@ -102,7 +100,6 @@ export class GenreManagementComponent implements OnInit {
     this.editingGenre = genre;
     this.form.patchValue({
       name: genre.name,
-      description: (genre as any).description || '',
       color: (genre as any).color || this.GENRE_COLORS[0]
     });
     this.showModal = true;

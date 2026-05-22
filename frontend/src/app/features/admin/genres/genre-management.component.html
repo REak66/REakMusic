@@ -47,8 +47,6 @@
         </div>
         <div class="genre-info">
           <span class="genre-name">{{ genre.name }}</span>
-          <span class="genre-desc" *ngIf="genre['description']">{{ genre['description'] }}</span>
-          <span class="genre-desc genre-desc--empty" *ngIf="!genre['description']">No description</span>
         </div>
         <div class="genre-actions">
           <button class="btn-icon btn-edit" (click)="openEdit(genre)" title="Edit genre">
@@ -103,11 +101,7 @@
       <input type="text" formControlName="name" placeholder="e.g. Hip Hop, Jazz, Rock..." style="width: 100%;" />
     </div>
 
-    <!-- Description -->
-    <div class="form-group" style="margin-bottom: 0;">
-      <label>Description</label>
-      <textarea formControlName="description" rows="3" placeholder="Brief description of this genre..." style="width: 100%; resize: vertical;"></textarea>
-    </div>
+
 
     <!-- Accent Color (ColorPicker Inline) -->
     <div class="form-group" style="margin-bottom: 0;">

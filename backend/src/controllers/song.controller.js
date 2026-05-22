@@ -1,6 +1,7 @@
 const Song = require('../models/Song');
 const Download = require('../models/Download');
 const User = require('../models/User');
+const Subscription = require('../models/Subscription');
 const mongoose = require('mongoose');
 const driveService = require('../services/drive.service');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
@@ -226,6 +227,18 @@ exports.downloadSong = async (req, res, next) => {
     if (!song) return errorResponse(res, 'Song not found', 404);
 
     if (!song.driveFileId) return errorResponse(res, 'File not available for download', 404);
+
+    // Verify user subscription status (admin and producer bypass this)
+    if (req.user.role !== 'admin' && req.user.role !== 'producer') {
+      const activeSubscription = await Subscription.findOne({
+        userId: req.user.id,
+        status: 'active',
+        endDate: { $gt: new Date() },
+      });
+      if (!activeSubscription) {
+        return errorResponse(res, 'An active subscription is required to download songs.', 403);
+      }
+    }
 
     await Download.create({ userId: req.user.id, songId: song._id, ip: req.ip });
     await Song.findByIdAndUpdate(song._id, { $inc: { downloadCount: 1 } });

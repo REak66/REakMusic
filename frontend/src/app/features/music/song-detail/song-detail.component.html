@@ -125,6 +125,16 @@
                 }}</span>
               </button>
 
+              <!-- Subscribe CTA (logged in but not subscribed) -->
+              <a
+                class="btn-action btn-subscribe-cta"
+                *ngIf="shouldShowSubscribeCTA"
+                routerLink="/subscribe"
+              >
+                <i class="fa-solid fa-crown"></i>
+                <span>{{ "music.subscribeToDownload" | translate }}</span>
+              </a>
+
               <!-- Login CTA -->
               <ng-container *ngIf="!isLoggedIn">
                 <a class="btn-action btn-ghost" routerLink="/auth/login">

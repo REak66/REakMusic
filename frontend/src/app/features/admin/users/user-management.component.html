@@ -137,11 +137,31 @@
     </div>
 
     <div class="alert alert-error" *ngIf="error">{{ error }}</div>
+    <div class="modal-tabs">
+      <button
+        type="button"
+        class="modal-tab-btn"
+        [class.active]="activeTab === 'profile'"
+        (click)="activeTab = 'profile'"
+      >
+        <i class="fa-solid fa-user-gear"></i>
+        <span>Profile & Role</span>
+      </button>
+      <button
+        type="button"
+        class="modal-tab-btn"
+        [class.active]="activeTab === 'permissions'"
+        (click)="activeTab = 'permissions'"
+      >
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Permissions</span>
+      </button>
+    </div>
 
     <div class="modal-scroll-body">
     <form [formGroup]="userForm" (ngSubmit)="save()">
       <!-- ── Section: Identity ─────────────────────────────────────────── -->
-      <div class="modal-section">
+      <div class="modal-section" *ngIf="activeTab === 'profile'">
         <div class="section-label">Identity</div>
         <div class="form-row">
           <div class="form-group">
@@ -198,7 +218,7 @@
       </div>
 
       <!-- ── Section: Role & Artist ────────────────────────────────────── -->
-      <div class="modal-section">
+      <div class="modal-section" *ngIf="activeTab === 'profile'">
         <div class="section-label">Role & Profile</div>
         <div class="form-row">
           <div class="form-group">
@@ -236,7 +256,7 @@
       </div>
 
       <!-- ── Section: Permissions ──────────────────────────────────────── -->
-      <div class="modal-section">
+      <div class="modal-section" *ngIf="activeTab === 'permissions'">
         <div class="section-label-row">
           <div class="section-label">Permissions</div>
           <button

@@ -83,6 +83,7 @@ export class UserManagementComponent implements OnInit {
   pageSize = 20;
   total = 0;
 
+  activeTab: 'profile' | 'permissions' = 'profile';
   userForm!: FormGroup; // Define the form property
   selectedPermissions: string[] = [];
 
@@ -152,6 +153,7 @@ export class UserManagementComponent implements OnInit {
   openAdd(): void {
     this.editingUser = null;
     this.error = '';
+    this.activeTab = 'profile';
     this.userForm.reset({ role: 'customer', isVerified: true });
     this.userForm.get('password')!.setValidators([Validators.required, Validators.minLength(6)]);
     this.userForm.get('password')!.updateValueAndValidity();
@@ -164,6 +166,7 @@ export class UserManagementComponent implements OnInit {
   openEdit(user: User): void {
     this.editingUser = user;
     this.error = '';
+    this.activeTab = 'profile';
     this.userForm.patchValue({
       fullName: user.fullName,
       email: user.email,

@@ -616,6 +616,25 @@
       }
     }
 
+    &.btn-subscribe-cta {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      box-shadow:
+        0 6px 24px rgba(245, 158, 11, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+      i {
+        color: #fff;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+      }
+
+      &:hover:not(:disabled) {
+        box-shadow:
+          0 10px 32px rgba(245, 158, 11, 0.45),
+          0 0 20px rgba(217, 119, 6, 0.2);
+      }
+    }
+
     &.btn-ghost {
       background: rgba(255, 255, 255, 0.05);
       color: #fff;

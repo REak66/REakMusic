@@ -68,7 +68,6 @@ async function seed() {
     genre = await Genre.create({
       name: 'Pop',
       slug: 'pop',
-      description: 'Mainstream popular music',
     });
   }
 

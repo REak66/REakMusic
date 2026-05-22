@@ -15,6 +15,10 @@ export class CartComponent implements OnInit {
   loading = true;
   subscribing: 'weekly' | 'monthly' | null = null;
   error = '';
+  plans: any = {
+    weekly: { price: 0.99 },
+    monthly: { price: 4.99, limit: 50, count: 0, isFreePromo: false }
+  };
 
   get daysRemaining(): number {
     if (!this.currentSubscription?.endDate) return 0;
@@ -42,10 +46,27 @@ export class CartComponent implements OnInit {
     this.subscriptionService.getMySubscription().subscribe({
       next: sub => {
         this.currentSubscription = sub;
+        this.loadPlans();
+      },
+      error: () => {
+        this.loadPlans();
+      }
+    });
+  }
+
+  loadPlans(): void {
+    this.subscriptionService.getPlans().subscribe({
+      next: data => {
+        if (data) {
+          this.plans = data;
+        }
         this.loading = false;
         this.cdr.markForCheck();
       },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      error: () => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
     });
   }
 

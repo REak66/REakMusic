@@ -82,9 +82,25 @@ export class SongDetailComponent implements OnInit {
     return false;
   }
 
-  /** Any logged-in user can download songs now */
+  /** Users must be logged in and either have an active subscription or be an admin/producer to download */
   get canDownload(): boolean {
-    return this.isLoggedIn;
+    if (!this.isLoggedIn) return false;
+    const user = this.authService.getCurrentUser();
+    if (!user) return false;
+    if (user.role === 'admin' || user.role === 'producer') {
+      return true;
+    }
+    return this.hasActiveSubscription;
+  }
+
+  get shouldShowSubscribeCTA(): boolean {
+    if (!this.isLoggedIn) return false;
+    const user = this.authService.getCurrentUser();
+    if (!user) return false;
+    if (user.role === 'admin' || user.role === 'producer') {
+      return false;
+    }
+    return !this.hasActiveSubscription;
   }
 
   get isLoggedIn(): boolean {

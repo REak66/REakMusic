@@ -8,29 +8,17 @@
 
   <!-- Search / Filters bar -->
   <div class="search-filter-bar" [@slideUp]>
-    <div class="filters-row" style="display: flex; gap: 1rem; align-items: center; width: 100%; flex-wrap: wrap;">
-      <div class="search-input-wrap" style="flex: 1; min-width: 250px;">
+    <div class="filters-row">
+      <div class="search-input-wrap">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          (ngModelChange)="onSearch()"
-          placeholder="Search by song, user, email, or IP..."
-          class="form-control search-input"
-        />
+        <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
+          placeholder="Search by song, user, email, or IP..." class="form-control search-input" />
       </div>
 
-      <div class="datepicker-wrap" style="display: flex; gap: 0.5rem; align-items: center; min-width: 280px; position: relative;">
-        <p-datepicker
-          [(ngModel)]="dateRange"
-          selectionMode="range"
-          [showIcon]="true"
-          placeholder="Filter by Date Range"
-          (ngModelChange)="applyFilter()"
-          [readonlyInput]="true"
-          [style]="{ width: '100%' }"
-        ></p-datepicker>
-        <button class="btn btn-ghost" *ngIf="dateRange" (click)="clearDateRange()" title="Clear date filter" style="padding: 0.5rem; font-size: 0.8125rem;">
+      <div class="datepicker-wrap">
+        <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [showIcon]="true" placeholder="Filter by Date Range"
+          (ngModelChange)="applyFilter()" [readonlyInput]="true"></p-datepicker>
+        <button class="btn-clear-date" *ngIf="dateRange" (click)="clearDateRange()" title="Clear date filter">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -70,12 +58,6 @@
     <p *ngIf="filteredDownloads.length === 0" class="no-results">No download history found.</p>
   </div>
 
-  <app-pagination
-    *ngIf="total > 0"
-    [total]="total"
-    [pageSize]="pageSize"
-    [currentPage]="page"
-    (pageChange)="onPageChange($event)"
-    (pageSizeChange)="onPageSizeChange($event)"
-  ></app-pagination>
+  <app-pagination *ngIf="total > 0" [total]="total" [pageSize]="pageSize" [currentPage]="page"
+    (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)"></app-pagination>
 </div>

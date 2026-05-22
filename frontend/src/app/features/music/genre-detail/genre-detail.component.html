@@ -4,7 +4,6 @@
       <div class="genre-header-skeleton">
         <div class="badge-skeleton"></div>
         <div class="title-skeleton"></div>
-        <div class="desc-skeleton"></div>
       </div>
       <app-skeleton type="song-cards" [count]="8"></app-skeleton>
     </div>
@@ -13,9 +12,6 @@
       <div class="genre-header">
         <span class="badge badge-primary">Genre</span>
         <h1>{{ genre.name }}</h1>
-        <p *ngIf="genre.description" class="genre-desc">
-          {{ genre.description }}
-        </p>
       </div>
 
       <div class="grid-songs">

@@ -34,17 +34,56 @@ exports.subscribe = async (req, res, next) => {
       }
     }
 
+    let price = PLAN_PRICES[plan];
+    if (plan === 'monthly') {
+      const activeOrPendingMonthlyCount = await Subscription.countDocuments({
+        plan: 'monthly',
+        status: { $in: ['active', 'pending'] }
+      });
+      if (activeOrPendingMonthlyCount >= 50) {
+        return errorResponse(res, 'The monthly subscription plan has reached its limit of 50 users.', 400);
+      }
+      price = 0.00;
+    }
+
     const subscription = await Subscription.create({
       userId: req.user.id,
       plan,
       status: 'pending',
-      price: PLAN_PRICES[plan],
+      price: price,
     });
 
     const user = await User.findById(req.user.id).select('fullName email');
     await notifySubscriptionRequest(subscription, user);
 
     return successResponse(res, { subscription }, 'Subscription request submitted. Awaiting admin approval.', 201);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getPlans = async (req, res, next) => {
+  try {
+    const monthlyCount = await Subscription.countDocuments({
+      plan: 'monthly',
+      status: { $in: ['active', 'pending'] }
+    });
+
+    const plans = {
+      weekly: {
+        price: 0.99,
+        period: 'week'
+      },
+      monthly: {
+        price: monthlyCount < 50 ? 0.00 : 4.99,
+        period: 'month',
+        limit: 50,
+        count: monthlyCount,
+        isFreePromo: monthlyCount < 50
+      }
+    };
+
+    return successResponse(res, { plans });
   } catch (err) {
     next(err);
   }

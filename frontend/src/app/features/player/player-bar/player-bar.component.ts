@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, Inject, ChangeDetectorRef } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { Observable, combineLatest, map } from 'rxjs';
 import { PlayerService } from '../player.service';
@@ -28,7 +28,8 @@ export class PlayerBarComponent implements OnInit {
 
   constructor(
     public playerService: PlayerService,
-    @Inject(DOCUMENT) private document: Document
+    @Inject(DOCUMENT) private document: Document,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
@@ -41,7 +42,10 @@ export class PlayerBarComponent implements OnInit {
     this.shuffle$ = this.playerService.shuffle$;
     this.repeatMode$ = this.playerService.repeatMode$;
 
-    this.currentTime$.subscribe(t => (this._currentTime = t));
+    this.currentTime$.subscribe(t => {
+      this._currentTime = t;
+      this.cdr.detectChanges();
+    });
     this.duration$.subscribe(d => (this._duration = d));
     this.repeatMode$.subscribe(m => (this._repeatMode = m));
   }

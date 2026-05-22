@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Song } from '../../core/models';
 
@@ -26,23 +26,33 @@ export class PlayerService {
   shuffle$ = this.shuffleSubject.asObservable();
   repeatMode$ = this.repeatModeSubject.asObservable();
 
-  constructor() {
-    this.audio.addEventListener('timeupdate', () => {
-      this.currentTimeSubject.next(this.audio.currentTime);
+  constructor(private ngZone: NgZone) {
+    this.ngZone.runOutsideAngular(() => {
+      this.audio.addEventListener('timeupdate', () => {
+        this.currentTimeSubject.next(this.audio.currentTime);
+      });
+      this.audio.addEventListener('loadedmetadata', () => {
+        this.ngZone.run(() => {
+          this.durationSubject.next(this.audio.duration);
+        });
+      });
+      this.audio.addEventListener('ended', () => {
+        this.ngZone.run(() => {
+          if (this.repeatModeSubject.value === 'one') {
+            this.audio.currentTime = 0;
+            this.audio.play().catch(() => { });
+          } else {
+            this.next();
+          }
+        });
+      });
+      this.audio.addEventListener('play', () => {
+        this.ngZone.run(() => this.isPlayingSubject.next(true));
+      });
+      this.audio.addEventListener('pause', () => {
+        this.ngZone.run(() => this.isPlayingSubject.next(false));
+      });
     });
-    this.audio.addEventListener('loadedmetadata', () => {
-      this.durationSubject.next(this.audio.duration);
-    });
-    this.audio.addEventListener('ended', () => {
-      if (this.repeatModeSubject.value === 'one') {
-        this.audio.currentTime = 0;
-        this.audio.play().catch(() => { });
-      } else {
-        this.next();
-      }
-    });
-    this.audio.addEventListener('play', () => this.isPlayingSubject.next(true));
-    this.audio.addEventListener('pause', () => this.isPlayingSubject.next(false));
   }
 
   play(song: Song): void {

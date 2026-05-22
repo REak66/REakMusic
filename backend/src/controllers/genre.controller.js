@@ -28,7 +28,7 @@ exports.getGenre = async (req, res, next) => {
 
 exports.createGenre = async (req, res, next) => {
   try {
-    const { name, description, color } = req.body;
+    const { name, color } = req.body;
     const baseSlug = slugify(name || '');
     // ensure unique slug
     let slug = baseSlug;
@@ -36,7 +36,7 @@ exports.createGenre = async (req, res, next) => {
     while (await Genre.findOne({ slug })) {
       slug = `${baseSlug}-${count++}`;
     }
-    const genre = await Genre.create({ name, description, color, slug });
+    const genre = await Genre.create({ name, color, slug });
     return successResponse(res, { genre }, 'Genre created', 201);
   } catch (err) {
     next(err);
@@ -45,8 +45,8 @@ exports.createGenre = async (req, res, next) => {
 
 exports.updateGenre = async (req, res, next) => {
   try {
-    const { name, description, color } = req.body;
-    const update = { description, color };
+    const { name, color } = req.body;
+    const update = { color };
     if (name) {
       update.name = name;
       update.slug = slugify(name);

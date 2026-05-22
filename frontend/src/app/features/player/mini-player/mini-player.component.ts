@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Observable, combineLatest, map } from 'rxjs';
 import { PlayerService } from '../player.service';
 import { Song, Artist } from '../../../core/models';
@@ -15,7 +15,10 @@ export class MiniPlayerComponent implements OnInit {
   isPlaying$!: Observable<boolean>;
   progressPercent$!: Observable<number>;
 
-  constructor(public playerService: PlayerService) { }
+  constructor(
+    public playerService: PlayerService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.currentSong$ = this.playerService.currentSong$;
@@ -26,6 +29,9 @@ export class MiniPlayerComponent implements OnInit {
     ]).pipe(
       map(([t, d]) => (d ? (t / d) * 100 : 0))
     );
+    this.progressPercent$.subscribe(() => {
+      this.cdr.detectChanges();
+    });
   }
 
   getCoverUrl(song: Song): string {

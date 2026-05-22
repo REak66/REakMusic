@@ -178,9 +178,94 @@
   &::-webkit-scrollbar-thumb  { background: var(--color-border); border-radius: 4px; }
 }
 
+// Modal Tabs Navigation
+.modal-tabs {
+  display: flex;
+  gap: 0.375rem;
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.08));
+  margin: -0.5rem 0 1.25rem 0;
+  padding-bottom: 0px;
+}
+
+.modal-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.125rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-muted, rgba(255, 255, 255, 0.4));
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+
+  i {
+    font-size: 0.875rem;
+    transition: transform 0.22s ease, color 0.22s;
+  }
+
+  &:hover {
+    color: var(--color-text-primary, #fff);
+    background: rgba(255, 255, 255, 0.03);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+
+    i {
+      transform: translateY(-1px);
+    }
+  }
+
+  &.active {
+    color: var(--color-accent-light, #a78bfa);
+    border-bottom: 2px solid var(--color-accent, #7c3aed);
+    background: rgba(124, 58, 237, 0.06);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    box-shadow: inset 0 -4px 12px -4px rgba(124, 58, 237, 0.2);
+
+    i {
+      color: var(--color-accent, #7c3aed);
+    }
+  }
+}
+
+// Elegant glowing inputs
+.modal-scroll-body {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"] {
+    width: 100%;
+    padding: 0.65rem 0.875rem;
+    background: var(--color-bg-elevated, rgba(255, 255, 255, 0.03)) !important;
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1)) !important;
+    border-radius: 0.5rem !important;
+    color: var(--color-text-primary, #fff) !important;
+    font-size: 0.875rem !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none !important;
+      border-color: var(--color-accent, #7c3aed) !important;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.18), 0 4px 12px rgba(124, 58, 237, 0.08) !important;
+      background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    &::placeholder {
+      color: var(--color-text-muted, rgba(255, 255, 255, 0.4)) !important;
+    }
+  }
+}
+
 // Inner scroll container so the modal can still scroll without clipping dropdowns
 .modal-scroll-body {
-  max-height: calc(90vh - 80px); // subtract modal-header height
+  max-height: calc(90vh - 140px); // adjusted to account for tab height and header
   overflow-y: auto;
   overflow-x: visible;
   padding-right: 2px; // breathing room for scrollbar
@@ -378,6 +463,11 @@
     border-color: var(--color-accent) !important;
     box-shadow: 0 0 0 1px rgba(var(--color-accent-rgb, 99, 102, 241), 0.5),
                 0 4px 20px rgba(var(--color-accent-rgb, 99, 102, 241), 0.15);
+
+    &:hover {
+      box-shadow: 0 0 0 1px rgba(var(--color-accent-rgb, 99, 102, 241), 0.6),
+                  0 6px 24px rgba(var(--color-accent-rgb, 99, 102, 241), 0.25) !important;
+    }
 
     .perm-icon-wrap {
       background: rgba(var(--color-accent-rgb, 99, 102, 241), 0.2);

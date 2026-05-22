@@ -44,7 +44,8 @@
     "artist": "Producer",
     "album": "Album",
     "releaseYear": "Release Year",
-    "downloads": "Downloads"
+    "downloads": "Downloads",
+    "subscribeToDownload": "Subscribe to Download"
   },
   "subscription": {
     "title": "Choose Your Plan",

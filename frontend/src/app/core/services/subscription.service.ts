@@ -17,6 +17,12 @@ export class SubscriptionService {
         );
     }
 
+    getPlans(): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/plans`).pipe(
+            map(res => res.data?.plans ?? res)
+        );
+    }
+
     getMySubscription(): Observable<Subscription | null> {
         return this.http.get<any>(`${this.apiUrl}/me`).pipe(
             map(res => res.data?.subscription ?? null)
