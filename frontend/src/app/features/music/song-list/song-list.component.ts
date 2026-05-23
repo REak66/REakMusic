@@ -18,7 +18,7 @@ export class SongListComponent implements OnInit {
   loading = false;
   total = 0;
   page = 1;
-  limit = 12;
+  limit = 10;
   totalPages = 1;
 
   filterForm!: FormGroup;

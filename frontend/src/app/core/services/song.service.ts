@@ -21,6 +21,9 @@ export class SongService {
         httpParams = httpParams.set(key, String(val));
       }
     });
+    // Add cache buster parameter to prevent browser caching
+    httpParams = httpParams.set('_t', new Date().getTime().toString());
+
     return this.http.get<any>(this.apiUrl, { params: httpParams }).pipe(
       map(res => ({
         data: res.data?.songs || [],
@@ -69,6 +72,10 @@ export class SongService {
   }
 
   createSong(data: FormData): Observable<Song> {
+    return this.http.post<Song>(this.apiUrl, data);
+  }
+
+  createSongJson(data: any): Observable<Song> {
     return this.http.post<Song>(this.apiUrl, data);
   }
 

@@ -1,0 +1,463 @@
+<div class="admin-page import-songs-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">{{ 'import.title' | translate }}</h1>
+      <p class="page-sub">Import multiple songs to the music catalog easily</p>
+    </div>
+    <button class="btn btn-outline" (click)="redirectToSongs()" [disabled]="uploading">
+      <i class="fa-solid fa-arrow-left" style="margin-right: 0.25rem;"></i>
+      {{ 'common.cancel' | translate }}
+    </button>
+  </div>
+
+  <!-- Wizard Steps Indicator -->
+  <div class="wizard-steps-container">
+    <div class="wizard-step" [class.active]="step === 1" [class.completed]="step > 1">
+      <div class="step-circle">1</div>
+      <div class="step-label">{{ 'import.step1' | translate }}</div>
+    </div>
+    <div class="step-connector" [class.active]="step > 1"></div>
+    <div class="wizard-step" [class.active]="step === 2" [class.completed]="step > 2" [class.disabled]="rows.length === 0">
+      <div class="step-circle">2</div>
+      <div class="step-label">{{ 'import.step2' | translate }}</div>
+    </div>
+    <div class="step-connector" [class.active]="step > 2"></div>
+    <div class="wizard-step" [class.active]="step === 3" [class.completed]="step > 3" [class.disabled]="rows.length === 0">
+      <div class="step-circle">3</div>
+      <div class="step-label">{{ 'import.step3' | translate }}</div>
+    </div>
+    <div class="step-connector" [class.active]="step > 3"></div>
+    <div class="wizard-step" [class.active]="step === 4" [class.completed]="step > 4" [class.disabled]="step < 4">
+      <div class="step-circle">4</div>
+      <div class="step-label">{{ 'import.step4' | translate }}</div>
+    </div>
+  </div>
+
+  <!-- Global Loader -->
+  <div class="loading-spinner" *ngIf="loading && !uploading"></div>
+
+  <!-- Step 1: Upload XLS File -->
+  <div class="step-card animate-fade-in" *ngIf="step === 1 && !loading">
+    <div class="step-card-header">
+      <h2 class="step-title"><i class="fa-solid fa-file-excel"></i> Select Spreadsheet File</h2>
+      <p class="step-desc">Upload your XLS or XLSX file to begin. Make sure columns map correctly or use our template below.</p>
+    </div>
+
+    <div class="upload-dropzone" 
+         [class.drag-over]="dragOver"
+         (dragover)="onDragOver($event)"
+         (dragleave)="onDragLeave()"
+         (drop)="onDrop($event)"
+         (click)="fileInput.click()">
+      <input type="file" #fileInput (change)="onFileSelected($event)" accept=".xlsx, .xls" style="display: none;" />
+      
+      <div class="dropzone-content">
+        <i class="fa-solid fa-cloud-arrow-up cloud-icon"></i>
+        <p class="dropzone-text">{{ 'import.dragDrop' | translate }}</p>
+        <span class="btn btn-primary btn-sm">{{ 'import.orBrowse' | translate }}</span>
+        <p class="dropzone-hint">{{ 'import.onlyExcel' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="alert alert-error animate-shake" *ngIf="errorMessage">
+      <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.5rem;"></i>
+      {{ errorMessage }}
+    </div>
+
+    <div class="template-download-section">
+      <div class="template-info">
+        <h3>Need a starting point?</h3>
+        <p>Download our pre-structured template containing example rows, required headers, and instructions.</p>
+      </div>
+      <button class="btn btn-outline" (click)="downloadTemplate()">
+        <i class="fa-solid fa-download"></i>
+        {{ 'import.downloadTemplate' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Review Data -->
+  <div class="step-card animate-fade-in" *ngIf="step === 2 && !loading">
+    <div class="step-card-header">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 class="step-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Review Extracted Data</h2>
+          <p class="step-desc">We successfully parsed <strong>{{ rows.length }}</strong> rows. Inspect headers and look for validation errors.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-outline" (click)="clearImportState()">{{ 'import.selectDifferent' | translate }}</button>
+          <button class="btn btn-primary" (click)="goToStep(3)">
+            {{ 'import.next' | translate }} <i class="fa-solid fa-arrow-right" style="margin-left: 0.25rem;"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Validation Summary Bar -->
+    <div class="summary-status-bar">
+      <div class="summary-item valid">
+        <i class="fa-solid fa-circle-check"></i>
+        <span class="count">{{ totalValidRows }}</span>
+        <span class="label">{{ 'import.totalValid' | translate }}</span>
+      </div>
+      <div class="summary-item invalid" [class.has-errors]="totalInvalidRows > 0">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span class="count">{{ totalInvalidRows }}</span>
+        <span class="label">{{ 'import.totalInvalid' | translate }}</span>
+      </div>
+    </div>
+
+    <div class="alert alert-warning" *ngIf="totalInvalidRows > 0" style="margin-bottom: 1.5rem;">
+      <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem;"></i>
+      Some rows contain invalid records. You can correct them in the next step.
+    </div>
+    <div class="alert alert-success" *ngIf="totalInvalidRows === 0" style="margin-bottom: 1.5rem;">
+      <i class="fa-solid fa-circle-check" style="margin-right: 0.5rem;"></i>
+      {{ 'import.noErrors' | translate }}
+    </div>
+
+    <!-- Read-Only Review Table -->
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width: 60px;">Row</th>
+            <th>Title</th>
+            <th>Producer</th>
+            <th>Genres</th>
+            <th>Year</th>
+            <th>Links</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of rows" [class.row-invalid]="!row.isValid">
+            <td class="cell-center">#{{ row.index }}</td>
+            <td class="cell-title">{{ row.title || '—' }}</td>
+            <td>
+              <span class="mapped-badge" *ngIf="row.artistId" title="Mapped to DB">
+                <i class="fa-solid fa-link"></i> {{ row.producerName }}
+              </span>
+              <span class="unmapped-badge" *ngIf="!row.artistId">
+                <i class="fa-solid fa-link-slash"></i> {{ row.producerName || '—' }}
+              </span>
+            </td>
+            <td>
+              <div class="genre-chips flex-wrap" style="gap: 0.25rem;">
+                <span class="genre-chip" *ngFor="let id of row.genreIds" style="font-size: 0.75rem; padding: 0.15rem 0.5rem;">
+                  {{ getGenreName(id) }}
+                </span>
+                <span class="text-muted" *ngIf="row.genreIds.length === 0" style="font-size: 0.8125rem;">{{ row.genreString || '—' }}</span>
+              </div>
+            </td>
+            <td>{{ row.releaseYear || '—' }}</td>
+            <td>
+              <div style="display: flex; gap: 0.5rem;">
+                <span *ngIf="row.driveLink" class="link-badge drive" title="Google Drive Link available"><i class="fa-brands fa-google-drive"></i> Drive</span>
+                <span *ngIf="row.previewUrl" class="link-badge preview" title="Preview URL available"><i class="fa-solid fa-volume-high"></i> Stream</span>
+              </div>
+            </td>
+            <td>
+              <span class="status-indicator valid" *ngIf="row.isValid">
+                <i class="fa-solid fa-circle-check"></i> {{ 'import.valid' | translate }}
+              </span>
+              <span class="status-indicator invalid" *ngIf="!row.isValid" [title]="row.errors.join('\n')">
+                <i class="fa-solid fa-circle-xmark"></i> {{ 'import.invalid' | translate }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="step-actions" style="margin-top: 1.5rem; justify-content: space-between;">
+      <button class="btn btn-outline" (click)="goToStep(1)">
+        <i class="fa-solid fa-arrow-left"></i> {{ 'import.back' | translate }}
+      </button>
+      <button class="btn btn-primary" (click)="goToStep(3)">
+        {{ 'import.next' | translate }} <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 3: Update Data -->
+  <div class="step-card animate-fade-in" *ngIf="step === 3 && !loading && !uploading">
+    <div class="step-card-header">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2 class="step-title"><i class="fa-solid fa-pen-to-square"></i> Update & Correct Catalog Data</h2>
+          <p class="step-desc">Double-check values, fix errors, and select proper mappings from dropdowns before importing.</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-outline" (click)="goToStep(2)">{{ 'import.back' | translate }}</button>
+          <button class="btn btn-success" (click)="executeImport()" [disabled]="totalValidRows === 0">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            {{ 'import.importBtn' | translate }} ({{ totalValidRows }})
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar Filters -->
+    <div class="toolbar-bar">
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input
+          type="text"
+          [placeholder]="'common.search' | translate"
+          class="search-input"
+          [ngModel]="searchQuery"
+          (ngModelChange)="onSearchChange($event)"
+        />
+      </div>
+
+      <div class="filter-dropdown-wrap">
+        <span class="filter-label"><i class="fa-solid fa-filter"></i> View:</span>
+        <div class="btn-group">
+          <button class="btn btn-sm" [class.btn-primary]="statusFilter === 'all'" [class.btn-outline]="statusFilter !== 'all'" (click)="onFilterStatusChange('all')">
+            All ({{ rows.length }})
+          </button>
+          <button class="btn btn-sm" [class.btn-primary]="statusFilter === 'valid'" [class.btn-outline]="statusFilter !== 'valid'" (click)="onFilterStatusChange('valid')">
+            Valid ({{ totalValidRows }})
+          </button>
+          <button class="btn btn-sm" [class.btn-primary]="statusFilter === 'invalid'" [class.btn-outline]="statusFilter !== 'invalid'" (click)="onFilterStatusChange('invalid')">
+            Errors ({{ totalInvalidRows }})
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Valid/Invalid Banner -->
+    <div class="alert alert-warning" *ngIf="totalInvalidRows > 0" style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+      <span>
+        <i class="fa-solid fa-triangle-exclamation" style="margin-right: 0.5rem;"></i>
+        {{ 'import.correctErrors' | translate }}
+      </span>
+      <span class="count-badge invalid">{{ totalInvalidRows }} errors remaining</span>
+    </div>
+    <div class="alert alert-success" *ngIf="totalInvalidRows === 0" style="margin-bottom: 1.5rem;">
+      <i class="fa-solid fa-circle-check" style="margin-right: 0.5rem;"></i>
+      All songs are completely correct! You are ready to import.
+    </div>
+
+    <!-- Interactive Spreadsheet Editable Table -->
+    <div class="table-wrap editable-table-wrap">
+      <table class="data-table data-table--editable">
+        <thead>
+          <tr>
+            <th style="width: 50px;">Row</th>
+            <th style="width: 250px;">Song Title *</th>
+            <th style="width: 220px;" *ngIf="!isProducerUser">Producer *</th>
+            <th style="width: 280px;">Genres</th>
+            <th style="width: 110px;">Release Year</th>
+            <th style="width: 320px;">Google Drive Link</th>
+            <th style="width: 320px;">Preview URL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of filteredRows" [class.row-invalid]="!row.isValid">
+            <td class="cell-center">
+              <span class="row-num" [class.row-num--error]="!row.isValid" [title]="row.errors.join('\n')">
+                #{{ row.index }}
+              </span>
+            </td>
+            
+            <!-- Song Title -->
+            <td>
+              <div class="input-cell-wrap">
+                <input 
+                  type="text" 
+                  [(ngModel)]="row.title" 
+                  (ngModelChange)="onRowValueChange(row)" 
+                  class="table-cell-input"
+                  [class.cell-error]="!row.title"
+                  placeholder="Enter title…"
+                />
+                <span class="cell-error-marker" *ngIf="!row.title" title="Title is required"><i class="fa-solid fa-exclamation-circle"></i></span>
+              </div>
+            </td>
+
+            <!-- Producer Selection -->
+            <td *ngIf="!isProducerUser">
+              <div class="input-cell-wrap">
+                <p-select 
+                  [(ngModel)]="row.artistId" 
+                  [options]="artistOptions" 
+                  optionLabel="label" 
+                  optionValue="value" 
+                  [filter]="true" 
+                  filterBy="label" 
+                  [editable]="false"
+                  (ngModelChange)="onRowValueChange(row)" 
+                  placeholder="Select producer"
+                  styleClass="table-cell-select"
+                  [class.cell-error]="!row.artistId"
+                ></p-select>
+                <span class="cell-error-marker" *ngIf="!row.artistId" title="Producer selection required"><i class="fa-solid fa-exclamation-circle"></i></span>
+              </div>
+            </td>
+
+            <!-- Genres TreeSelect -->
+            <td>
+              <div class="input-cell-wrap">
+                <p-treeselect 
+                  [options]="genreTreeNodes" 
+                  selectionMode="checkbox" 
+                  [(ngModel)]="row.selectedGenreNodes"
+                  (ngModelChange)="onGenreTreeSelectChange(row, $event)"
+                  [metaKeySelection]="false" 
+                  display="chip" 
+                  placeholder="Choose genres…"
+                  styleClass="table-cell-treeselect"
+                ></p-treeselect>
+              </div>
+            </td>
+
+            <!-- Release Year -->
+            <td>
+              <div class="input-cell-wrap">
+                <input 
+                  type="number" 
+                  [(ngModel)]="row.releaseYear" 
+                  (ngModelChange)="onRowValueChange(row)" 
+                  class="table-cell-input text-center"
+                  [class.cell-error]="row.releaseYear && (row.releaseYear < 1900 || row.releaseYear > 2040)"
+                  placeholder="YYYY"
+                />
+              </div>
+            </td>
+
+            <!-- Google Drive Link -->
+            <td>
+              <div class="input-cell-wrap">
+                <input 
+                  type="url" 
+                  [(ngModel)]="row.driveLink" 
+                  (ngModelChange)="onRowValueChange(row)" 
+                  class="table-cell-input"
+                  [class.cell-error]="!row.driveLink && !row.previewUrl"
+                  placeholder="https://drive.google.com/file/d/..."
+                />
+                <span class="cell-error-marker" *ngIf="!row.driveLink && !row.previewUrl" title="Either Drive Link or Stream URL is required"><i class="fa-solid fa-exclamation-circle"></i></span>
+              </div>
+            </td>
+
+            <!-- Preview URL -->
+            <td>
+              <div class="input-cell-wrap">
+                <input 
+                  type="url" 
+                  [(ngModel)]="row.previewUrl" 
+                  (ngModelChange)="onRowValueChange(row)" 
+                  class="table-cell-input"
+                  [class.cell-error]="!row.driveLink && !row.previewUrl"
+                  placeholder="https://..."
+                />
+                <span class="cell-error-marker" *ngIf="!row.driveLink && !row.previewUrl" title="Either Drive Link or Stream URL is required"><i class="fa-solid fa-exclamation-circle"></i></span>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Empty State -->
+          <tr *ngIf="filteredRows.length === 0">
+            <td [attr.colspan]="isProducerUser ? 6 : 7" class="cell-empty">
+              <i class="fa-solid fa-magnifying-glass" style="font-size: 1.5rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+              <p>No rows matching filters found.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Step Buttons -->
+    <div class="step-actions" style="margin-top: 1.5rem; justify-content: space-between;">
+      <button class="btn btn-outline" (click)="goToStep(2)">
+        <i class="fa-solid fa-arrow-left"></i> {{ 'import.back' | translate }}
+      </button>
+      <button class="btn btn-success animate-pulse" (click)="executeImport()" [disabled]="totalValidRows === 0">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        {{ 'import.importBtn' | translate }} ({{ totalValidRows }})
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Overlay for Upload Execution (Step 3 Uploading) -->
+  <div class="import-uploading-overlay animate-fade-in" *ngIf="uploading">
+    <div class="upload-progress-card">
+      <h2>Importing Songs...</h2>
+      <p class="stats">Processing song {{ totalImported + totalFailed + 1 }} of {{ totalValidRows }}</p>
+      
+      <!-- Progress Bar -->
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" [style.width.%]="importProgress"></div>
+      </div>
+      <span class="percentage">{{ importProgress }}%</span>
+
+      <div class="uploading-logs">
+        <div class="log-line" *ngFor="let row of rows" [class.success]="row.importStatus === 'success'" [class.failed]="row.importStatus === 'failed'" [class.uploading]="row.importStatus === 'uploading'">
+          <span *ngIf="row.importStatus === 'pending'" class="status"><i class="fa-regular fa-circle text-muted"></i></span>
+          <span *ngIf="row.importStatus === 'uploading'" class="status spinning"><i class="fa-solid fa-spinner fa-spin text-accent"></i></span>
+          <span *ngIf="row.importStatus === 'success'" class="status"><i class="fa-solid fa-circle-check text-success"></i></span>
+          <span *ngIf="row.importStatus === 'failed'" class="status" [title]="row.errorMessage"><i class="fa-solid fa-circle-xmark text-danger"></i></span>
+          
+          <span class="log-title">{{ row.title }}</span>
+          <span class="log-details" *ngIf="row.importStatus === 'uploading'">creating record...</span>
+          <span class="log-details" *ngIf="row.importStatus === 'success'">imported successfully</span>
+          <span class="log-details" *ngIf="row.importStatus === 'failed'">failed: {{ row.errorMessage }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Complete -->
+  <div class="step-card animate-fade-in" *ngIf="step === 4 && !loading">
+    <div class="completion-container">
+      <div class="completion-icon-wrapper animate-zoom-in">
+        <i class="fa-solid fa-circle-check checkmark"></i>
+      </div>
+      
+      <h2 class="completion-title">{{ 'import.successTitle' | translate }}</h2>
+      <p class="completion-desc">{{ 'import.successDesc' | translate }}</p>
+
+      <!-- Import Dashboard Result Cards -->
+      <div class="result-cards-wrap">
+        <div class="result-card success">
+          <i class="fa-solid fa-music"></i>
+          <span class="count">{{ totalImported }}</span>
+          <span class="label">Songs Imported</span>
+        </div>
+        
+        <div class="result-card failed" [class.has-failures]="totalFailed > 0">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span class="count">{{ totalFailed }}</span>
+          <span class="label">Rows Failed / Skipped</span>
+        </div>
+      </div>
+
+      <!-- Failed Rows Download Segment -->
+      <div class="failed-report-panel animate-fade-in" *ngIf="totalFailed > 0">
+        <div class="panel-info">
+          <h3>Failed Records Report Available</h3>
+          <p>Export a spreadsheet containing the <strong>{{ totalFailed }}</strong> rows that failed to import. Correct details in the sheet, re-upload it, and import.</p>
+        </div>
+        <button class="btn btn-outline animate-shake" (click)="exportFailedRows()">
+          <i class="fa-solid fa-file-arrow-down"></i>
+          {{ 'import.exportFailed' | translate }}
+        </button>
+      </div>
+
+      <!-- Actions Redirect -->
+      <div class="completion-actions" style="margin-top: 2rem;">
+        <button class="btn btn-primary" (click)="redirectToSongs()">
+          <i class="fa-solid fa-music"></i>
+          {{ 'import.redirectBtn' | translate }}
+        </button>
+        <button class="btn btn-outline" (click)="clearImportState()">
+          Import More Files
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-toast></p-toast>

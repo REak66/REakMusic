@@ -33,7 +33,8 @@
       <tbody>
         <tr *ngFor="let user of users">
           <td class="cell-name">
-            <span class="avatar-initial">{{
+            <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" [alt]="user.fullName" class="avatar-img" />
+            <span *ngIf="!user.avatarUrl" class="avatar-initial">{{
               user.fullName.charAt(0).toUpperCase()
             }}</span>
             <span>{{ user.fullName }}</span>

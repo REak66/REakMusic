@@ -1,4 +1,5 @@
 const Song = require('../models/Song');
+const Artist = require('../models/Artist');
 const Download = require('../models/Download');
 const User = require('../models/User');
 const Subscription = require('../models/Subscription');
@@ -44,13 +45,51 @@ exports.listSongs = async (req, res, next) => {
     if (req.query.genre) {
       filter.genre = req.query.genre;
     }
+    if (req.query.releaseYear) {
+      filter.releaseYear = parseInt(req.query.releaseYear);
+    }
+
+    if (req.query.search) {
+      const matchingArtists = await Artist.find({ name: { $regex: req.query.search, $options: 'i' } }).select('_id');
+      const artistIds = matchingArtists.map(a => a._id);
+      
+      const searchFilter = {
+        $or: [
+          { title: { $regex: req.query.search, $options: 'i' } },
+          { artistId: { $in: artistIds } }
+        ]
+      };
+      
+      if (filter.$or) {
+        filter.$and = [
+          { $or: filter.$or },
+          searchFilter
+        ];
+        delete filter.$or;
+      } else {
+        filter.$or = searchFilter.$or;
+      }
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (req.query.sort) {
+      if (req.query.sort === '-createdAt') {
+        sortOption = { createdAt: -1 };
+      } else if (req.query.sort === '-downloadCount') {
+        sortOption = { downloadCount: -1 };
+      } else if (req.query.sort === 'title') {
+        sortOption = { title: 1 };
+      } else {
+        sortOption = req.query.sort;
+      }
+    }
 
     const [songs, total] = await Promise.all([
       Song.find(filter)
         .populate('artistId', 'name imageUrl')
         .populate('albumId', 'title coverImage')
         .populate('genre', 'name slug')
-        .sort({ createdAt: -1 })
+        .sort(sortOption)
         .skip(skip)
         .limit(limit),
       Song.countDocuments(filter),

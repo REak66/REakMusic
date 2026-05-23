@@ -1,9 +1,13 @@
 <p-confirmDialog [style]="{ width: '420px' }" [baseZIndex]="10000">
   <ng-template pTemplate="headless" let-message #content>
-    <div class="confirm-dialog">
+    <div class="confirm-dialog" [ngClass]="message.styleClass">
       <!-- Icon -->
-      <div class="confirm-dialog__icon-wrapper">
-        <i *ngIf="message.icon; else defaultIcon" [class]="message.icon + ' confirm-dialog__icon'"></i>
+      <div class="confirm-dialog__icon-wrapper" [ngClass]="{
+        'confirm-dialog__icon-wrapper--success': message.styleClass?.includes('confirm-dialog--success') || message.icon?.includes('check')
+      }">
+        <i *ngIf="message.icon; else defaultIcon" [class]="message.icon + ' confirm-dialog__icon'" [ngClass]="{
+          'confirm-dialog__icon--success': message.styleClass?.includes('confirm-dialog--success') || message.icon?.includes('check')
+        }"></i>
         <ng-template #defaultIcon>
           <i class="fa-solid fa-triangle-exclamation confirm-dialog__icon"></i>
         </ng-template>
@@ -18,6 +22,7 @@
       <!-- Actions -->
       <div class="confirm-dialog__footer">
         <button
+          *ngIf="message.rejectVisible !== false"
           class="btn btn--ghost"
           (click)="reject(message)"
           type="button">
@@ -25,7 +30,9 @@
           {{ message.rejectLabel || 'Cancel' }}
         </button>
         <button
-          class="btn btn--danger"
+          *ngIf="message.acceptVisible !== false"
+          class="btn"
+          [ngClass]="message.styleClass?.includes('confirm-dialog--success') ? 'btn--success' : 'btn--danger'"
           (click)="accept(message)"
           type="button">
           <i class="fa-solid fa-check btn__icon"></i>

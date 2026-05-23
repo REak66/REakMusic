@@ -135,5 +135,31 @@
     "of": "of",
     "next": "Next",
     "previous": "Previous"
+  },
+  "import": {
+    "title": "Import Songs from Excel",
+    "step1": "Upload XLS File",
+    "step2": "Review Data",
+    "step3": "Update Data",
+    "step4": "Complete",
+    "dragDrop": "Drag & drop your XLS/XLSX file here",
+    "orBrowse": "or browse files",
+    "downloadTemplate": "Download Excel Template",
+    "onlyExcel": "Only Excel files (.xls, .xlsx) are supported.",
+    "selectDifferent": "Choose a different file",
+    "totalValid": "Total Valid Rows",
+    "totalInvalid": "Total Invalid Rows",
+    "totalImported": "Total songs imported successfully",
+    "back": "Back",
+    "next": "Next",
+    "importBtn": "Import Songs",
+    "exportFailed": "Export Failed Rows",
+    "redirectBtn": "Go to Song Management",
+    "successTitle": "Import Completed!",
+    "successDesc": "Your songs have been processed and added to the music catalog.",
+    "noErrors": "All rows are valid! You can proceed to the final step.",
+    "correctErrors": "Please review and edit the fields below to fix the errors before importing.",
+    "valid": "Valid",
+    "invalid": "Invalid"
   }
 }

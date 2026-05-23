@@ -42,7 +42,7 @@
     </p>
 
     <!-- Skeleton -->
-    <app-skeleton type="song-cards" [count]="12" *ngIf="loading" />
+    <app-skeleton type="song-cards" [count]="limit" *ngIf="loading" />
 
     <!-- Grid -->
     <div class="grid-songs" *ngIf="!loading">

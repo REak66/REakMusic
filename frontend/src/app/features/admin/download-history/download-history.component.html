@@ -12,13 +12,16 @@
       <div class="search-input-wrap">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()"
-          placeholder="Search by song, user, email, or IP..." class="form-control search-input" />
+          placeholder="Search by song, user, email, or IP..." class="search-input" />
+        <button class="search-clear" *ngIf="searchQuery" (click)="searchQuery = ''; onSearch()" title="Clear search">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
-
       <div class="datepicker-wrap">
         <p-datepicker [(ngModel)]="dateRange" selectionMode="range" [showIcon]="true" placeholder="Filter by Date Range"
-          (ngModelChange)="applyFilter()" [readonlyInput]="true"></p-datepicker>
-        <button class="btn-clear-date" *ngIf="dateRange" (click)="clearDateRange()" title="Clear date filter">
+          (ngModelChange)="applyFilter()" [readonlyInput]="true" appendTo="body"></p-datepicker>
+        <button class="btn-clear-date" *ngIf="dateRange && dateRange.length > 0 && dateRange[0]"
+          (click)="clearDateRange()" title="Clear date filter">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>

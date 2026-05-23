@@ -12,7 +12,8 @@ export class GenreService {
   constructor(private http: HttpClient) { }
 
   getGenres(): Observable<Genre[]> {
-    return this.http.get<any>(this.apiUrl).pipe(
+    const httpParams = { _t: new Date().getTime().toString() };
+    return this.http.get<any>(this.apiUrl, { params: httpParams }).pipe(
       map(res => res.data?.genres || [])
     );
   }

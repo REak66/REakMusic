@@ -78,12 +78,12 @@ export class GenreManagementComponent implements OnInit {
       next: (genres) => {
         this.genres = genres;
         this.loading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
       error: (err: any) => {
         this.error = err.message;
         this.loading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       }
     });
   }
@@ -129,19 +129,31 @@ export class GenreManagementComponent implements OnInit {
   }
 
   delete(id: string): void {
+    const genre = this.genres.find(g => g._id === id);
     this.confirmationService.confirm({
-      message: 'Are you sure you want to delete this genre?',
+      header: 'Delete Genre',
+      message: `Are you sure you want to delete "${genre?.name || 'this genre'}"? This action cannot be undone.`,
+      acceptLabel: 'Delete',
+      rejectLabel: 'Cancel',
       accept: () => {
         this.genreService.deleteGenre(id).subscribe({
           next: () => {
+            this.genres = this.genres.filter(g => g._id !== id);
             this.load();
-            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Genre deleted successfully!' });
-            this.cdr.markForCheck();
+            this.confirmationService.confirm({
+              header: 'Deleted Successfully',
+              message: `Genre "${genre?.name || 'Genre'}" was deleted successfully.`,
+              icon: 'fa-solid fa-circle-check',
+              acceptLabel: 'OK',
+              rejectVisible: false,
+              styleClass: 'confirm-dialog--success'
+            } as any);
+            this.cdr.detectChanges();
           },
           error: (err: any) => {
             this.error = err.message;
             this.messageService.add({ severity: 'error', summary: 'Error', detail: err.message || 'Failed to delete genre.' });
-            this.cdr.markForCheck();
+            this.cdr.detectChanges();
           }
         });
       }

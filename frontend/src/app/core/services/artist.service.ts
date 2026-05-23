@@ -12,7 +12,8 @@ export class ArtistService {
   constructor(private http: HttpClient) {}
 
   getArtists(params: { page?: number; limit?: number; search?: string } = {}): Observable<PaginatedResponse<Artist>> {
-    return this.http.get<PaginatedResponse<Artist>>(this.apiUrl, { params: params as Record<string, string> });
+    const httpParams = { ...params, _t: new Date().getTime().toString() };
+    return this.http.get<PaginatedResponse<Artist>>(this.apiUrl, { params: httpParams as any });
   }
 
   getArtist(id: string): Observable<Artist> {

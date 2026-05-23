@@ -110,8 +110,8 @@ export class ArtistManagementComponent implements OnInit {
   load(): void {
     this.loading = true;
     this.artistService.getArtists({ limit: 100 }).subscribe({
-      next: (res: any) => { this.artists = res.data?.artists || []; this.loading = false; this.cdr.markForCheck(); },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      next: (res: any) => { this.artists = res.data?.artists || []; this.loading = false; this.cdr.detectChanges(); },
+      error: () => { this.loading = false; this.cdr.detectChanges(); }
     });
   }
 
@@ -163,13 +163,28 @@ export class ArtistManagementComponent implements OnInit {
   }
 
   delete(id: string): void {
+    const artist = this.artists.find(a => a._id === id);
     this.confirmationService.confirm({
       header: 'Delete Producer',
-      message: 'Are you sure you want to delete this producer? This action cannot be undone.',
+      message: `Are you sure you want to delete "${artist?.name || 'this producer'}"? This action cannot be undone.`,
       acceptLabel: 'Delete',
       rejectLabel: 'Cancel',
       accept: () => {
-        this.artistService.deleteArtist(id).subscribe({ next: () => this.load() });
+        this.artistService.deleteArtist(id).subscribe({
+          next: () => {
+            this.artists = this.artists.filter(a => a._id !== id);
+            this.load();
+            this.confirmationService.confirm({
+              header: 'Deleted Successfully',
+              message: `Producer "${artist?.name || 'Producer'}" was deleted successfully.`,
+              icon: 'fa-solid fa-circle-check',
+              acceptLabel: 'OK',
+              rejectVisible: false,
+              styleClass: 'confirm-dialog--success'
+            } as any);
+            this.cdr.detectChanges();
+          }
+        });
       }
     });
   }

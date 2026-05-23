@@ -31,7 +31,7 @@ export class DownloadHistoryComponent implements OnInit {
   pageSize = 10;
   total = 0;
   searchQuery = '';
-  dateRange: Date[] | null = null;
+  dateRange: Date[] = [];
 
   constructor(
     private userService: UserService,
@@ -74,7 +74,7 @@ export class DownloadHistoryComponent implements OnInit {
     }
 
     // Filter by date range (DatePicker select from date to date range)
-    if (this.dateRange && this.dateRange[0]) {
+    if (this.dateRange && this.dateRange.length > 0 && this.dateRange[0]) {
       const start = new Date(this.dateRange[0]);
       start.setHours(0, 0, 0, 0);
 
@@ -92,7 +92,7 @@ export class DownloadHistoryComponent implements OnInit {
   }
 
   clearDateRange(): void {
-    this.dateRange = null;
+    this.dateRange = [];
     this.applyFilter();
   }
 

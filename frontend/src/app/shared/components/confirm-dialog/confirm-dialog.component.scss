@@ -42,11 +42,20 @@
     background: rgba(239, 68, 68, 0.12);
     border: 1px solid rgba(239, 68, 68, 0.25);
     flex-shrink: 0;
+
+    &--success {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
   }
 
   &__icon {
     font-size: 1.5rem;
     color: var(--color-error);
+
+    &--success {
+      color: var(--color-success);
+    }
   }
 
   &__body {
@@ -113,6 +122,20 @@
 
     &:hover {
       background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &--success {
+    background: var(--color-success);
+    color: #fff;
+
+    &:hover {
+      background: #059669;
       transform: translateY(-1px);
     }
 

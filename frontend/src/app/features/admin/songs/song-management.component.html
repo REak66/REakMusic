@@ -4,10 +4,16 @@
       <h1 class="page-title">{{ 'admin.songs' | translate }}</h1>
       <p class="page-sub">Manage your music catalog</p>
     </div>
-    <button class="btn btn-primary" (click)="openAdd()">
-      <i class="fa-solid fa-plus"></i>
-      {{ 'common.add' | translate }} Song
-    </button>
+    <div style="display: flex; gap: 0.75rem;">
+      <button class="btn btn-outline" routerLink="/admin/songs/import">
+        <i class="fa-solid fa-file-import"></i>
+        Import XLS
+      </button>
+      <button class="btn btn-primary" (click)="openAdd()">
+        <i class="fa-solid fa-plus"></i>
+        {{ 'common.add' | translate }} Song
+      </button>
+    </div>
   </div>
 
   <div class="loading-spinner" *ngIf="loading"></div>

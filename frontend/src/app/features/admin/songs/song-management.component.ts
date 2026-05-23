@@ -109,9 +109,9 @@ export class SongManagementComponent implements OnInit {
         this.songs = res.data || [];
         this.total = res.total || 0;
         this.loading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      error: () => { this.loading = false; this.cdr.detectChanges(); }
     });
     this.artistService.getArtists({ limit: 100 }).subscribe({
       next: (res: any) => { this.artists = res.data?.artists || []; this.cdr.markForCheck(); }
@@ -534,13 +534,17 @@ export class SongManagementComponent implements OnInit {
       accept: () => {
         this.songService.deleteSong(id).subscribe({
           next: () => {
+            this.songs = this.songs.filter(s => s._id !== id);
             this.loadData();
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: `Song "${song?.title || 'Song'}" was deleted successfully.`
-            });
-            this.cdr.markForCheck();
+            this.confirmationService.confirm({
+              header: 'Deleted Successfully',
+              message: `Song "${song?.title || 'Song'}" was deleted successfully.`,
+              icon: 'fa-solid fa-circle-check',
+              acceptLabel: 'OK',
+              rejectVisible: false,
+              styleClass: 'confirm-dialog--success'
+            } as any);
+            this.cdr.detectChanges();
           },
           error: (err: any) => {
             this.messageService.add({
@@ -548,7 +552,7 @@ export class SongManagementComponent implements OnInit {
               summary: 'Error',
               detail: err.message || 'Failed to delete the song.'
             });
-            this.cdr.markForCheck();
+            this.cdr.detectChanges();
           }
         });
       }

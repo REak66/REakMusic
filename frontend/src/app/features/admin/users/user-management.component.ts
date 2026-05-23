@@ -80,7 +80,7 @@ export class UserManagementComponent implements OnInit {
   error = '';
 
   page = 1;
-  pageSize = 20;
+  pageSize = 10;
   total = 0;
 
   activeTab: 'profile' | 'permissions' = 'profile';
@@ -133,9 +133,9 @@ export class UserManagementComponent implements OnInit {
         this.users = res.data;
         this.total = res.total;
         this.loading = false;
-        this.cdr.markForCheck();
+        this.cdr.detectChanges();
       },
-      error: () => { this.loading = false; this.cdr.markForCheck(); }
+      error: () => { this.loading = false; this.cdr.detectChanges(); }
     });
   }
 
@@ -256,13 +256,34 @@ export class UserManagementComponent implements OnInit {
   deleteUser(user: User): void {
     this.confirmationService.confirm({
       header: 'Delete User',
-      message: `Are you sure you want to permanently delete ${user.fullName}? This action cannot be undone.`,
+      message: `Are you sure you want to permanently delete "${user.fullName}"? This action cannot be undone.`,
       acceptLabel: 'Delete',
       rejectLabel: 'Cancel',
       accept: () => {
         this.userService.deleteUser(user._id).subscribe({
-          next: () => { this.load(); },
-          error: (err: any) => { alert(err.error?.message || 'Delete failed.'); }
+          next: () => {
+            this.users = this.users.filter(u => u._id !== user._id);
+            this.load();
+            this.confirmationService.confirm({
+              header: 'Deleted Successfully',
+              message: `User "${user.fullName}" was deleted successfully.`,
+              icon: 'fa-solid fa-circle-check',
+              acceptLabel: 'OK',
+              rejectVisible: false,
+              styleClass: 'confirm-dialog--success'
+            } as any);
+            this.cdr.detectChanges();
+          },
+          error: (err: any) => {
+            this.confirmationService.confirm({
+              header: 'Delete Failed',
+              message: err.error?.message || 'Failed to delete the user.',
+              icon: 'fa-solid fa-triangle-exclamation',
+              acceptLabel: 'OK',
+              rejectVisible: false
+            });
+            this.cdr.detectChanges();
+          }
         });
       }
     });

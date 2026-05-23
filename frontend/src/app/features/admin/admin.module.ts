@@ -7,6 +7,7 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { AdminLayoutComponent } from './layout/admin-layout.component';
 import { AdminDashboardComponent } from './dashboard/admin-dashboard.component';
 import { SongManagementComponent } from './songs/song-management.component';
+import { SongImportComponent } from './songs/song-import/song-import.component';
 import { ArtistManagementComponent } from './artists/artist-management.component';
 import { OrderManagementComponent } from './orders/order-management.component';
 import { UserManagementComponent } from './users/user-management.component';
@@ -19,6 +20,7 @@ import { SharedModule } from '../../shared/shared.module';
     AdminLayoutComponent,
     AdminDashboardComponent,
     SongManagementComponent,
+    SongImportComponent,
     ArtistManagementComponent,
     OrderManagementComponent,
     UserManagementComponent,

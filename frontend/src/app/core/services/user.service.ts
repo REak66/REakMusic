@@ -48,7 +48,8 @@ export class UserService {
   }
 
   getUsers(params: { page?: number; limit?: number } = {}): Observable<{ data: User[]; total: number }> {
-    return this.http.get<{ data: { users: User[] }; pagination: { total: number } }>(this.apiUrl, { params: params as Record<string, string> }).pipe(
+    const httpParams = { ...params, _t: new Date().getTime().toString() };
+    return this.http.get<{ data: { users: User[] }; pagination: { total: number } }>(this.apiUrl, { params: httpParams as any }).pipe(
       map(res => ({ data: res.data.users, total: res.pagination?.total ?? 0 }))
     );
   }
