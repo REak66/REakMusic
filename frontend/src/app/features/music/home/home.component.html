@@ -1,67 +1,104 @@
 <div class="home-page main-content">
-  <!-- Hero Section -->
-  <app-animate-on-scroll enterClass="animate-fade-in-down" [threshold]="0.1">
-    <section class="hero">
-      <div class="hero-grid-overlay"></div>
-      <div class="container hero-content">
-        <div class="hero-eyebrow">
-          <span class="pulse-indicator"></span>
-          <i class="fa-solid fa-music"></i> The Music Marketplace
-        </div>
+  <!-- Immersive Cyberpunk Hero Section -->
+  <header class="hero">
+    <div class="hero-grid-overlay"></div>
+    <div class="light-streaks">
+      <div class="streak streak-1"></div>
+      <div class="streak streak-2"></div>
+      <div class="streak streak-3"></div>
+    </div>
+    <div class="ambient-orbs-container">
+      <div class="ambient-orb orb-1"></div>
+      <div class="ambient-orb orb-2"></div>
+      <div class="ambient-orb orb-3"></div>
+    </div>
 
-        <h1 class="hero-title">
-          Discover &amp; Own<br>
-          <span class="gradient-text-animate">Music Forever</span>
-        </h1>
 
-        <p class="hero-subtitle">Buy DRM-free tracks and keep them forever. Support independent producers directly.</p>
+    <div class="hero-content container">
+      <div class="hero-eyebrow">
+        <span class="pulse-indicator"></span>
+        REakMusic Premium Marketplace
+      </div>
+      <h1 class="hero-title">
+        Discover & Stream<br>
+        <span class="gradient-text-animate">Next-Gen Sound</span>
+      </h1>
+      <p class="hero-subtitle">
+        Immerse yourself in a curated library of high-quality tracks. Buy licenses, support independent producers, or subscribe for unlimited downloads.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/home/songs" class="btn btn-lg shine-button">
+          <i class="fa-solid fa-compass"></i> Browse Tracks
+        </a>
+        <a routerLink="/subscribe" class="btn btn-lg explore-button">
+          <i class="fa-solid fa-crown text-warning"></i> Join Premium
+        </a>
+      </div>
 
-        <div class="hero-actions">
-          <a class="btn btn-primary btn-lg shine-button" routerLink="/home/songs">
-            <i class="fa-solid fa-compass"></i> {{ 'nav.browse' | translate }}
-          </a>
-          <a class="btn btn-outline btn-lg explore-button" routerLink="/home">
-            <i class="fa-solid fa-users"></i> Explore Producers
-          </a>
-        </div>
-
-        <div class="hero-stats-glass">
-          <div class="hero-stat-card">
-            <div class="stat-icon-wrapper">
-              <i class="fa-solid fa-music"></i>
-            </div>
-            <div class="stat-info">
-              <span class="stat-num">10K+</span>
-              <span class="stat-lbl">Songs</span>
-            </div>
-            <div class="stat-card-glow"></div>
+      <!-- Glassmorphic Stats Counter -->
+      <div class="hero-stats-glass">
+        <div class="hero-stat-card">
+          <div class="stat-icon-wrapper">
+            <i class="fa-solid fa-music"></i>
           </div>
-
-          <div class="hero-stat-card">
-            <div class="stat-icon-wrapper">
-              <i class="fa-solid fa-record-vinyl"></i>
-            </div>
-            <div class="stat-info">
-              <span class="stat-num">500+</span>
-              <span class="stat-lbl">Producers</span>
-            </div>
-            <div class="stat-card-glow"></div>
+          <div class="stat-info">
+            <span class="stat-num">{{ stats.tracks }}</span>
+            <span class="stat-lbl">Premium Tracks</span>
           </div>
+          <div class="stat-card-glow"></div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="stat-icon-wrapper">
+            <i class="fa-solid fa-sliders"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-num">{{ stats.producers }}</span>
+            <span class="stat-lbl">Top Producers</span>
+          </div>
+          <div class="stat-card-glow"></div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="stat-icon-wrapper">
+            <i class="fa-solid fa-cloud-arrow-down"></i>
+          </div>
+          <div class="stat-info">
+            <span class="stat-num">{{ stats.downloads }}</span>
+            <span class="stat-lbl">Downloads</span>
+          </div>
+          <div class="stat-card-glow"></div>
+        </div>
+      </div>
+    </div>
+  </header>
 
-          <div class="hero-stat-card">
-            <div class="stat-icon-wrapper">
-              <i class="fa-solid fa-circle-down"></i>
-            </div>
-            <div class="stat-info">
-              <span class="stat-num">50K+</span>
-              <span class="stat-lbl">Downloads</span>
-            </div>
-            <div class="stat-card-glow"></div>
+  <!-- Interactive Genre Explorer Carousel -->
+  <section class="section container genre-explorer-section">
+    <app-animate-on-scroll enterClass="animate-fade-in-up" [threshold]="0.15">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="pulse-indicator-section"></span>
+          <h2 class="section-title">Explore by Genre</h2>
+        </div>
+      </div>
+    </app-animate-on-scroll>
+
+    <div class="genre-carousel-wrapper">
+      <div class="genre-carousel" *ngIf="!genresLoading">
+        <div class="genre-pill-card" *ngFor="let genre of genres; let idx = index" 
+             [routerLink]="['/home/songs']" [queryParams]="{ genre: genre.name }"
+             [style.background]="getGenreGradient(idx)">
+          <div class="genre-pill-overlay"></div>
+          <div class="genre-pill-content">
+            <span class="genre-pill-icon"><i class="fa-solid fa-compact-disc"></i></span>
+            <span class="genre-pill-name">{{ genre.name }}</span>
           </div>
         </div>
       </div>
-    </section>
-  </app-animate-on-scroll>
+      <div class="genre-carousel-skeleton" *ngIf="genresLoading">
+        <div class="skeleton-pill" *ngFor="let i of [1,2,3,4,5,6]"></div>
+      </div>
+    </div>
+  </section>
 
   <!-- Featured Songs -->
   <section class="section container">
@@ -147,5 +184,81 @@
         <span class="trending-downloads">{{ song.downloadCount }} downloads</span>
       </div>
     </div>
+  </section>
+
+  <!-- Trending Creators Showcase -->
+  <section class="section container creators-section">
+    <app-animate-on-scroll enterClass="animate-fade-in-up" [threshold]="0.15">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <span class="pulse-indicator-section"></span>
+          <h2 class="section-title">Meet Our Top Producers</h2>
+        </div>
+        <a class="section-link glow-link" routerLink="/home/songs">View all <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </app-animate-on-scroll>
+
+    <div class="creators-grid" *ngIf="!artistsLoading">
+      <div class="creator-card" *ngFor="let artist of artists" [routerLink]="['/home/artists', artist._id]">
+        <div class="creator-avatar-wrap">
+          <div class="creator-glow-ring"></div>
+          <img [src]="getArtistAvatar(artist)" [alt]="artist.name" class="creator-avatar" />
+        </div>
+        <h3 class="creator-name">{{ artist.name }}</h3>
+        <p class="creator-country" *ngIf="artist.country">
+          <i class="fa-solid fa-location-dot"></i> {{ artist.country }}
+        </p>
+        <span class="creator-badge">Verified Producer</span>
+      </div>
+      <p *ngIf="artists.length === 0" class="no-results">No producers found</p>
+    </div>
+    <div class="creators-skeleton-grid" *ngIf="artistsLoading">
+      <div class="skeleton-creator-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
+    </div>
+  </section>
+
+  <!-- Platform Highlights Section -->
+  <section class="section container highlights-section">
+    <app-animate-on-scroll enterClass="animate-fade-in-up" [threshold]="0.15">
+      <div class="highlights-grid">
+        <div class="highlight-card">
+          <div class="highlight-icon"><i class="fa-solid fa-bolt"></i></div>
+          <h3 class="highlight-title">Next-Gen Audio</h3>
+          <p class="highlight-desc">High-fidelity 320kbps streaming and lossless downloads for absolute sonic precision.</p>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-icon"><i class="fa-solid fa-file-shield"></i></div>
+          <h3 class="highlight-title">Secure Licensing</h3>
+          <p class="highlight-desc">Worry-free digital licensing agreements protecting both creators and listeners instantly.</p>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-icon"><i class="fa-solid fa-handshake-angle"></i></div>
+          <h3 class="highlight-title">Direct Support</h3>
+          <p class="highlight-desc">Up to 90% of revenue goes directly back to creators, fostering independent art.</p>
+        </div>
+      </div>
+    </app-animate-on-scroll>
+  </section>
+
+  <!-- Subscription CTA Section -->
+  <section class="section container cta-subscription-section">
+    <app-animate-on-scroll enterClass="animate-zoom-in" [threshold]="0.1">
+      <div class="cta-card-glass">
+        <div class="cta-backdrop-glow"></div>
+        <div class="cta-content">
+          <span class="cta-badge"><i class="fa-solid fa-gem text-warning"></i> Premium Membership</span>
+          <h2 class="cta-title">Unlock Unlimited Music Downloads</h2>
+          <p class="cta-desc">Join our premium subscription plan today for ad-free experience, priority releases, and unlimited full track downloads.</p>
+          <div class="cta-features">
+            <span class="cta-feature-item"><i class="fa-solid fa-circle-check"></i> Unlimited Streaming</span>
+            <span class="cta-feature-item"><i class="fa-solid fa-circle-check"></i> Lossless Downloads</span>
+            <span class="cta-feature-item"><i class="fa-solid fa-circle-check"></i> No Ads</span>
+          </div>
+          <a routerLink="/subscribe" class="btn btn-lg cta-btn">
+            Subscribe Now <i class="fa-solid fa-arrow-right-long"></i>
+          </a>
+        </div>
+      </div>
+    </app-animate-on-scroll>
   </section>
 </div>

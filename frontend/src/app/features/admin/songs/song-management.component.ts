@@ -571,6 +571,41 @@ export class SongManagementComponent implements OnInit {
     return this.selectedGenreIds.includes(genreId);
   }
 
+  toggleCategoryGenres(catNode: TreeNode): void {
+    if (!catNode.children || catNode.children.length === 0) return;
+    
+    // Check if all children are currently selected
+    const allSelected = this.isCategoryFullySelected(catNode);
+    const childKeys = catNode.children.map(child => child.key || '');
+    
+    if (allSelected) {
+      // Remove all children of this category
+      this.selectedGenreIds = this.selectedGenreIds.filter(id => !childKeys.includes(id));
+    } else {
+      // Add all missing children of this category
+      const newIds = [...this.selectedGenreIds];
+      childKeys.forEach(key => {
+        if (key && !newIds.includes(key)) {
+          newIds.push(key);
+        }
+      });
+      this.selectedGenreIds = newIds;
+    }
+    this.updateGenreKeysFromIds();
+    this.cdr.markForCheck();
+  }
+
+  isCategoryFullySelected(catNode: TreeNode): boolean {
+    if (!catNode.children || catNode.children.length === 0) return false;
+    return catNode.children.every(child => this.selectedGenreIds.includes(child.key || ''));
+  }
+
+  isCategoryPartiallySelected(catNode: TreeNode): boolean {
+    if (!catNode.children || catNode.children.length === 0) return false;
+    const selectedCount = catNode.children.filter(child => this.selectedGenreIds.includes(child.key || '')).length;
+    return selectedCount > 0 && selectedCount < catNode.children.length;
+  }
+
   toggleGenre(genreId: string): void {
     const idx = this.selectedGenreIds.indexOf(genreId);
     if (idx === -1) {

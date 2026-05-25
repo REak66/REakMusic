@@ -1,8 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { SongService } from '../../../core/services/song.service';
+import { GenreService } from '../../../core/services/genre.service';
+import { ArtistService } from '../../../core/services/artist.service';
 import { PlayerService } from '../../player/player.service';
 import { CartService } from '../../../core/services/cart.service';
-import { Song } from '../../../core/models';
+import { Song, Artist, Genre } from '../../../core/models';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -15,11 +17,23 @@ import { environment } from '../../../../environments/environment';
 export class HomeComponent implements OnInit {
   featuredSongs: Song[] = [];
   trendingSongs: Song[] = [];
+  genres: Genre[] = [];
+  artists: Artist[] = [];
   loading = true;
   trendingLoading = true;
+  genresLoading = true;
+  artistsLoading = true;
+
+  stats = {
+    tracks: '12K+',
+    producers: '350+',
+    downloads: '850K+'
+  };
 
   constructor(
     private songService: SongService,
+    private genreService: GenreService,
+    private artistService: ArtistService,
     public playerService: PlayerService,
     public cartService: CartService,
     private cdr: ChangeDetectorRef
@@ -35,6 +49,7 @@ export class HomeComponent implements OnInit {
       },
       error: () => { this.loading = false; this.cdr.markForCheck(); }
     });
+
     this.songService.getTrending(10).subscribe({
       next: res => {
         this.trendingSongs = res.data || res as unknown as Song[];
@@ -42,6 +57,24 @@ export class HomeComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: () => { this.trendingLoading = false; this.cdr.markForCheck(); }
+    });
+
+    this.genreService.getGenres().subscribe({
+      next: res => {
+        this.genres = Array.isArray(res) ? res.slice(0, 8) : [];
+        this.genresLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.genresLoading = false; this.cdr.markForCheck(); }
+    });
+
+    this.artistService.getArtists({ limit: 6 }).subscribe({
+      next: (res: any) => {
+        this.artists = res.data?.artists || [];
+        this.artistsLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => { this.artistsLoading = false; this.cdr.markForCheck(); }
     });
   }
 
@@ -64,6 +97,24 @@ export class HomeComponent implements OnInit {
       return artist.imageUrl;
     }
     return 'assets/images/music.png';
+  }
+
+  getArtistAvatar(artist: Artist): string {
+    return artist.imageUrl || 'assets/images/music.png';
+  }
+
+  getGenreGradient(index: number): string {
+    const gradients = [
+      'linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%)',
+      'linear-gradient(135deg, #3b82f6 0%, #10b981 100%)',
+      'linear-gradient(135deg, #f59e0b 0%, #ef4444 100%)',
+      'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)',
+      'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)',
+      'linear-gradient(135deg, #10b981 0%, #06b6d4 100%)',
+      'linear-gradient(135deg, #ef4444 0%, #f59e0b 100%)',
+      'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)'
+    ];
+    return gradients[index % gradients.length];
   }
 
   isInCart(song: Song): boolean {

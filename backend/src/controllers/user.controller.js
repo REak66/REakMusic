@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 
@@ -18,9 +17,6 @@ exports.getMe = async (req, res, next) => {
 
 exports.updateMe = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { fullName, phone } = req.body;
     const user = await User.findByIdAndUpdate(
       req.user.id,
@@ -76,9 +72,6 @@ exports.uploadAvatar = async (req, res, next) => {
 
 exports.createUser = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { fullName, email, password, phone, role, artistId, permissions } = req.body;
 
     const existing = await User.findOne({ email });
@@ -114,9 +107,6 @@ exports.createUser = async (req, res, next) => {
 
 exports.updateUser = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { fullName, email, phone, role, artistId, isVerified, permissions } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(

@@ -37,6 +37,7 @@ export class GenreManagementComponent implements OnInit {
   searchQuery = '';
   page = 1;
   pageSize = 10;
+  viewMode: 'table' | 'grid' = 'grid';
 
   readonly GENRE_COLORS = [
     '#7c3aed', '#2563eb', '#059669', '#dc2626', '#d97706',
@@ -111,18 +112,27 @@ export class GenreManagementComponent implements OnInit {
     if (this.form.invalid) return;
     const data = this.form.value;
     this.saving = true;
-    this.genreService.createGenre(data).subscribe({
+    const obs = this.editingGenre
+      ? this.genreService.updateGenre(this.editingGenre._id, data)
+      : this.genreService.createGenre(data);
+
+    obs.subscribe({
       next: () => {
         this.load();
         this.showModal = false;
         this.saving = false;
-        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Genre saved successfully!' });
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: `Genre ${this.editingGenre ? 'updated' : 'saved'} successfully!` });
         this.cdr.markForCheck();
       },
       error: (err: any) => {
-        this.error = err.message;
+        const validationErrors = err.error?.errors;
+        if (Array.isArray(validationErrors) && validationErrors.length > 0) {
+          this.error = validationErrors.map((e: any) => e.msg || e.message || e).join(', ');
+        } else {
+          this.error = err.error?.message || err.message || 'Failed to save genre.';
+        }
         this.saving = false;
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.message || 'Failed to save genre.' });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: this.error });
         this.cdr.markForCheck();
       }
     });
@@ -174,6 +184,11 @@ export class GenreManagementComponent implements OnInit {
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.page = 1;
+    this.cdr.markForCheck();
+  }
+
+  setViewMode(mode: 'table' | 'grid'): void {
+    this.viewMode = mode;
     this.cdr.markForCheck();
   }
 

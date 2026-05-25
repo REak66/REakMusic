@@ -118,10 +118,52 @@
         </span>
       </div>
 
-      <!-- Hierarchical TreeSelect -->
-      <p-treeselect formControlName="genres" [options]="genreTreeNodes" selectionMode="checkbox"
-        [metaKeySelection]="false" display="chip" placeholder="Select genres hierarchy..."
-        styleClass="w-full"></p-treeselect>
+      <!-- Hierarchical Checkboxes List -->
+      <div class="genres-checkbox-container" *ngIf="genres.length > 0">
+        <!-- When hierarchical tree is available -->
+        <ng-container *ngIf="genreTreeNodes[0]?.children && genreTreeNodes[0]?.children?.length; else flatGenres">
+          <div class="genre-category-group" *ngFor="let cat of genreTreeNodes">
+            <div class="category-header">
+              <label class="category-checkbox-label" 
+                     [class.selected]="isCategoryFullySelected(cat)" 
+                     [class.indeterminate]="isCategoryPartiallySelected(cat)">
+                <input type="checkbox" 
+                       [checked]="isCategoryFullySelected(cat)" 
+                       (change)="toggleCategoryGenres(cat)" />
+                <span class="checkbox-custom" 
+                      [class.indeterminate]="isCategoryPartiallySelected(cat)">
+                  <i class="fa-solid fa-check check-icon" *ngIf="isCategoryFullySelected(cat)"></i>
+                </span>
+                <span class="category-title">{{ cat.label }}</span>
+              </label>
+              <div class="category-line"></div>
+            </div>
+            <div class="category-genres-grid">
+              <label class="genre-checkbox-label" *ngFor="let sub of cat.children" [class.selected]="isGenreSelected(sub.key || '')">
+                <input type="checkbox" [checked]="isGenreSelected(sub.key || '')" (change)="toggleGenre(sub.key || '')" />
+                <span class="checkbox-custom">
+                  <i class="fa-solid fa-check check-icon" *ngIf="isGenreSelected(sub.key || '')"></i>
+                </span>
+                <span class="genre-name">{{ sub.label }}</span>
+              </label>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Flat list fallback -->
+        <ng-template #flatGenres>
+          <div class="category-genres-grid" style="padding-left: 0;">
+            <label class="genre-checkbox-label" *ngFor="let item of genreTreeNodes" [class.selected]="isGenreSelected(item.key || '')">
+              <input type="checkbox" [checked]="isGenreSelected(item.key || '')" (change)="toggleGenre(item.key || '')" />
+              <span class="checkbox-custom">
+                <i class="fa-solid fa-check check-icon" *ngIf="isGenreSelected(item.key || '')"></i>
+              </span>
+              <span class="genre-name">{{ item.label }}</span>
+            </label>
+          </div>
+        </ng-template>
+      </div>
+
       <p class="no-genres-hint" *ngIf="genres.length === 0" style="margin-top: 0.5rem; font-size: 0.8125rem;">
         <i class="fa-solid fa-tags"></i> No genres yet —
         <a routerLink="/admin/genres" (click)="showModal = false"

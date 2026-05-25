@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { ArtistService } from '../../../core/services/artist.service';
 import { Artist } from '../../../core/models';
 import { SelectOption } from '../../../shared/components/select-dropdown/select-dropdown.component';
@@ -72,7 +72,8 @@ export class ArtistManagementComponent implements OnInit {
     private artistService: ArtistService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) { }
 
   ngOnInit(): void {
@@ -153,10 +154,22 @@ export class ArtistManagementComponent implements OnInit {
       : this.artistService.createArtist(data);
 
     obs.subscribe({
-      next: () => { this.showModal = false; this.saving = false; this.load(); this.cdr.markForCheck(); },
-      error: (err: { error?: { message?: string } }) => {
-        this.error = err.error?.message || 'Failed.';
+      next: () => {
+        this.showModal = false;
         this.saving = false;
+        this.load();
+        this.messageService.add({ severity: 'success', summary: 'Success', detail: `Producer ${this.editingArtist ? 'updated' : 'saved'} successfully!` });
+        this.cdr.markForCheck();
+      },
+      error: (err: any) => {
+        const validationErrors = err.error?.errors;
+        if (Array.isArray(validationErrors) && validationErrors.length > 0) {
+          this.error = validationErrors.map((e: any) => e.msg || e.message || e).join(', ');
+        } else {
+          this.error = err.error?.message || err.message || 'Failed to save producer.';
+        }
+        this.saving = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: this.error });
         this.cdr.markForCheck();
       }
     });
@@ -182,6 +195,11 @@ export class ArtistManagementComponent implements OnInit {
               rejectVisible: false,
               styleClass: 'confirm-dialog--success'
             } as any);
+            this.cdr.detectChanges();
+          },
+          error: (err: any) => {
+            this.error = err.message || 'Failed to delete producer.';
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: this.error });
             this.cdr.detectChanges();
           }
         });

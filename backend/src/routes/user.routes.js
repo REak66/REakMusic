@@ -3,6 +3,12 @@ const multer = require('multer');
 const userController = require('../controllers/user.controller');
 const { authenticate } = require('../middleware/auth.middleware');
 const { requirePermission } = require('../middleware/rbac.middleware');
+const validate = require('../middleware/validate.middleware');
+const {
+  validateCreateUser,
+  validateUpdateUser,
+  validateUpdateMe,
+} = require('../utils/validators');
 
 const avatarUpload = multer({
   storage: multer.memoryStorage(),
@@ -18,11 +24,11 @@ const avatarUpload = multer({
 
 router.use(authenticate);
 router.get('/', requirePermission('users:manage'), userController.listUsers);
-router.post('/', requirePermission('users:manage'), userController.createUser);
-router.patch('/:id', requirePermission('users:manage'), userController.updateUser);
+router.post('/', requirePermission('users:manage'), validateCreateUser, validate, userController.createUser);
+router.patch('/:id', requirePermission('users:manage'), validateUpdateUser, validate, userController.updateUser);
 router.delete('/:id', requirePermission('users:manage'), userController.deleteUser);
 router.get('/me', userController.getMe);
-router.patch('/me', userController.updateMe);
+router.patch('/me', validateUpdateMe, validate, userController.updateMe);
 router.post('/me/avatar', avatarUpload.single('avatar'), userController.uploadAvatar);
 
 module.exports = router;

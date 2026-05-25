@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
-const { validationResult } = require('express-validator');
 const User = require('../models/User');
 const otpService = require('../services/otp.service');
 const emailService = require('../services/email.service');
@@ -26,9 +25,6 @@ const _storeGet = (map, key) => {
 
 exports.register = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { fullName, email, password, phone, role } = req.body;
 
     const existing = await User.findOne({ email });
@@ -87,9 +83,6 @@ exports.register = async (req, res, next) => {
 
 exports.verifyOtp = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { email, otp } = req.body;
 
     const locked = otpService.isLocked(email, 'otp:register');
@@ -119,9 +112,6 @@ exports.verifyOtp = async (req, res, next) => {
 
 exports.resendOtp = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { email } = req.body;
 
     const user = await User.findOne({ email });
@@ -143,9 +133,6 @@ exports.resendOtp = async (req, res, next) => {
 
 exports.login = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { email, password } = req.body;
 
     const user = await User.findOne({ email });
@@ -211,9 +198,6 @@ exports.logout = (req, res, next) => {
 
 exports.forgotPassword = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) return successResponse(res, null, 'If an account exists, an OTP has been sent.');
@@ -229,9 +213,6 @@ exports.forgotPassword = async (req, res, next) => {
 
 exports.verifyForgotOtp = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { email, otp } = req.body;
 
     const locked = otpService.isLocked(email, 'otp:forgot');
@@ -256,9 +237,6 @@ exports.verifyForgotOtp = async (req, res, next) => {
 
 exports.resetPassword = async (req, res, next) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return errorResponse(res, 'Validation failed', 400, errors.array());
-
     const { resetToken, password } = req.body;
     const email = _storeGet(resetTokenStore, resetToken);
     if (!email) return errorResponse(res, 'Invalid or expired reset token', 400);

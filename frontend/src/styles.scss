@@ -1127,14 +1127,57 @@ nav,
 .p-colorpicker-panel {
   background: var(--color-bg-elevated) !important;
   border: 1px solid var(--color-border-light) !important;
-  border-radius: var(--border-radius) !important;
+  border-radius: var(--border-radius-lg) !important;
   box-shadow: var(--shadow) !important;
   padding: 0.75rem !important;
+  width: 217px !important; /* 193px default width + 24px padding */
+  height: 190px !important; /* 166px default height + 24px padding */
+  box-sizing: border-box !important;
 }
 
 .p-colorpicker-inline {
   background: transparent !important;
   border: none !important;
+  display: inline-block !important;
+}
+
+/* Rounded color spectrum selector box */
+.p-colorpicker-color-selector {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+/* Rounded hue slider bar */
+.p-colorpicker-hue {
+  border-radius: 4px !important;
+  overflow: hidden !important;
+}
+
+/* Custom premium circular handle with high-contrast drop shadow */
+.p-colorpicker-color-handle {
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6) !important;
+  background: transparent !important;
+  cursor: pointer !important;
+  width: 12px !important;
+  height: 12px !important;
+  border-radius: 50% !important;
+  margin-left: -6px !important;
+  margin-top: -6px !important;
+}
+
+/* Custom premium pill-shaped hue handle */
+.p-colorpicker-hue-handle {
+  border: 2px solid #ffffff !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(2px) !important;
+  cursor: pointer !important;
+  height: 8px !important;
+  width: 21px !important;
+  margin-top: -4px !important;
+  margin-left: -2px !important;
 }
 
 /* ── PrimeNG p-select overrides ── */
