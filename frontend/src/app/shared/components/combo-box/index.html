@@ -1,0 +1,11 @@
+<tui-textfield tuiChevron>
+  <input
+    tuiComboBox
+    placeholder="Select an item"
+    [(ngModel)]="value"
+  />
+  <tui-data-list-wrapper
+    *tuiDropdown
+    [items]="items | tuiFilterByInput"
+  />
+</tui-textfield>

@@ -1,4 +1,5 @@
 <div class="auth-page">
+  <om-silk [color]="'#7c3aed'" [speed]="0.05" [scale]="0.8" [noiseIntensity]="1.2" class="auth-silk-bg"></om-silk>
   <div class="auth-card card">
     <h1 class="auth-title">{{ 'auth.verifyOtp' | translate }}</h1>
     <p class="otp-hint">{{ 'auth.otpSent' | translate }} <strong>{{ email }}</strong></p>
@@ -9,14 +10,8 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label>OTP Code</label>
-        <input
-          type="text"
-          formControlName="otp"
-          maxlength="6"
-          placeholder="000000"
-          class="otp-input"
-          [class.is-invalid]="form.get('otp')?.invalid && form.get('otp')?.touched"
-        />
+        <input type="text" formControlName="otp" maxlength="6" placeholder="000000" class="otp-input"
+          [class.is-invalid]="form.get('otp')?.invalid && form.get('otp')?.touched" />
       </div>
 
       <button type="submit" class="btn btn-primary btn-full" [disabled]="loading || form.invalid">

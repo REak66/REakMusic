@@ -31,12 +31,12 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
 import { AnimateOnScrollComponent } from './components/animate-on-scroll/animate-on-scroll.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { SkeletonComponent } from './components/skeleton/skeleton.component';
+import { ComboBoxComponent } from './components/combo-box/combo-box.component';
 
 @NgModule({
   declarations: [
     NavbarComponent,
     FooterComponent,
-    SelectDropdownComponent,
     ImageCropperComponent,
     PaginationComponent,
     ConfirmDialogComponent,
@@ -64,7 +64,9 @@ import { SkeletonComponent } from './components/skeleton/skeleton.component';
     BreadcrumbModule,
     ToastModule,
     MeterGroupModule,
-    ColorPickerModule
+    ColorPickerModule,
+    ComboBoxComponent,
+    SelectDropdownComponent
   ],
   exports: [
     NavbarComponent,
@@ -77,6 +79,7 @@ import { SkeletonComponent } from './components/skeleton/skeleton.component';
     ProgressBarComponent,
     SkeletonComponent,
     ScrollTopComponent,
+    ComboBoxComponent,
     CommonModule,
     RouterModule,
     FormsModule,

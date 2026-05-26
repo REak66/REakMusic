@@ -10,6 +10,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
+import { NgxSilkComponent } from '@omnedia/ngx-silk';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { SharedModule } from '../../shared/shared.module';
     RouterModule,
     TranslateModule,
     AuthRoutingModule,
-    SharedModule
+    SharedModule,
+    NgxSilkComponent
   ]
 })
 export class AuthModule {}

@@ -1,4 +1,5 @@
 <div class="auth-page">
+  <om-silk [color]="'#7c3aed'" [speed]="0.05" [scale]="0.8" [noiseIntensity]="1.2" class="auth-silk-bg"></om-silk>
   <div class="auth-card card">
     <a class="auth-logo" routerLink="/home">
       <div class="logo-icon"><i class="fa-solid fa-music"></i></div>
@@ -15,30 +16,18 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="form-group">
         <label>{{ "auth.email" | translate }}</label>
-        <input
-          type="email"
-          formControlName="email"
-          [class.is-invalid]="
+        <input type="email" formControlName="email" [class.is-invalid]="
             form.get('email')?.invalid && form.get('email')?.touched
-          "
-          placeholder="you@example.com"
-          autocomplete="email"
-        />
-        <span
-          class="error-msg"
-          *ngIf="
+          " placeholder="you@example.com" autocomplete="email" />
+        <span class="error-msg" *ngIf="
             form.get('email')?.touched &&
             form.get('email')?.hasError('required')
-          "
-        >
+          ">
           Email is required
         </span>
-        <span
-          class="error-msg"
-          *ngIf="
+        <span class="error-msg" *ngIf="
             form.get('email')?.touched && form.get('email')?.hasError('email')
-          "
-        >
+          ">
           Invalid email address
         </span>
       </div>
@@ -46,35 +35,18 @@
       <div class="form-group">
         <label>{{ "auth.password" | translate }}</label>
         <div class="password-wrapper">
-          <input
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            [class.is-invalid]="
+          <input [type]="showPassword ? 'text' : 'password'" formControlName="password" [class.is-invalid]="
               form.get('password')?.invalid && form.get('password')?.touched
-            "
-            placeholder="••••••••"
-            autocomplete="current-password"
-          />
-          <button
-            type="button"
-            class="password-toggle"
-            (click)="togglePassword()"
-            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
-          >
-            <i
-              class="fa-regular"
-              [class.fa-eye]="!showPassword"
-              [class.fa-eye-slash]="showPassword"
-            ></i>
+            " placeholder="••••••••" autocomplete="current-password" />
+          <button type="button" class="password-toggle" (click)="togglePassword()"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'">
+            <i class="fa-regular" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
           </button>
         </div>
-        <span
-          class="error-msg"
-          *ngIf="
+        <span class="error-msg" *ngIf="
             form.get('password')?.touched &&
             form.get('password')?.hasError('required')
-          "
-        >
+          ">
           Password is required
         </span>
       </div>
@@ -82,14 +54,10 @@
       <div class="auth-actions">
         <a routerLink="/auth/forgot-password">{{
           "auth.forgotPassword" | translate
-        }}</a>
+          }}</a>
       </div>
 
-      <button
-        type="submit"
-        class="btn btn-primary btn-full"
-        [disabled]="loading || form.invalid"
-      >
+      <button type="submit" class="btn btn-primary btn-full" [disabled]="loading || form.invalid">
         <span *ngIf="loading">{{ "common.loading" | translate }}</span>
         <span *ngIf="!loading">{{ "auth.login" | translate }}</span>
       </button>

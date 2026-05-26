@@ -1,229 +1,142 @@
 :host {
   display: block;
-  position: relative;
-  outline: none;
+  width: 100%;
 }
 
-.select-dropdown {
-  position: relative;
-  user-select: none;
-  outline: none;
-  z-index: 10;
+::ng-deep {
+  /* Override Taiga UI Textfield and ComboBox Styles to integrate with the REakMusic theme */
+  tui-textfield {
+    --tui-radius-m: var(--border-radius, 10px);
+    --tui-height-m: 48px;
+    --tui-height-s: 40px;
+    
+    background: rgba(28, 28, 46, 0.95) !important;
+    border: 1px solid rgba(124, 58, 237, 0.25) !important;
+    border-radius: var(--border-radius, 10px) !important;
+    color: var(--color-text-primary) !important;
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    overflow: hidden;
+    font-family: inherit;
 
-  &:focus-visible .select-trigger,
-  &:focus .select-trigger {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
-  }
+    &.is-compact {
+      --tui-height-m: 40px;
+      
+      input {
+        font-size: 0.875rem !important;
+      }
+    }
 
-  &.is-disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
+    &:hover {
+      border-color: var(--color-accent-light, #a78bfa) !important;
+      background: color-mix(in srgb, var(--color-bg-elevated) 96%, rgb(139 92 246) 4%) !important;
+    }
 
-    .select-trigger {
-      cursor: not-allowed;
-      pointer-events: none;
+    &[data-state="focused"],
+    &:focus-within {
+      border-color: var(--color-accent, #7c3aed) !important;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
+    }
+
+    /* Chevron icon color */
+    [tuiChevron],
+    .t-chevron {
+      color: var(--color-text-secondary) !important;
+      transition: transform var(--transition), color var(--transition);
     }
   }
-}
 
-.select-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  background: rgba(18, 18, 38, 0.95);
-  border: 1px solid rgba(124, 58, 237, 0.4);
-  border-radius: var(--border-radius);
-  padding: 0.8125rem 1rem;
-  cursor: pointer;
-  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
-  min-height: 48px;
+  /* Input styles */
+  input[tuiComboBox] {
+    color: var(--color-text-primary) !important;
+    font-family: inherit !important;
+    font-weight: 500 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 
-  .is-compact & {
-    padding: 0.5rem 0.75rem;
-    min-height: 40px;
+    &::placeholder {
+      color: var(--color-text-muted, #64748b) !important;
+      opacity: 1 !important;
+    }
+  }
+
+  /* Options list styling (appended to body or overlay) */
+  .tui-dropdown,
+  tui-dropdown,
+  .t-dropdown {
+    background: rgba(12, 12, 30, 0.98) !important;
+    backdrop-filter: blur(16px) saturate(180%) !important;
+    border: 1px solid rgba(124, 58, 237, 0.3) !important;
+    border-radius: var(--border-radius, 10px) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  tui-data-list,
+  .t-data-list {
+    background: transparent !important;
+    padding: 0.375rem !important;
+  }
+
+  /* Dropdown option styling */
+  button[tuiOption],
+  .t-option {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.625rem !important;
+    padding: 0.625rem 0.875rem !important;
+    border-radius: calc(var(--border-radius, 10px) - 2px) !important;
+    color: var(--color-text-primary) !important;
+    font-size: 0.875rem !important;
+    font-family: inherit !important;
+    transition: background var(--transition), color var(--transition) !important;
+    background: transparent !important;
+    border: none !important;
+    width: 100% !important;
+    text-align: left !important;
+    cursor: pointer !important;
+
+    &:hover,
+    &[data-state="focused"],
+    &:focus {
+      background: rgba(124, 58, 237, 0.2) !important;
+      color: var(--color-text-primary) !important;
+
+      .option-icon {
+        color: var(--color-accent-light, #a78bfa) !important;
+      }
+    }
+
+    &[aria-selected="true"] {
+      background: rgba(124, 58, 237, 0.25) !important;
+      font-weight: 600 !important;
+
+      .option-icon {
+        color: var(--color-accent-light, #a78bfa) !important;
+      }
+    }
+  }
+
+  /* Custom Option Content container */
+  .option-content-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .option-icon {
+    flex-shrink: 0;
+    width: 1rem;
+    text-align: center;
     font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    transition: color var(--transition);
   }
 
-  .is-open & {
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    background: color-mix(in srgb, var(--color-bg-elevated) 94%, rgb(124 58 237) 6%);
+  .option-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-
-  .has-value & {
-    border-color: rgba(139, 92, 246, 0.35);
-  }
-
-  &:hover {
-    border-color: var(--color-accent-light);
-    background: color-mix(in srgb, var(--color-bg-elevated) 96%, rgb(139 92 246) 4%);
-  }
-}
-
-.select-value {
-  flex: 1;
-  min-width: 0;
-  font-size: 0.9375rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  display: flex;
-  align-items: center;
-}
-
-.selected-content {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.selected-text {
-  color: var(--color-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.placeholder-text {
-  color: var(--color-text-muted);
-}
-
-.select-arrow {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  color: var(--color-text-secondary);
-  transition: transform var(--transition), color var(--transition);
-  font-size: 0.75rem;
-
-  .is-open & {
-    transform: rotate(180deg);
-    color: var(--color-accent-light);
-  }
-
-  .has-value & {
-    color: rgba(139, 92, 246, 0.7);
-  }
-}
-
-.select-panel {
-  position: absolute;
-  top: calc(100% + 0.25rem);
-  left: 0;
-  right: 0;
-  z-index: 100000;
-  background: rgba(12, 12, 30, 0.96);
-  border: 1px solid rgba(124, 58, 237, 0.35);
-  border-top: none;
-  border-bottom-left-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(124, 58, 237, 0.12);
-  max-height: 240px;
-  overflow-y: auto;
-  animation: dropdownSlide 0.15s ease;
-
-  // Custom scrollbar
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--color-border-light);
-    border-radius: 2px;
-  }
-}
-
-@keyframes dropdownSlide {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.select-list {
-  padding: 0.375rem;
-}
-
-.select-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: calc(var(--border-radius) - 2px);
-  cursor: pointer;
-  transition: background var(--transition), color var(--transition);
-  font-size: 0.875rem;
-  color: var(--color-text-primary);
-
-  &:hover,
-  &.is-focused {
-    background: rgba(124, 58, 237, 0.2);
-    color: var(--color-text-primary);
-
-    .option-icon {
-      color: var(--color-accent-light);
-    }
-  }
-
-  &.is-selected {
-    background: rgba(124, 58, 237, 0.25);
-    color: var(--color-text-primary);
-    font-weight: 600;
-
-    .option-icon {
-      color: var(--color-accent-light);
-    }
-  }
-
-  &.is-disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-}
-
-.option-content {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  flex: 1;
-  overflow: hidden;
-}
-
-.option-icon {
-  flex-shrink: 0;
-  width: 1rem;
-  text-align: center;
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  transition: color var(--transition);
-}
-
-.option-label {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.option-check {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  color: var(--color-accent-light);
-  font-size: 0.75rem;
 }

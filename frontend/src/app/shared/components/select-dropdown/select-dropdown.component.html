@@ -1,58 +1,25 @@
-<div
-  class="select-dropdown"
-  [class.is-open]="isOpen"
-  [class.is-disabled]="disabled"
-  [class.has-value]="selectedValue !== null"
+<tui-textfield
+  [tuiChevron]="true"
   [class.is-compact]="compact"
-  [attr.tabindex]="disabled ? -1 : 0"
   [attr.id]="id || null"
-  role="combobox"
-  [attr.aria-expanded]="isOpen"
-  [attr.aria-haspopup]="'listbox'"
-  [attr.aria-disabled]="disabled"
+  [stringify]="stringify"
 >
-  <!-- Trigger -->
-  <div class="select-trigger" (click)="toggle(); $event.stopPropagation()">
-    <span class="select-value">
-      <ng-container *ngIf="selectedLabel; else showPlaceholder">
-        <span class="selected-content">
-          <i *ngIf="selectedIcon" [class]="selectedIcon" class="option-icon"></i>
-          <span class="selected-text">{{ selectedLabel }}</span>
-        </span>
-      </ng-container>
-      <ng-template #showPlaceholder>
-        <span class="placeholder-text">{{ placeholder }}</span>
-      </ng-template>
-    </span>
-    <span class="select-arrow">
-      <i class="fa-solid fa-chevron-down"></i>
-    </span>
-  </div>
+  <input
+    tuiComboBox
+    [formControl]="control"
+    [placeholder]="placeholder"
+    (blur)="onBlur()"
+  />
+  <tui-data-list-wrapper
+    *tuiDropdown
+    [items]="options | tuiFilterByInput"
+    [itemContent]="optionTemplate"
+  />
+</tui-textfield>
 
-  <!-- Dropdown Panel -->
-  <div class="select-panel" role="listbox" *ngIf="isOpen" (click)="$event.stopPropagation()">
-    <ul class="select-list">
-      <li
-        *ngFor="let option of options; let i = index"
-        class="select-option"
-        [class.is-selected]="isSelected(option)"
-        [class.is-focused]="focusedIndex === i"
-        [class.is-disabled]="option.disabled"
-        role="option"
-        [attr.aria-selected]="isSelected(option)"
-        [attr.aria-disabled]="option.disabled"
-        (mousedown)="onOptionMouseDown($event)"
-        (click)="onOptionClick(option, $event)"
-        (mouseenter)="focusedIndex = i"
-      >
-        <span class="option-content">
-          <i *ngIf="option.icon" [class]="option.icon" class="option-icon"></i>
-          <span class="option-label">{{ option.label }}</span>
-        </span>
-        <span class="option-check" *ngIf="isSelected(option)">
-          <i class="fa-solid fa-check"></i>
-        </span>
-      </li>
-    </ul>
-  </div>
-</div>
+<ng-template #optionTemplate let-item>
+  <span class="option-content-wrapper">
+    <i *ngIf="item.icon" [class]="item.icon" class="option-icon"></i>
+    <span class="option-label">{{ item.label }}</span>
+  </span>
+</ng-template>

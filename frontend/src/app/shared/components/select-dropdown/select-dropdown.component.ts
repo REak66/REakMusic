@@ -4,14 +4,17 @@ import {
     Output,
     EventEmitter,
     forwardRef,
-    HostListener,
-    ElementRef,
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     OnChanges,
-    SimpleChanges
+    SimpleChanges,
+    DestroyRef,
+    inject
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { TuiFilterByInputPipe, TuiTextfield, TuiDropdown } from '@taiga-ui/core';
+import { TuiChevron, TuiComboBox, TuiDataListWrapper } from '@taiga-ui/kit';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface SelectOption {
     value: any;
@@ -21,8 +24,18 @@ export interface SelectOption {
 }
 
 @Component({
-    standalone: false,
     selector: 'app-select-dropdown',
+    standalone: true,
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        TuiChevron,
+        TuiComboBox,
+        TuiDataListWrapper,
+        TuiFilterByInputPipe,
+        TuiTextfield,
+        TuiDropdown,
+    ],
     templateUrl: './select-dropdown.component.html',
     styleUrls: ['./select-dropdown.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,140 +55,47 @@ export class SelectDropdownComponent implements ControlValueAccessor, OnChanges 
     @Input() compact = false;
     @Output() selectionChange = new EventEmitter<any>();
 
-    isOpen = false;
-    selectedValue: any = null;
-    focusedIndex = -1;
+    // Internal form control to bind with TuiComboBox
+    protected readonly control = new FormControl<SelectOption | null>(null);
+
+    protected readonly stringify = (item: SelectOption): string => item?.label || '';
 
     private onChange: (value: any) => void = () => { };
     private onTouched: () => void = () => { };
+    private readonly destroyRef = inject(DestroyRef);
 
-    constructor(private elRef: ElementRef, private cdr: ChangeDetectorRef) { }
+    constructor() {
+        // Subscribe to internal control changes and propagate primitive value to parent
+        this.control.valueChanges
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe(option => {
+                const rawValue = option ? option.value : null;
+                this.onChange(rawValue);
+                this.selectionChange.emit(rawValue);
+            });
+    }
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes['options'] && this.selectedValue !== null) {
-            const exists = this.options.some(o => o.value === this.selectedValue);
+        if (changes['disabled']) {
+            if (this.disabled) {
+                this.control.disable({ emitEvent: false });
+            } else {
+                this.control.enable({ emitEvent: false });
+            }
+        }
+        if (changes['options'] && this.control.value) {
+            // Check if the current value is still a valid option in the new list
+            const exists = this.options.some(o => o.value === this.control.value?.value);
             if (!exists) {
-                this.selectedValue = null;
+                this.control.setValue(null, { emitEvent: true });
             }
         }
     }
 
-    get selectedLabel(): string {
-        const opt = this.options.find(o => o.value === this.selectedValue);
-        return opt ? opt.label : '';
-    }
-
-    get selectedIcon(): string {
-        const opt = this.options.find(o => o.value === this.selectedValue);
-        return opt?.icon ?? '';
-    }
-
-    toggle(): void {
-        if (this.disabled) return;
-        this.isOpen = !this.isOpen;
-        if (this.isOpen) {
-            this.focusedIndex = this.options.findIndex(o => o.value === this.selectedValue);
-            if (this.focusedIndex < 0) this.focusedIndex = 0;
-        }
-        this.cdr.markForCheck();
-    }
-
-    select(option: SelectOption): void {
-        if (option.disabled) return;
-        this.selectedValue = option.value;
-        this.onChange(option.value);
-        this.onTouched();
-        this.selectionChange.emit(option.value);
-        this.cdr.markForCheck();
-        // Defer close so the panel stays in DOM during the click event cycle.
-        // This ensures stopPropagation on the <li> fires before Angular removes the panel.
-        setTimeout(() => {
-            this.isOpen = false;
-            this.cdr.markForCheck();
-        }, 0);
-    }
-
-    isSelected(option: SelectOption): boolean {
-        return this.selectedValue === option.value;
-    }
-
-    onOptionMouseDown(event: MouseEvent): void {
-        // Prevent focus loss on mousedown; selection is handled by the click event.
-        event.preventDefault();
-        event.stopPropagation();
-    }
-
-    onOptionClick(option: SelectOption, event: MouseEvent): void {
-        event.stopPropagation();
-        this.select(option);
-    }
-
-    @HostListener('document:click', ['$event'])
-    onDocumentClick(event: MouseEvent): void {
-        if (!this.elRef.nativeElement.contains(event.target)) {
-            if (this.isOpen) {
-                this.isOpen = false;
-                this.cdr.markForCheck();
-            }
-        }
-    }
-
-    @HostListener('keydown', ['$event'])
-    onKeyDown(event: KeyboardEvent): void {
-        if (this.disabled) return;
-
-        switch (event.key) {
-            case 'Enter':
-            case ' ':
-                event.preventDefault();
-                if (!this.isOpen) {
-                    this.toggle();
-                } else if (this.focusedIndex >= 0 && this.focusedIndex < this.options.length) {
-                    this.select(this.options[this.focusedIndex]);
-                }
-                break;
-            case 'ArrowDown':
-                event.preventDefault();
-                if (!this.isOpen) {
-                    this.toggle();
-                } else {
-                    this.moveFocus(1);
-                }
-                break;
-            case 'ArrowUp':
-                event.preventDefault();
-                if (this.isOpen) {
-                    this.moveFocus(-1);
-                }
-                break;
-            case 'Escape':
-                this.isOpen = false;
-                this.cdr.markForCheck();
-                break;
-            case 'Tab':
-                if (this.isOpen) {
-                    this.isOpen = false;
-                    this.cdr.markForCheck();
-                }
-                break;
-        }
-    }
-
-    private moveFocus(direction: 1 | -1): void {
-        let next = this.focusedIndex + direction;
-        while (next >= 0 && next < this.options.length && this.options[next].disabled) {
-            next += direction;
-        }
-        if (next >= 0 && next < this.options.length) {
-            this.focusedIndex = next;
-            this.cdr.markForCheck();
-        }
-    }
-
-    // ControlValueAccessor
+    // ControlValueAccessor methods
     writeValue(value: any): void {
-        this.selectedValue = value ?? null;
-        this.cdr.markForCheck();
+        const option = this.options.find(o => o.value === value) || null;
+        this.control.setValue(option, { emitEvent: false });
     }
 
     registerOnChange(fn: (value: any) => void): void {
@@ -188,6 +108,14 @@ export class SelectDropdownComponent implements ControlValueAccessor, OnChanges 
 
     setDisabledState(isDisabled: boolean): void {
         this.disabled = isDisabled;
-        this.cdr.markForCheck();
+        if (isDisabled) {
+            this.control.disable({ emitEvent: false });
+        } else {
+            this.control.enable({ emitEvent: false });
+        }
+    }
+
+    onBlur(): void {
+        this.onTouched();
     }
 }

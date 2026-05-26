@@ -14,6 +14,7 @@ import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 import { PlayerModule } from './features/player/player.module';
 import { AuthService } from './core/services/auth.service';
+import { TuiRoot, provideTaiga } from '@taiga-ui/core';
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -35,6 +36,7 @@ function initAuth(authService: AuthService) {
     CoreModule,
     SharedModule,
     PlayerModule,
+    TuiRoot,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
@@ -46,6 +48,7 @@ function initAuth(authService: AuthService) {
   ],
   providers: [
     providePrimeNG({ theme: { preset: Aura } }),
+    provideTaiga(),
     {
       provide: APP_INITIALIZER,
       useFactory: initAuth,

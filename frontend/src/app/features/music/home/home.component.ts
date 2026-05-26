@@ -61,14 +61,14 @@ export class HomeComponent implements OnInit {
 
     this.genreService.getGenres().subscribe({
       next: res => {
-        this.genres = Array.isArray(res) ? res.slice(0, 8) : [];
+        this.genres = Array.isArray(res) ? res.slice(0, 100) : [];
         this.genresLoading = false;
         this.cdr.markForCheck();
       },
       error: () => { this.genresLoading = false; this.cdr.markForCheck(); }
     });
 
-    this.artistService.getArtists({ limit: 6 }).subscribe({
+    this.artistService.getArtists({ limit: 10 }).subscribe({
       next: (res: any) => {
         this.artists = res.data?.artists || [];
         this.artistsLoading = false;

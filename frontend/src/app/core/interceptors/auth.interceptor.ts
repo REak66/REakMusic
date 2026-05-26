@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import {
   HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse
 } from '@angular/common/http';
@@ -8,23 +8,21 @@ import { AuthService } from '../services/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  private cachedToken: string | null = null;
+  private authService: AuthService | null = null;
 
-  constructor(private authService: AuthService) {
-    // Keep cachedToken in sync with login/logout events reactively
-    this.authService.currentUser$.subscribe(() => {
-      this.cachedToken = localStorage.getItem('token');
-    });
+  constructor(private injector: Injector) {}
+
+  private getAuthService(): AuthService {
+    if (!this.authService) {
+      this.authService = this.injector.get(AuthService);
+    }
+    return this.authService;
   }
 
   intercept(req: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    const token = localStorage.getItem('token');
     let authReq = req;
     
-    if (!this.cachedToken) {
-      this.cachedToken = localStorage.getItem('token');
-    }
-    
-    const token = this.cachedToken;
     if (token) {
       authReq = req.clone({
         headers: req.headers.set('Authorization', `Bearer ${token}`)
@@ -34,10 +32,11 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401 && !req.url.includes('/auth/login')) {
-          this.authService.clearSession();
+          this.getAuthService().clearSession();
         }
         return throwError(() => error);
       })
     );
   }
 }
+

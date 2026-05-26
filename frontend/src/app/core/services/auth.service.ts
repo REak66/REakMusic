@@ -109,7 +109,13 @@ export class AuthService implements OnDestroy {
     this.stopSessionTimer();
     this.currentUserSubject.next(null);
     const queryParams = messageKey ? { messageKey } : {};
-    this.router.navigate(['/auth/login'], { queryParams });
+    // Use setTimeout to defer navigation to the next macrotask tick.
+    // This prevents Angular bootstrapping crashes during APP_INITIALIZER if clearSession is called on startup.
+    setTimeout(() => {
+      this.router.navigate(['/auth/login'], { queryParams }).catch(err => {
+        console.error('Navigation to login failed:', err);
+      });
+    });
   }
 
   /** Returns true if the login session has exceeded the JWT expiry or fallback login timeout. */
